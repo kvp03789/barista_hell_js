@@ -74,10 +74,6 @@ export default class Character{
         
     }
 
-    run = () => {
-        this.handleMovement()
-    }
-
     handleMovement = () => {
         let newAnimation = null
 
@@ -131,6 +127,9 @@ export default class Character{
             this.sprite.play()
             this.currentAnimation = newAnimation
         }
-        
+    }
+
+    run = () => {
+        this.handleMovement()
     }
 }

@@ -1,12 +1,11 @@
 import * as PIXI from 'pixi.js'
+import { settings } from './settings'
 import { assetsManifest } from './assetsManifest'
 import Character from './code/Character'
 import Cafe from './code/Cafe'
 import './styles/main.css'
 
-//global constants
-const WIDTH = 800
-const HEIGHT = 600
+
 const body = document.querySelector('body')
 
 class Application{
@@ -21,19 +20,16 @@ class Application{
         globalThis.__PIXI_APP__ = this.app;
 
         this.state_manager = new State_Manager('cafe')
-
-        
     }
 
     async init(){
-        await this.app.init({width: WIDTH, height: HEIGHT, preference: 'webgl'})
+        await this.app.init({width: settings.SCREEN_WIDTH, height: settings.SCREEN_HEIGHT, preference: 'webgl'})
         body.append(this.app.canvas)
         await PIXI.Assets.init({manifest: assetsManifest})
-        this.spritesheetAssets = await PIXI.Assets.loadBundle('character_spritesheets');
 
-        this.cafe = new Cafe(this.app)
+        this.cafe = new Cafe(this.app, this.keysObject)
         this.statesObject = {
-            'cafe': this.cafesad
+            'cafe': this.cafe
         }
         await this.statesObject[this.state_manager.currentState].initMap()
         this.app.ticker.add(this.statesObject[this.state_manager.currentState].run)
