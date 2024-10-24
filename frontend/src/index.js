@@ -12,7 +12,7 @@ class Application{
     constructor(){
         this.app = new PIXI.Application()
         this.ticker = new PIXI.Ticker()
-
+        // this.app.stage.scale.set(1.5)
         //object for storing keys currently being pressed
         this.keysObject = {}
 
@@ -34,8 +34,6 @@ class Application{
         await this.statesObject[this.state_manager.currentState].initMap()
         this.app.ticker.add(this.statesObject[this.state_manager.currentState].run)
         
-        
-
         //key events
         window.addEventListener("keydown", e => this.handleKeyDown(e))
         window.addEventListener("keyup", e => this.handleKeyUp(e))
