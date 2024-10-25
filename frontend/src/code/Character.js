@@ -1,21 +1,20 @@
-import { Spritesheet, AnimatedSprite, Texture, Assets, Application } from "pixi.js";
+import { Spritesheet, AnimatedSprite } from "pixi.js";
 import { characterIdleData, charcterRunRightData, charcterRunLeftData, characterRunDownData, characterRunUpData } from "../json/character/characterSpriteData";
 import { spritesAreColliding } from "../utils";
-import { settings } from '../settings'
+import { Inventory, Equipment } from "./ItemsInventoryEquipment.js";
 
 export default class Character{
-    constructor(app, keysObject, spritesheetAssets, x_pos, y_pos, obstacleSprites){
+    constructor(app, keysObject, spritesheetAssets, itemAssets, x_pos, y_pos, obstacleSprites, mousePos){
         this.app = app
         this.keysObject = keysObject
         this.spritesheetAssets = spritesheetAssets
+        this.itemAssets = itemAssets
 
         this.x_pos = x_pos
         this.y_pos = y_pos
 
         //movement
         this.speed = 7
-        this.dx = 0
-        this.dy = 0
         
         //movement vector
         this.movement = { x: 0, y: 0 };
@@ -24,6 +23,9 @@ export default class Character{
 
         this.obstacleSprites = obstacleSprites
 
+        this.mousePos = {x: 0, y: 0}
+
+        this.keyboardCooldown = 0
     }
 
     addSpriteToGroups = (group) => {
@@ -83,15 +85,60 @@ export default class Character{
         this.sprite.x = this.x_pos
         this.sprite.y = this.y_pos
         this.sprite.label = 'Character'
-        console.log('Character Sprite:', this.sprite);
-        // this.sprite.scale.set(1.5, 1.5)
-        // this.sprite.anchor.set(0.5)
+        this.sprite.hitboxWidth = this.sprite.width
+        this.sprite.hitboxHeight = this.sprite.height - 10
         this.rect = this.sprite.getBounds()
-
+        //initialize mousePos to prevent error
+        this.mousePos = {x: this.sprite.x, y: this.sprite.y}
+        //initialize player inventory
+        this.inventory = new Inventory(this.app, this, this.itemAssets)
+        //initialize player equipment, along with weaponSlots and equipmentSlots
+        this.equipment = new Equipment(this.app, this, this.itemAssets)
+        this.weaponSlots = this.equipment.weaponSlots
+        this.equipmentSlots = this.equipment.equipmentSlots
+        //set active weapon index
+        this.activeWeaponIndex = 0
+        this.activeWeapon = this.weaponSlots[this.activeWeaponIndex].item
+        
         //add character sprite to visible sprite group
         this.addSpriteToGroups(group)
 
+        //add active weapon sprite to stage as child of character
+        this.sprite.addChild(this.activeWeapon.sprite)
+
         this.sprite.play()
+    }
+
+    //returns bool if a non movement key is pressed
+    isKeyPressed = () => {
+        if(
+            this.keysObject[69] || //e key
+            this.keysObject[16]    //left shift key
+        ){
+            return true
+        }
+        else return false
+    }
+
+    handleActionKeyPress = () => {
+        if(this.keysObject[69]){
+            console.log("E key pressed!")
+            this.setActiveWeaponIndex()
+        }
+        else if(this.keysObject[16]){
+            console.log("LSHIFT key pressed!")
+        }
+    }
+
+    setActiveWeaponIndex = () => {
+        //first change the activeWeaponIndex
+        this.activeWeaponIndex == 0 ? this.activeWeaponIndex = 1 : this.activeWeaponIndex = 0
+        //remove old weapon sprite from character sprite
+        this.sprite.removeChild(this.activeWeapon.sprite)
+        //set new active weapon
+        this.activeWeapon = this.weaponSlots[this.activeWeaponIndex].item
+        //add active weapon to stage as child of character sprite
+        this.sprite.addChild(this.activeWeapon.sprite)
     }
 
     handleMovement = () => {
@@ -147,85 +194,30 @@ export default class Character{
             this.currentAnimation = newAnimation
         }
     }
-
-  
-    // checkCollision = (direction) => {
-    //     if (direction === 'horizontal') {
-    //         // Check horizontal collision
-    //         this.obstacleSprites.children.forEach(obstacle => {
-    //             const obstacleBounds = obstacle.getBounds();
-    //             // Adjust obstacle bounds based on camera offset
-    //             obstacleBounds.x += this.obstacleSprites.offset.x;
-    //             obstacleBounds.y += this.obstacleSprites.offset.y;
-    
-    //             const spriteBounds = this.sprite.getBounds();
-    
-    //             if (spritesAreColliding(spriteBounds, obstacleBounds)) {
-    //                 console.log('DEBUG 1: ', this.sprite.x, this.sprite.y, obstacleBounds)
-    //                 if (this.movement.x > 0) { // Moving right
-    //                     this.sprite.x = obstacleBounds.x - spriteBounds.width; // prevent moving past the obstacle
-    //                     this.movement.x = 0
-    //                     this.movement.y = 0
-    //                 }
-    //                 if (this.movement.x < 0) { // Moving left
-    //                     this.sprite.x = obstacleBounds.x + obstacleBounds.width; // prevent moving past the obstacle
-    //                     this.movement.x = 0
-    //                     this.movement.y = 0
-    //                 }
-    //                 console.log('DEBUG 2: ', this.sprite.x, this.sprite.y, obstacleBounds)
-    //             }
-    //         });
-    //     } 
-
-    //     if (direction === 'vertical') {
-    //         // Check vertical collision
-    //         this.obstacleSprites.children.forEach(obstacle => {
-    //             const obstacleBounds = obstacle.getBounds();
-    //             // Adjust obstacle bounds based on camera offset
-    //             obstacleBounds.x += this.obstacleSprites.offset.x;
-    //             obstacleBounds.y += this.obstacleSprites.offset.y;
-    
-    //             const spriteBounds = this.sprite.getBounds();
-    //             if (spritesAreColliding(spriteBounds, obstacleBounds)) {
-    //                 console.log('DEBUG 1: ', this.sprite.x, this.sprite.y, obstacleBounds)
-    //                 if (this.movement.y > 0) { // Moving down
-    //                     this.sprite.y = obstacleBounds.y - spriteBounds.height; // Prevent moving past the obstacle
-    //                     this.movement.x = 0
-    //                     this.movement.y = 0
-    //                 }
-    //                 if (this.movement.y < 0) { // Moving up
-    //                     this.sprite.y = obstacleBounds.y + obstacleBounds.height; // Prevent moving past the obstacle
-    //                     this.movement.x = 0
-    //                     this.movement.y = 0
-    //                 }
-    //                 console.log('DEBUG 2: ', this.sprite.x, this.sprite.y, obstacleBounds)
-    //             }
-    //         });
-    //     }
-    // }
     
     checkCollision = (direction) => {
+        //the hitbox of the char sprite
         const spriteBounds = {
-            x: this.sprite.x ,
-            y: this.sprite.y ,
-            width: this.sprite.width ,
-            height: this.sprite.height 
+            x: this.sprite.x,
+            y: this.sprite.y,
+            width: this.sprite.hitboxWidth,
+            height: this.sprite.hitboxHeight 
         }
     
         if (direction === 'horizontal') {
             this.obstacleSprites.children.forEach(obstacle => {
-                const obstacleBounds = {
+                const obstacleHitboxBounds = {
                     x: (obstacle.x) ,
                     y: (obstacle.y) ,
                     width: obstacle.width ,
-                    height: obstacle.height 
+                    height: obstacle.height - 10 
                 }
     
-                if (spritesAreColliding(spriteBounds, obstacleBounds)) {
+                if (spritesAreColliding(spriteBounds, obstacleHitboxBounds)) {
                     if (this.movement.x > 0) { // moving right
-                        this.sprite.x = obstacleBounds.x - spriteBounds.width; // snap to the left of the obstacle
+                        this.sprite.x = obstacleHitboxBounds.x - spriteBounds.width; // snap to the left of the obstacle
                     } else if (this.movement.x < 0) { // moving left
-                        this.sprite.x = obstacleBounds.x + obstacleBounds.width; // snap to the right of the obstacle
+                        this.sprite.x = obstacleHitboxBounds.x + obstacleHitboxBounds.width; // snap to the right of the obstacle
                     }
                     this.movement.x = 0; // stop horizontal movement on collision
                 }
@@ -234,18 +226,18 @@ export default class Character{
     
         if (direction === 'vertical') {
             this.obstacleSprites.children.forEach(obstacle => {
-                const obstacleBounds = {
+                const obstacleHitboxBounds = {
                     x: (obstacle.x) ,
                     y: (obstacle.y) ,
                     width: obstacle.width ,
-                    height: obstacle.height 
+                    height: obstacle.height - 10 
                 }
     
-                if (spritesAreColliding(spriteBounds, obstacleBounds)) {
+                if (spritesAreColliding(spriteBounds, obstacleHitboxBounds)) {
                     if (this.movement.y > 0) { // moving down
-                        this.sprite.y = obstacleBounds.y - spriteBounds.height; // snap to the top of obstacle
+                        this.sprite.y = obstacleHitboxBounds.y - spriteBounds.height; // snap to the top of obstacle
                     } else if (this.movement.y < 0) { // moving up
-                        this.sprite.y = obstacleBounds.y + obstacleBounds.height; // snap to the bottom of obstacle
+                        this.sprite.y = obstacleHitboxBounds.y + obstacleHitboxBounds.height; // snap to the bottom of obstacle
                     }
                     this.movement.y = 0; // stop horizontal movement on collision
                 }
@@ -253,8 +245,34 @@ export default class Character{
         }
     }
     
+    getAngle = (mousePos) => {
+        if(mousePos.x && mousePos.y){
+            const dx = mousePos.x - this.sprite.x
+            const dy = mousePos.y - this.sprite.y
+            //calculate angle and convert from rads to degrees
+            const angle = (Math.atan2(dy, dx) * 180) / Math.PI
+            return angle
+        }
+    }
 
-    run = () => {
+    run = (mousePos) => {
         this.handleMovement()
+
+        //update mousePos
+        this.mousePos = mousePos    
+        
+        //cooldowns for key presses
+        if(this.isKeyPressed() && this.keyboardCooldown == 0){
+            this.handleActionKeyPress()
+            this.keyboardCooldown = 20
+        }
+        if(this.keyboardCooldown !== 0){
+            this.keyboardCooldown -= 1
+        }
+        this.keyboardCooldown
+
+        //get angle for weapon sprite and char sprite rotation
+        let angle = this.getAngle(mousePos)
+        this.activeWeapon.run(angle)
     }
 }

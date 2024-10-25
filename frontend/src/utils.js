@@ -1,5 +1,5 @@
 import parse from "parse-svg-path"
-import { settings } from "./settings"
+import { TILE_WIDTH, TILE_HEIGHT } from "./settings"
 
 //parse map data from 1d array into 2d array 
 export function parseMapData(mapData) {
@@ -25,4 +25,12 @@ export function spritesAreColliding(rect1, rect2){
             rect1.x < rect2Right &&     // rect1's left edge is before rect2's right edge
             rect1Bottom > rect2.y &&    // rect1's bottom edge is below rect2's top edge
             rect1.y < rect2Bottom;      // rect1's top edge is above rect2's bottom edge
+}
+
+//derive x and y for slicing tilemap png tiles
+export function getXYSlice(tileId, rowWidth){
+    return {
+        x: (Math.floor(tileId / rowWidth) * TILE_WIDTH) + (tileId % rowWidth * TILE_WIDTH),
+        y: (Math.floor(tileId / rowWidth) * TILE_HEIGHT)
+    }
 }

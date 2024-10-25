@@ -1,5 +1,5 @@
 import { Container } from "pixi.js";
-import { settings } from "../settings";
+import { ZOOM_FACTOR } from "../settings";
 
 export default class YSortCameraSpriteGroup extends Container{
     constructor(app){
@@ -21,10 +21,11 @@ export default class YSortCameraSpriteGroup extends Container{
         this.offset.y = player.y + (player.height / 2) - this.half_height
         
         // update position of each child sprite based oncalculated offset
-        this.children.forEach(sprite => {
-            sprite.x -= this.offset.x * settings.ZOOM_FACTOR
-            sprite.y -= this.offset.y * settings.ZOOM_FACTOR
-            sprite.scale.set(settings.ZOOM_FACTOR)
+        let sortedSprites = this.children.sort((a, b) => a.y - b.y)
+        sortedSprites.forEach(sprite => {
+            sprite.x -= this.offset.x * ZOOM_FACTOR
+            sprite.y -= this.offset.y * ZOOM_FACTOR
+            sprite.scale.set(ZOOM_FACTOR)
 
         })
     }

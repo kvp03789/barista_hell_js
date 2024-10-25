@@ -1,8 +1,8 @@
-import { settings } from "../settings"
+import { TILE_HEIGHT, TILE_WIDTH } from "../settings"
 
 export const cafeMapData = {
-    tileHeight: settings.TILE_HEIGHT,
-    tilewidth: settings.TILE_WIDTH,
+    tileHeight: TILE_HEIGHT,
+    tilewidth: TILE_WIDTH,
     height: 28,
     width:28,
     renderOrientation:"orthogonal",

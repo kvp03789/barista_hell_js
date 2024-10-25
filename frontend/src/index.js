@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js'
-import { settings } from './settings'
+import { SCREEN_WIDTH, SCREEN_HEIGHT } from './settings'
 import { assetsManifest } from './assetsManifest'
 import Character from './code/Character'
 import Cafe from './code/Cafe'
@@ -12,6 +12,7 @@ class Application{
     constructor(){
         this.app = new PIXI.Application()
         this.ticker = new PIXI.Ticker()
+        
         // this.app.stage.scale.set(1.5)
         //object for storing keys currently being pressed
         this.keysObject = {}
@@ -23,7 +24,7 @@ class Application{
     }
 
     async init(){
-        await this.app.init({width: settings.SCREEN_WIDTH, height: settings.SCREEN_HEIGHT, preference: 'webgl'})
+        await this.app.init({width: SCREEN_WIDTH, height: SCREEN_HEIGHT, preference: 'webgl'})
         body.append(this.app.canvas)
         await PIXI.Assets.init({manifest: assetsManifest})
 

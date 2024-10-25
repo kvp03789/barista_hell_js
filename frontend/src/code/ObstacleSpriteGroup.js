@@ -1,5 +1,5 @@
 import { Container } from "pixi.js";
-import { settings } from "../settings";
+import { ZOOM_FACTOR } from "../settings";
 
 export default class ObstacleSpriteGroup extends Container{
     constructor(app){
@@ -21,9 +21,9 @@ export default class ObstacleSpriteGroup extends Container{
         // update position of each child sprite based oncalculated offset
         this.children.forEach(sprite => {
             
-            sprite.x -= this.offset.x * settings.ZOOM_FACTOR
-            sprite.y -= this.offset.y * settings.ZOOM_FACTOR
-            sprite.scale.set(settings.ZOOM_FACTOR)
+            sprite.x -= this.offset.x * ZOOM_FACTOR
+            sprite.y -= this.offset.y * ZOOM_FACTOR
+            sprite.scale.set(ZOOM_FACTOR)
 
             //reduce alpha for obstacles:
             sprite.alpha = 0
