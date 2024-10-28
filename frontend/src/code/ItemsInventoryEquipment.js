@@ -1,5 +1,5 @@
 import { Sprite } from "pixi.js"
-import { PLAYER_SETTINGS, ALL_WEAPON_TYPES } from "../settings"
+import { PLAYER_SETTINGS, WEAPON_SETTINGS } from "../settings"
 import { BattleRifle, Shotgun } from "./item_classes/Weapons"
 
 export class Item{
@@ -68,14 +68,14 @@ export class Equipment{
     //into an object. facilitates passing textures to weapon classes
     parseWeaponAssets = () => {
         const texturesObject = {}
-        ALL_WEAPON_TYPES.forEach((type, i) => {
-            texturesObject[type] = {}
-            for (let key in this.weaponAssets){
-                if(key.startsWith(type)){
-                    texturesObject[type][key] = this.weaponAssets[key]
+        for(let key1 in WEAPON_SETTINGS){
+            texturesObject[key1] = {}
+            for (let key2 in this.weaponAssets){
+                if(key2.startsWith(key1)){
+                    texturesObject[key1][key2] = this.weaponAssets[key2]
                 }
             }
-        })
+        }
         return texturesObject
     }
 

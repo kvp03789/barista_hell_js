@@ -34,3 +34,8 @@ export function getXYSlice(tileId, rowWidth){
         y: (Math.floor(tileId / rowWidth) * TILE_HEIGHT)
     }
 }
+
+//generate random number between min and max
+export function randomNumber(min, max){
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}

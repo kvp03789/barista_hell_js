@@ -6,6 +6,8 @@ import Character from './Character'
 import YSortCameraSpriteGroup from './YSortCameraSpriteGroup'
 import ObstacleSpriteGroup from './ObstacleSpriteGroup'
 import Tile from './Tile'
+import ParticleManager from './Particles'
+import BulletManager from './BulletManager'
 
 export default class Cafe{
     constructor(app, keysObject){
@@ -21,6 +23,7 @@ export default class Cafe{
         //sprite group/container
         this.visibleSprites = new YSortCameraSpriteGroup(this.app)
         this.obstacleSprites = new ObstacleSpriteGroup(this.app)
+        
     }
 
     onMouseMove = (e) => {
@@ -32,9 +35,18 @@ export default class Cafe{
         this.cafeAssets = await PIXI.Assets.loadBundle('cafe_assets');
         this.spritesheetAssets = await PIXI.Assets.loadBundle('character_spritesheets');
         this.weaponAssets = await PIXI.Assets.loadBundle('weapon_assets')
+        this.particleAssets = await PIXI.Assets.loadBundle('particle_spritesheets')
+        this.bulletAssets = await PIXI.Assets.loadBundle('bullet_assets')
+        
         //parse map data...
         this.parsedMapObject = parseMapData(cafeMapData)
 
+        //init the particleManager
+        this.particleManager = new ParticleManager(this.app, this.particleAssets)
+        await this.particleManager.init()
+
+        //init bulletManager
+        this.bulletManager = new BulletManager(this.app, this.bulletAssets)
         ////ORDER MATTERS HERE/////
         
         //add collision blocks to map
@@ -60,7 +72,7 @@ export default class Cafe{
         this.visibleSprites.addChild(this.cafeBaseMap)
 
         //add character as property of level and init, adding to visibleSprites and to stage
-        this.character = new Character(this.app, this.keysObject, this.spritesheetAssets, this.weaponAssets, this.display_width / 2, this.display_height / 2, this.obstacleSprites, this.mousePos)
+        this.character = new Character(this.app, this.keysObject, this.spritesheetAssets, this.weaponAssets, this.display_width / 2, this.display_height / 2, this.obstacleSprites, this.bulletManager)
         await this.character.init(this.visibleSprites)
         this.mousePos = {x: this.character.sprite.x, y: this.character.sprite.y}
         //add foreground blocks to map
@@ -87,6 +99,19 @@ export default class Cafe{
 
         //add custom camera group to stage
         this.app.stage.addChild(this.visibleSprites)  
+
+        //add bullet manager group to stage
+        this.app.stage.addChild(this.bulletManager)
+    }
+
+    getPlayerAngle = (mousePos) => {
+        if(mousePos.x && mousePos.y){
+            const dx = mousePos.x - this.character.sprite.x - (this.character.sprite.width / 2)
+            const dy = mousePos.y - this.character.sprite.y - (this.character.sprite.height / 2)
+            //calculate angle and convert from rads to degrees
+            const angle = (Math.atan2(dy, dx) * 180) / Math.PI
+            return angle
+        }
     }
 
     //the level's run method is added to the stage by the Application class
@@ -95,8 +120,11 @@ export default class Cafe{
         //for calculating offset, keeping character centered
 
         //ORDER MATTERS HERE
-        this.character.run(this.mousePos)
+        let angle = this.getPlayerAngle(this.mousePos)
+        this.character.run(angle)
         this.obstacleSprites.run(this.character.sprite)
         this.visibleSprites.run(this.character.sprite)
+        this.particleManager.run()
+        this.bulletManager.run(this.character.sprite)
     }
 }

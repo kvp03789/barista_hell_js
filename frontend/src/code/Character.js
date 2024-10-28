@@ -4,11 +4,12 @@ import { spritesAreColliding } from "../utils";
 import { Inventory, Equipment } from "./ItemsInventoryEquipment.js";
 
 export default class Character{
-    constructor(app, keysObject, spritesheetAssets, itemAssets, x_pos, y_pos, obstacleSprites, mousePos){
+    constructor(app, keysObject, spritesheetAssets, itemAssets, x_pos, y_pos, obstacleSprites, bulletManager){
         this.app = app
         this.keysObject = keysObject
         this.spritesheetAssets = spritesheetAssets
         this.itemAssets = itemAssets
+        this.bulletManager = bulletManager
 
         this.x_pos = x_pos
         this.y_pos = y_pos
@@ -38,6 +39,30 @@ export default class Character{
             characterIdleData
         )
         await this.idle_spritesheet.parse()
+    }
+
+    initIdleUpSpriteSheet = async () => {
+        this.idle_up_spritesheet = new Spritesheet(
+            this.spritesheetAssets.character_idle_up,
+            characterIdleData
+        )
+        await this.idle_up_spritesheet.parse()
+    }
+
+    initIdleRightSpriteSheet = async () => {
+        this.idle_right_spritesheet = new Spritesheet(
+            this.spritesheetAssets.character_idle_right,
+            characterIdleData
+        )
+        await this.idle_right_spritesheet.parse()
+    }
+
+    initIdleLeftSpriteSheet = async () => {
+        this.idle_left_spritesheet = new Spritesheet(
+            this.spritesheetAssets.character_idle_left,
+            characterIdleData
+        )
+        await this.idle_left_spritesheet.parse()
     }
 
     initRunRightSpriteSheet = async () => {
@@ -75,6 +100,9 @@ export default class Character{
     init = async (group) => {
         
         await this.initIdleSpriteSheet()
+        await this.initIdleUpSpriteSheet()
+        await this.initIdleRightSpriteSheet()
+        await this.initIdleLeftSpriteSheet()
         await this.initRunRightSpriteSheet()
         await this.initRunLeftSpriteSheet()
         await this.initRunDownSpriteSheet()
@@ -105,10 +133,17 @@ export default class Character{
 
         //add active weapon sprite to stage as child of character
         this.sprite.addChild(this.activeWeapon.sprite)
-
+        //
+        this.app.stage.on('pointerdown', this.mouseDown)
         this.sprite.play()
     }
 
+    mouseDown = () => {
+        if(this.activeWeapon){
+            // this.activeWeapon.fire()
+            this.bulletManager.fireWeapon(this.activeWeapon, this.angle, this.sprite.x, this.sprite.y)
+        }
+    }
     //returns bool if a non movement key is pressed
     isKeyPressed = () => {
         if(
@@ -141,60 +176,90 @@ export default class Character{
         this.sprite.addChild(this.activeWeapon.sprite)
     }
 
-    handleMovement = () => {
-        this.movement.x = 0
-        this.movement.y = 0
-        let newAnimation = null
-
-        //W key
-        if(this.keysObject[87]){
-            newAnimation = this.run_up_spritesheet.animations.main
-            this.movement.y = -1
-        }
-        //A key
-        if(this.keysObject[65]){
-            newAnimation = this.run_left_spritesheet.animations.main
-            this.movement.x = -1
-        }
-        //S key
-        if(this.keysObject[83]){
-            newAnimation = this.run_down_spritesheet.animations.main
-            this.movement.y = 1
-        }
-        //D key
-        if(this.keysObject[68]){
-            newAnimation = this.run_right_spritesheet.animations.main
-            this.movement.x = 1
-        }
-
-        //back to idle animation
-        if(!this.keysObject[68] && !this.keysObject[83] && !this.keysObject[65] && !this.keysObject[87]){
-            newAnimation = this.idle_spritesheet.animations.main
-            this.movement.x = 0
-            this.movement.y = 0    
-        }
-
-        //normalize the vector
-        if(this.movement.x !== 0 && this.movement.y !== 0){
-            let length = Math.sqrt(this.movement.x * this.movement.x + this.movement.y * this.movement.y)
-            this.movement.x /= length
-            this.movement.y /= length
-        }
-
-        //apply direction to speed while checking for collisions
-        this.sprite.x += this.movement.x * this.speed
-        this.checkCollision('horizontal')
-        this.sprite.y += this.movement.y * this.speed
-        this.checkCollision('vertical')
-
-        //only change texture if different from currentAnimation
-        if(newAnimation && this.currentAnimation !== newAnimation){
-            this.sprite.textures = newAnimation
-            this.sprite.play()
-            this.currentAnimation = newAnimation
-        }
-    }
+    handleDirection = (angle) => {
+        let newTextures = null;
     
+        // determine direction based on angle
+        //S KEY
+        if (angle >= 45 && angle <= 135) {
+            //check if idle
+            if(this.movement.x == 0 && this.movement.y == 0){
+                this.sprite.stop()
+                newTextures = this.idle_spritesheet.animations.main;
+                this.sprite.play()
+            }else newTextures = this.run_down_spritesheet.animations.main;        
+        } 
+        //A KEY
+        else if (angle >= 135 || angle <= -135) {
+            //check if idle
+            if(this.movement.x == 0 && this.movement.y == 0){
+                this.sprite.stop()
+                newTextures = this.idle_left_spritesheet.animations.main;
+                this.sprite.play()
+            }else newTextures = this.run_left_spritesheet.animations.main;
+        } 
+        //W KEY
+        else if (angle >= -135 && angle <= -45) {
+            //check if idle
+            if(this.movement.x == 0 && this.movement.y == 0){
+                this.sprite.stop()
+                newTextures = this.idle_up_spritesheet.animations.main;
+                this.sprite.play()
+            }else newTextures = this.run_up_spritesheet.animations.main;
+        } 
+        //D KEY
+        else {
+            //check if idle
+            if(this.movement.x == 0 && this.movement.y == 0){
+                this.sprite.stop()
+                newTextures = this.idle_right_spritesheet.animations.main;
+                this.sprite.play()
+            }else newTextures = this.run_right_spritesheet.animations.main;
+        }
+
+        // update animation based on movement
+            // play the current movement animation
+        if (this.sprite.textures !== newTextures) {
+            this.sprite.textures = newTextures;
+            this.sprite.play();
+        }
+    }    
+
+
+    handleMovement = (angle) => {
+        this.movement.x = 0;
+        this.movement.y = 0;
+        
+    
+        // If keys are pressed, update movement
+        if (this.keysObject[87]) { // W key
+            this.movement.y = -1;
+        }
+        if (this.keysObject[65]) { // A key
+            this.movement.x = -1;
+        }
+        if (this.keysObject[83]) { // S key
+            this.movement.y = 1;
+        }
+        if (this.keysObject[68]) { // D key
+            this.movement.x = 1;
+        }
+    
+        // Normalize movement vector if moving diagonally
+        if (this.movement.x !== 0 && this.movement.y !== 0) {
+            const length = Math.sqrt(this.movement.x ** 2 + this.movement.y ** 2);
+            this.movement.x /= length;
+            this.movement.y /= length;
+        }
+    
+        // Update character position
+        this.sprite.x += this.movement.x * this.speed;
+        this.checkCollision('horizontal');
+        this.sprite.y += this.movement.y * this.speed;
+        this.checkCollision('vertical');
+    };
+    
+
     checkCollision = (direction) => {
         //the hitbox of the char sprite
         const spriteBounds = {
@@ -244,22 +309,13 @@ export default class Character{
             });
         }
     }
-    
-    getAngle = (mousePos) => {
-        if(mousePos.x && mousePos.y){
-            const dx = mousePos.x - this.sprite.x
-            const dy = mousePos.y - this.sprite.y
-            //calculate angle and convert from rads to degrees
-            const angle = (Math.atan2(dy, dx) * 180) / Math.PI
-            return angle
-        }
-    }
 
-    run = (mousePos) => {
-        this.handleMovement()
-
-        //update mousePos
-        this.mousePos = mousePos    
+    run = (angle) => {
+        //angle passed in from level class
+        this.angle = angle
+        this.activeWeapon.run(angle)
+        this.handleMovement(angle)
+        this.handleDirection(angle)  
         
         //cooldowns for key presses
         if(this.isKeyPressed() && this.keyboardCooldown == 0){
@@ -270,9 +326,5 @@ export default class Character{
             this.keyboardCooldown -= 1
         }
         this.keyboardCooldown
-
-        //get angle for weapon sprite and char sprite rotation
-        let angle = this.getAngle(mousePos)
-        this.activeWeapon.run(angle)
     }
 }

@@ -1,0 +1,74 @@
+{ "frames": {
+   "bullet_explode_particle_1_0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 10, "h": 10 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
+    "sourceSize": { "w": 10, "h": 10 },
+    "duration": 100
+   },
+   "bullet_explode_particle_1_1.aseprite": {
+    "frame": { "x": 10, "y": 0, "w": 10, "h": 10 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
+    "sourceSize": { "w": 10, "h": 10 },
+    "duration": 100
+   },
+   "bullet_explode_particle_1_2.aseprite": {
+    "frame": { "x": 20, "y": 0, "w": 10, "h": 10 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
+    "sourceSize": { "w": 10, "h": 10 },
+    "duration": 100
+   },
+   "bullet_explode_particle_1_3.aseprite": {
+    "frame": { "x": 30, "y": 0, "w": 10, "h": 10 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
+    "sourceSize": { "w": 10, "h": 10 },
+    "duration": 100
+   },
+   "bullet_explode_particle_1_4.aseprite": {
+    "frame": { "x": 40, "y": 0, "w": 10, "h": 10 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
+    "sourceSize": { "w": 10, "h": 10 },
+    "duration": 100
+   },
+   "bullet_explode_particle_1_5.aseprite": {
+    "frame": { "x": 50, "y": 0, "w": 10, "h": 10 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
+    "sourceSize": { "w": 10, "h": 10 },
+    "duration": 100
+   },
+   "bullet_explode_particle_1_6.aseprite": {
+    "frame": { "x": 60, "y": 0, "w": 10, "h": 10 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
+    "sourceSize": { "w": 10, "h": 10 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.8.1-x64",
+  "image": "bullet_explode_particle_1.png",
+  "format": "RGBA8888",
+  "size": { "w": 70, "h": 10 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}
