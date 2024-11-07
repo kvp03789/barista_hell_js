@@ -1,5 +1,6 @@
 import { Container } from "pixi.js";
 import { ZOOM_FACTOR } from "../settings";
+import { AdvancedBloomFilter } from "pixi-filters";
 
 export default class YSortCameraSpriteGroup extends Container{
     constructor(app){
@@ -25,8 +26,9 @@ export default class YSortCameraSpriteGroup extends Container{
         sortedSprites.forEach(sprite => {
             sprite.x -= this.offset.x * ZOOM_FACTOR
             sprite.y -= this.offset.y * ZOOM_FACTOR
-            sprite.scale.set(ZOOM_FACTOR)
-
+            if(!sprite.label.startsWith("animated")){
+                sprite.scale.set(ZOOM_FACTOR)
+            }
         })
     }
 }

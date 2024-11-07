@@ -29,7 +29,6 @@ export class BattleRifle extends Weapon{
     }
 
     run = (angle) => {
-        console.log('BattleRifle is running')
         this.sprite.angle = angle
     }
 

@@ -1,0 +1,90 @@
+{ "frames": {
+   "Sprite-0002_0.": {
+    "frame": { "x": 0, "y": 0, "w": 60, "h": 40 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 40 },
+    "sourceSize": { "w": 60, "h": 40 },
+    "duration": 100
+   },
+   "Sprite-0002_1.": {
+    "frame": { "x": 60, "y": 0, "w": 60, "h": 40 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 40 },
+    "sourceSize": { "w": 60, "h": 40 },
+    "duration": 100
+   },
+   "Sprite-0002_2.": {
+    "frame": { "x": 120, "y": 0, "w": 60, "h": 40 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 40 },
+    "sourceSize": { "w": 60, "h": 40 },
+    "duration": 100
+   },
+   "Sprite-0002_3.": {
+    "frame": { "x": 180, "y": 0, "w": 60, "h": 40 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 40 },
+    "sourceSize": { "w": 60, "h": 40 },
+    "duration": 100
+   },
+   "Sprite-0002_4.": {
+    "frame": { "x": 240, "y": 0, "w": 60, "h": 40 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 40 },
+    "sourceSize": { "w": 60, "h": 40 },
+    "duration": 100
+   },
+   "Sprite-0002_5.": {
+    "frame": { "x": 300, "y": 0, "w": 60, "h": 40 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 40 },
+    "sourceSize": { "w": 60, "h": 40 },
+    "duration": 100
+   },
+   "Sprite-0002_6.": {
+    "frame": { "x": 360, "y": 0, "w": 60, "h": 40 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 40 },
+    "sourceSize": { "w": 60, "h": 40 },
+    "duration": 100
+   },
+   "Sprite-0002_7.": {
+    "frame": { "x": 420, "y": 0, "w": 60, "h": 40 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 40 },
+    "sourceSize": { "w": 60, "h": 40 },
+    "duration": 100
+   },
+   "Sprite-0002_8.": {
+    "frame": { "x": 480, "y": 0, "w": 60, "h": 40 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 40 },
+    "sourceSize": { "w": 60, "h": 40 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.8.1-x64",
+  "image": "trash_pile_spritesheet.png",
+  "format": "RGBA8888",
+  "size": { "w": 540, "h": 40 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

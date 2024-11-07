@@ -1,15 +1,16 @@
 import { Spritesheet, AnimatedSprite } from "pixi.js";
 import { characterIdleData, charcterRunRightData, charcterRunLeftData, characterRunDownData, characterRunUpData } from "../json/character/characterSpriteData";
 import { spritesAreColliding } from "../utils";
-import { Inventory, Equipment } from "./ItemsInventoryEquipment.js";
+import { Inventory, Equipment, QuickBar } from "./ItemsInventoryEquipment.js";
 
 export default class Character{
-    constructor(app, keysObject, spritesheetAssets, itemAssets, x_pos, y_pos, obstacleSprites, bulletManager){
+    constructor(app, keysObject, spritesheetAssets, itemAssets, x_pos, y_pos, obstacleSprites, bulletManager, particleManager){
         this.app = app
         this.keysObject = keysObject
         this.spritesheetAssets = spritesheetAssets
         this.itemAssets = itemAssets
         this.bulletManager = bulletManager
+        this.particleManager = particleManager
 
         this.x_pos = x_pos
         this.y_pos = y_pos
@@ -97,7 +98,7 @@ export default class Character{
         await this.run_up_spritesheet.parse()
     }
 
-    init = async (group) => {
+    init = async (group, particleManager) => {
         
         await this.initIdleSpriteSheet()
         await this.initIdleUpSpriteSheet()
@@ -122,6 +123,8 @@ export default class Character{
         this.inventory = new Inventory(this.app, this, this.itemAssets)
         //initialize player equipment, along with weaponSlots and equipmentSlots
         this.equipment = new Equipment(this.app, this, this.itemAssets)
+        //initialize player quick bar
+        this.quickBar = new QuickBar(this.app, this, this.itemAssets)
         this.weaponSlots = this.equipment.weaponSlots
         this.equipmentSlots = this.equipment.equipmentSlots
         //set active weapon index
@@ -142,6 +145,7 @@ export default class Character{
         if(this.activeWeapon){
             // this.activeWeapon.fire()
             this.bulletManager.fireWeapon(this.activeWeapon, this.angle, this.sprite.x, this.sprite.y)
+            
         }
     }
     //returns bool if a non movement key is pressed

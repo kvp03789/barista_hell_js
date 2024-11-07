@@ -5,9 +5,12 @@ export const settings = {
     TILE_HEIGHT: 30,
     TILE_WIDTH: 30,
     ZOOM_FACTOR: 1.8,
+    UI_CLICK_COOLDOWN: 20,
+    UI_SETTINGS: {PADDING: 12},
     PLAYER_SETTINGS: {
         INVENTORY_SLOTS_AMOUNT: 16,
-        EQUIPMENT_SLOTS: ['weapon', 'weapon', 'hat', 'apron', 'shoes', 'trinket']
+        EQUIPMENT_SLOTS: ['weapon', 'weapon', 'hat', 'apron', 'shoes', 'trinket'],
+        QUICK_BAR_SLOTS_AMOUNT: 8
     },
     WEAPON_SETTINGS: {
         BattleRifle:{
@@ -16,7 +19,7 @@ export const settings = {
             fireType: 'automatic',
             clipSize: 80,
             damage: 2,
-            bulletSpeed: 25
+            bulletSpeed: 45
         },
         Shotgun:{ 
             type: 'BattleRifle',
@@ -29,6 +32,6 @@ export const settings = {
     }
 };
 
-export const { SCREEN_WIDTH, SCREEN_HEIGHT, TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR, PLAYER_SETTINGS,  WEAPON_SETTINGS } = settings;
+export const { SCREEN_WIDTH, SCREEN_HEIGHT, TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR, UI_CLICK_COOLDOWN, UI_SETTINGS, PLAYER_SETTINGS,  WEAPON_SETTINGS } = settings;
 
 

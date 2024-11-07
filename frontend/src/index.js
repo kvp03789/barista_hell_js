@@ -35,18 +35,18 @@ class Application{
         await this.statesObject[this.state_manager.currentState].initMap()
         this.app.ticker.add(this.statesObject[this.state_manager.currentState].run)
         
-        //key events
-        window.addEventListener("keydown", e => this.handleKeyDown(e))
-        window.addEventListener("keyup", e => this.handleKeyUp(e))
+        // //key events
+        // window.addEventListener("keydown", e => this.handleKeyDown(e))
+        // window.addEventListener("keyup", e => this.handleKeyUp(e))
     }
 
-    handleKeyDown = (e) => {
-        this.keysObject[e.keyCode] = true
-    }
+    // handleKeyDown = (e) => {
+    //     this.keysObject[e.keyCode] = true
+    // }
 
-    handleKeyUp = (e) => {
-        this.keysObject[e.keyCode] = false
-    }
+    // handleKeyUp = (e) => {
+    //     this.keysObject[e.keyCode] = false
+    // }
 }
 
 class State_Manager{

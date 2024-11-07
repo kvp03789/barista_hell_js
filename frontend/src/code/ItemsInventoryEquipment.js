@@ -97,7 +97,7 @@ export class Equipment{
     }
 
     run = () => {
-        console.log('equipment running....')
+        
     }
 }
 
@@ -109,5 +109,23 @@ export class ItemSlot{
         this.slotType = slotType
         this.slotIndex = slotIndex
         this.item = null
+    }
+}
+
+export class QuickBar{
+    constructor(app, player, itemAssets){
+        this.app = app
+        this.player = player
+        this.itemAssets = itemAssets
+        //this array is populated with ItemSlot instances during init call
+        this.itemSlots = []
+        this.init()
+    }
+
+    init = () => {
+        for(let i = 0; i < PLAYER_SETTINGS.QUICK_BAR_SLOTS_AMOUNT; i++){
+            const itemSlot = new ItemSlot(this.app, this.player, 'item', i) //all slots type of item
+            this.itemSlots.push(itemSlot)
+        }
     }
 }

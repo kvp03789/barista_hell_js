@@ -7,8 +7,28 @@ import CharacterRunRightSpritesheet from './img/spritesheets/character/run_right
 import CharacterRunLeftSpritesheet from './img/spritesheets/character/run_left_spritesheet.png'
 import CharacterRunDownSpritesheet from './img/spritesheets/character/run_down_spritesheet.png'
 import CharacterRunUpSpritesheet from './img/spritesheets/character/run_up_spritesheet.png'
+
+//ui
+import UI_IpadTurnOnSpritesheet from './img/spritesheets/ipad/ipad_turn_on.png'
+import UI_HUDHealthBar from './img/ui/health_bar.png'
+import UI_IpadFrame from './img/ui/ipad_frame.png'
+import UI_IpadEquipmentBG from './img/ui/ipad_equipment_bg.png'
+import UI_IpadStatsBG from './img/ui/ipad_stats_bg.png'
+import UI_HUDFullBG from './img/ui/full_ui_bg.png'
+import UI_EmptyItemSlot from './img/ui/empty_item_slot.png'
+import UI_IpadNavRight from './img/ui/ipad_nav_right.png'
+import UI_IpadNavLeft from './img/ui/ipad_nav_left.png'
+import UI_IpadEmptyCharacterSheetSlot from './img/ui/empty_character_sheet_item.png'
+
 //particles
-import BulletExplodeParticleSmoke from './img/spritesheets/particles/bullet_explode_particle_smoke.png'
+import BulletWallExplodeParticleSmoke from './img/spritesheets/particles/bullet_explode_particle_smoke.png'
+import CharacterWalkingParticle from './img/spritesheets/particles/walking_particle_spritesheet.png'
+
+//tiles
+import PuddleTile from './img/spritesheets/tiles/puddle_spritesheet.png'
+import HellCircleInactive from './img/spritesheets/tiles/hell_circle_inactive_spritesheet.png'
+import TrashPile from './img/spritesheets/tiles/trash_pile_spritesheet.png'
+
 //guns
 import CafeBaseMap from './img/map_pngs/cafe_base_map.png'
 import CafeTilesetPng from './img/tileset_pngs/cafe_tileset_1.png'
@@ -25,8 +45,55 @@ import BattleRifle1 from './img/weapons/battle_rifle/bullet1.png'
 import BattleRifle2 from './img/weapons/battle_rifle/bullet2.png'
 import BattleRifle3 from './img/weapons/battle_rifle/bullet3.png'
 
+
 export const assetsManifest = {
     "bundles":[
+      {
+         "name": "ui_assets",
+         "assets":[
+            {
+               "alias": "UI_IpadTurnOnSpritesheet",
+               "src": UI_IpadTurnOnSpritesheet
+            },
+            {
+               "alias": "UI_HUDHealthBar",
+               "src": UI_HUDHealthBar
+            },
+            {
+               "alias": "UI_IpadFrame",
+               "src": UI_IpadFrame
+            },
+            {
+               "alias": "UI_IpadEquipmentBG",
+               "src": UI_IpadEquipmentBG
+            },
+            {
+               "alias": "UI_IpadStatsBG",
+               "src": UI_IpadStatsBG
+            },
+            {
+               "alias" :"UI_HUDFullBG",
+               "src": UI_HUDFullBG
+            },
+            {
+               "alias" :"UI_EmptyItemSlot",
+               "src": UI_EmptyItemSlot
+            },
+            {
+               "alias" :"UI_IpadNavRight",
+               "src": UI_IpadNavRight
+            },
+            {
+               "alias" :"UI_IpadNavLeft",
+               "src": UI_IpadNavLeft
+            },
+            {
+               "alias": "UI_IpadEmptyCharacterSheetSlot",
+               "src": UI_IpadEmptyCharacterSheetSlot
+            }
+
+         ]
+      },
        {
           "name":"character_spritesheets",
           "assets":[
@@ -69,11 +136,32 @@ export const assetsManifest = {
             "name": "particle_spritesheets",
             "assets": [
                {
-                  "alias": "BulletExplodeParticleSmoke",
-                  "src": BulletExplodeParticleSmoke
+                  "alias": "BulletWallExplodeParticleSmoke",
+                  "src": BulletWallExplodeParticleSmoke
+               },
+               {
+                  "alias": "CharacterWalkingParticle",
+                  "src": CharacterWalkingParticle
                }
          ]
        },
+       {
+         "name": "tile_spritesheets",
+         "assets": [
+            {
+               "alias": "PuddleTile",
+               "src": PuddleTile
+            },
+            {
+               "alias": "HellCircleInactive",
+               "src": HellCircleInactive
+            },
+            {
+               "alias": "TrashPile",
+               "src": TrashPile
+            }
+      ]
+    },
       {
          "name": "cafe_assets",
          "assets":[
