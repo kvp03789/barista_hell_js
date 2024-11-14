@@ -12,6 +12,7 @@ import BulletManager from './BulletManager'
 import { tileSpriteData, hellCircleInactiveData, trashPileData } from '../json/tiles/tileSpriteData'
 import { GlowFilter, ReflectionFilter, ShockwaveFilter } from 'pixi-filters'
 import UIManager from './UI'
+import { ClickEventManager } from './ClickEventManager'
 
 export default class Cafe{
     constructor(app, keysObject){
@@ -27,6 +28,8 @@ export default class Cafe{
         //sprite group/container
         this.visibleSprites = new YSortCameraSpriteGroup(this.app)
         this.obstacleSprites = new ObstacleSpriteGroup(this.app)
+
+        this.clickEventManager = new ClickEventManager(this.app)
 
         //used when calculating angle of player
         this.offset = {x: 0, y:0}
@@ -61,6 +64,7 @@ export default class Cafe{
         this.bulletAssets = await PIXI.Assets.loadBundle('bullet_assets')
         this.animatedTileAssets = await PIXI.Assets.loadBundle('tile_spritesheets')
         this.uiAssets = await PIXI.Assets.loadBundle('ui_assets')
+        this.iconAssets = await PIXI.Assets.loadBundle("icons")
 
         //parse map data...
         this.parsedMapObject = parseMapData(cafeMapData)
@@ -96,7 +100,7 @@ export default class Cafe{
         this.visibleSprites.addChild(this.cafeBaseMap)
 
         //add character as property of level and init, adding to visibleSprites and to stage
-        this.character = new Character(this.app, this.keysObject, this.spritesheetAssets, this.weaponAssets, this.display_width / 2, this.display_height / 2, this.obstacleSprites, this.bulletManager, this.particleManager)
+        this.character = new Character(this.app, this.keysObject, this.spritesheetAssets, this.weaponAssets, this.display_width / 2, this.display_height / 2, this.obstacleSprites, this.bulletManager, this.particleManager, this.iconAssets)
         await this.character.init(this.visibleSprites, this.particleManager)
         this.mousePos = {x: this.character.sprite.x, y: this.character.sprite.y}
         //add foreground blocks to map
@@ -118,9 +122,11 @@ export default class Cafe{
             })
         })
 
-        this.uiManager = new UIManager(this.app, this.character, this.uiAssets, this.keysObject)
+        this.uiManager = new UIManager(this.app, this.character, this.uiAssets, this.keysObject, this.iconAssets, this.clickEventManager)
         await this.uiManager.init()
         
+        
+
         //add obstacle sprites to stage
         this.app.stage.addChild(this.obstacleSprites)
 
@@ -138,6 +144,10 @@ export default class Cafe{
 
         //append ui to stage
         this.app.stage.addChild(this.uiManager.uiContainer)
+
+        //init and add clickEventManager to stage, for rendering click event icons
+        this.clickEventManager.init(this.character, this.uiManager, this.keysObject)
+        this.app.stage.addChild(this.clickEventManager)
     }
 
     initializeAnimatedTiles = async () => {
@@ -213,6 +223,8 @@ export default class Cafe{
 
     //the level's run method is added to the stage by the Application class
     run = () => {
+        //run the click event manager
+        this.clickEventManager.run()
         //this.character.sprite is passed to run methods of sprite groups
         //for calculating offset, keeping character centered
 

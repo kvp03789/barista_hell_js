@@ -43,7 +43,6 @@ class ParticleManager extends Container{
         //parse particleAssets so that during init the particleDictionary 
         //can be easily populated
         this.parseParticleAssets()
-        console.log("debug particleDictionary: ", this.particleDictionary)
 
         this.offset = {x: 0, y: 0}
     }

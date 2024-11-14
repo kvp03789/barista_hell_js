@@ -1,15 +1,18 @@
-import { AnimatedSprite, Container, Graphics, Sprite, Spritesheet, Text, TextStyle } from "pixi.js";
+import { Container, Graphics, Sprite, Text, TextStyle } from "pixi.js";
 import { SCREEN_HEIGHT, SCREEN_WIDTH, UI_CLICK_COOLDOWN, UI_SETTINGS } from "../settings";
-import { ipadTurnOnData } from "../json/ui/uiData";
 import { AdjustmentFilter, CRTFilter, GlitchFilter, GlowFilter } from "pixi-filters";
-import { ItemSlot } from "./ItemsInventoryEquipment";
+
 
 export default class UIManager{
-    constructor(app, player, uiAssets, keysObject){
+    constructor(app, player, uiAssets, keysObject, iconAssets, clickEventManager){
         this.app = app
         this.player = player
+
+        this.clickEventManager = clickEventManager
+
         //raw assets that are loaded in assetsManifest 
         this.uiAssets = uiAssets
+        this.iconAssets = iconAssets
         this.keysObject = keysObject
 
         //things to do with click cooldown
@@ -21,12 +24,14 @@ export default class UIManager{
 
         //display properties
         this.characterSheetDisplaying = false
+        this.inventoryDisplaying = false
         
-        //object to hold parsed assets 
-        this.assetsObject = {}
+        //object to hold parsed ui assets 
+        this.UIAssetsObject = {}
+        this.iconAssetsObject = {}
 
         this.uiContainer = new Container()
-        this.uiContainer.zIndex = 100
+        // this.uiContainer.zIndex = 100
         this.uiContainer.label = "ui_container"
     }
 
@@ -44,26 +49,36 @@ export default class UIManager{
     init = async () => {
         for(let key in this.uiAssets){
             if(key.startsWith("UI")){
-                this.assetsObject[key] = this.uiAssets[key]
+                this.UIAssetsObject[key] = this.uiAssets[key]
             }
         }
-        
-        //init health bar
-        this.healthBar = new HealthBar(this.app, this.assetsObject.UI_HUDFullBG, this.player,  55, SCREEN_HEIGHT - this.assetsObject.UI_HUDHealthBar.height, this.uiContainer)
+        for(let key in this.iconAssets){
+            if(key.startsWith("Icon")){
+                this.iconAssetsObject[key] = this.iconAssets[key]
+            }
+        }
+
+        //--init all of the components of the UI--//
+        //health bar
+        this.healthBar = new HealthBar(this.app, this.UIAssetsObject.UI_HUDFullBG, this.player,  55, SCREEN_HEIGHT - this.UIAssetsObject.UI_HUDHealthBar.height, this.uiContainer)
 
         //ipad/character sheet
-        this.characterSheet = new CharacterSheet(this.app, this.clickCooldownTimer, this.clicking, this.assetsObject,this.uiContainer, this.player)
+        this.characterSheet = new CharacterSheet(this.app, this.clickCooldownTimer, this.clicking, this.UIAssetsObject, this.uiContainer, this.player, this.clickEventManager, this.iconAssetsObject)
 
          //character inventory, items, and equipment slots
-         this.quickBar = new QuickBarUI(this.app, this.player.quickBar.itemSlots, this.clickCooldown, this.clicking, this.assetsObject.UI_EmptyItemSlot, this.uiContainer)
+        this.quickBar = new QuickBarUI(this.app, this.player, this.player.quickBar.itemSlots, this.clickCooldown, this.clicking, this.iconAssetsObject.Icon_EmptyItemSlot, this.uiContainer, this.iconAssetsObject, this.clickEventManager)
 
+         //inventory
+        this.inventory = new InventoryUI(this.app, this.player, this.player.inventory.itemSlots, this.clickCooldown, this.clicking, this.UIAssetsObject, this.uiContainer, SCREEN_WIDTH - (this.UIAssetsObject.UI_InventoryBG.width + 20), 50, this.iconAssetsObject, this.clickEventManager)
+         
     }     
 
     //returns bool if a non movement key is pressed
     isKeyPressed = () => {
         if(
             this.keysObject[67] || //c key
-            this.keysObject[84]    //t key
+            this.keysObject[84] || //t key
+            this.keysObject[73]    //i key
         ){
             return true
         }
@@ -79,6 +94,14 @@ export default class UIManager{
             }
             else this.uiContainer.removeChild(this.characterSheet)
         }
+
+        if(this.keysObject[73]){
+            this.inventoryDisplaying = !this.inventoryDisplaying
+            if(this.inventoryDisplaying){
+                this.uiContainer.addChild(this.inventory)
+            }
+            else this.uiContainer.removeChild(this.inventory)
+        }
     }
 
     run = () => {
@@ -91,23 +114,32 @@ export default class UIManager{
             this.keyboardCooldown -= 1
         }
 
-        this.characterSheet.run()
+        this.characterSheet.run(this.player)
+        this.inventory.run(this.player)
+        this.quickBar.run(this.player)
     }
-
+    
 }
 
 class ItemSlot_UI extends Sprite{
-    constructor(texture, xPos, yPos, index, item){
+    constructor(texture, emptyTexture, player, type, xPos, yPos, slotIndex, item, clickEventManager){
         super(texture)
+        this.emptyTexture = emptyTexture
+        
+        this.player = player
+        this.clickEventManager = clickEventManager
+        //slotType refers to whether item slot is for inventory, quickBar, or equipment
+        this.slotType = type
         this.x = xPos
         this.y = yPos
-        this.index = index
+        this.slotIndex = slotIndex
         this.item = item
+        this.quantity = 0
         this.scale.set(1.5)
         this.interactive = true
         this.on("click", this.onClick)
 
-        this.textStyle = new TextStyle({
+        this.quantityTextStyle = new TextStyle({
             fontFamily: 'roboto',
             dropShadow: {
                 alpha: 0.5,
@@ -117,29 +149,158 @@ class ItemSlot_UI extends Sprite{
                 distance: 10,
             },
             fill: '#ffffff',
-            stroke: { color: '#1d1f1e', width: 10, join: 'round' },
+            stroke: { color: '#1d1f1e', width: 7, join: 'round' },
             fontSize: 10,
             fontWeight: 'lighter',
+            alpha: .5
         })
-        this.textContent = `${this.index + 1}`
-        this.slotNumberText = new Text({style: this.textStyle, text: this.textContent})
-        this.slotNumberText.x = -5
-        this.slotNumberText.y = -5
-        this.addChild(this.slotNumberText)
+        this.quantityTextContent = `${this.quantity}`
+        
+        this.init()
+        
+    }
+
+    init = () => {
+        if(this.slotType === "quickBar"){
+            this.slotNumberTextStyle = new TextStyle({
+                fontFamily: 'roboto',
+                dropShadow: {
+                    alpha: 0.5,
+                    angle: 2.1,
+                    blur: 4,
+                    color: '#cae0dd',
+                    distance: 10,
+                },
+                fill: '#ffffff',
+                stroke: { color: '#1d1f1e', width: 7, join: 'round' },
+                fontSize: 7,
+                fontWeight: 'lighter',
+                alpha: .5
+            })
+            this.slotNumberTextContent = `${this.slotIndex + 1}`
+            this.slotNumberText = new Text({style: this.slotNumberTextStyle, text: this.slotNumberTextContent})
+            this.slotNumberText.x = -5
+            this.slotNumberText.y = -5
+            this.addChild(this.slotNumberText)
+        }
+
+        
+        this.quantityText = new Text({style: this.quantityTextStyle, text: this.quantityTextContent})
+        if(this.item){
+            this.addChild(this.quantityText)
+        }
     }
 
     onClick = () => {
-        console.log(`you clicked quick bar slot ${this.index}`)
+        // if(!this.item){
+        //     //if no item and no event in queue nothing happens
+        //     if(!this.clickEventManager.currentEvent){
+        //         return
+        //     }
+        //     //if no item and there is event in queue player is dropping item
+        //     else if(this.clickEventManager.currentEvent){
+        //         this.clickEventManager.handleDropClick(this)
+        //     }
+        // }
+        // else {
+        //     //if item in slot but there no current event player is picking up item
+        //     if(!this.clickEventManager.currentEvent){
+        //         this.clickEventManager.handlePickupClick(this)
+        //     }
+        //     //if item in slot and there IS current event player
+        //     //is either swapping items or stacking
+        //     else this.clickEventManager.handleStacksAndSwaps(this)
+        // }
+        this.clickEventManager.handleSlotClick(this)
+        console.log("DEBUG player inventory: ", this.player.inventory.itemSlots)
+    }
+
+    run = () => {
+        //keep contents of actual player inventory, equip, and char screen  
+        //in sync with ui counterparts
+        this.item = this.player[this.slotType].itemSlots[this.slotIndex].item
+        this.quantity =  this.player[this.slotType].itemSlots[this.slotIndex].quantity
+
+        //update textures 
+        if(this.item){
+            this.texture = this.item.texture
+            //update the quantity text
+            this.quantityText.text = `${this.quantity}`
+            if(this.children.length === 0){
+                this.addChild(this.quantityText)
+            }
+        }
+        //remove quantity text if item becomes !item or quantity below 1
+        else if((!this.item && this.children.length > 0) || this.quantity < 1){
+            this.texture = this.emptyTexture
+            this.removeChild(this.quantityText)
+        }
+    }
+}
+
+class InventoryUI extends Container{
+    constructor(app, player, playerInventoryItemSlots, clickCooldown, clicking, UIAssetsObject, uiContainer, xPos, yPos, iconsAssetsObject, clickEventManager){
+        super()
+        this.app = app
+        this.player = player
+        this.playerInventoryItemSlots = playerInventoryItemSlots
+        this.clickEventManager = clickEventManager
+        this.clickCooldown = clickCooldown
+        this.clicking = clicking
+
+        this.UIAssetsObject = UIAssetsObject
+        this.iconsAssetsObject = iconsAssetsObject
+        this.uiContainer = uiContainer
+
+        this.emptySlotTexture = this.iconsAssetsObject.Icon_EmptyItemSlot
+        
+        this.background = new Sprite(this.UIAssetsObject.UI_InventoryBG)
+        this.background.x = 0
+        this.background.y = 0
+        this.addChild(this.background)
+
+        this.label = "inventory_ui"
+        this.x = xPos
+        this.y = yPos
+
+        this.init()
+    }
+
+    init = () => {
+        this.playerInventoryItemSlots.forEach((itemSlot, i) => {
+            const columns = 8
+            const xPos = 30 + i % columns * (this.emptySlotTexture.width * 1.5 + UI_SETTINGS.PADDING) 
+                const yPos = 20 + Math.floor(i / columns) * (this.emptySlotTexture.height * 1.5 + 10)
+            //if item slot empty, add empty slot sprite
+            if(!itemSlot.item){
+                const slotSprite = new ItemSlot_UI(this.emptySlotTexture, this.emptySlotTexture, this.player, "inventory", xPos, yPos, i, itemSlot.item, this.clickEventManager)
+                this.addChild(slotSprite)
+            }else{
+                const textureIdentifier = `Icon_${itemSlot.item.itemName}`
+                const texture = this.iconsAssetsObject[textureIdentifier]
+                const slotSprite = new ItemSlot_UI(texture, this.emptySlotTexture, this.player, "inventory", xPos, yPos, i, itemSlot.item, this.clickEventManager)
+                this.addChild(slotSprite)
+            }
+        })
+    }
+
+    run = (player) => {
+        this.children.forEach(child => {
+            if(child.run){child.run(player)}
+        })
     }
 }
 
 class QuickBarUI extends Container{
-    constructor(app, playerQuickBarItemSlots, clickCooldown, clicking, emptySlotTexture, uiContainer){
+    constructor(app, player, playerQuickBarItemSlots, clickCooldown, clicking, emptySlotTexture, uiContainer, iconsAssetsObject, clickEventManager){
         super()
         this.app = app  
+        this.player = player
         this.playerQuickBarItemSlots = playerQuickBarItemSlots
-        this.emptySlotTexture = emptySlotTexture
+        this.clickEventManager = clickEventManager
 
+        this.iconsAssetsObject = iconsAssetsObject
+        this.emptySlotTexture = emptySlotTexture
         this.clickCooldown = clickCooldown
         this.clicking = clicking
 
@@ -154,11 +315,16 @@ class QuickBarUI extends Container{
             //if item slot empty, add empty slot sprite
             if(!itemSlot.item){
                 const offset = 350
-                const emptySlotSprite = new ItemSlot_UI(this.emptySlotTexture, offset + (i * (this.emptySlotTexture.width * 1.5 + UI_SETTINGS.PADDING)) , 517, i, itemSlot.item)
-                console.log("this debug ", this )
+                const emptySlotSprite = new ItemSlot_UI(this.emptySlotTexture, this.emptySlotTexture, this.player, "quickBar", offset + (i * (this.emptySlotTexture.width * 1.5 + UI_SETTINGS.PADDING)) , 517, i, itemSlot.item, this.clickEventManager)
                 this.addChild(emptySlotSprite)
             }
             
+        })
+    }
+
+    run = (player) => {
+        this.children.forEach(child => {
+            if(child.run){child.run(player)}
         })
     }
 }
@@ -200,11 +366,13 @@ class CharacterSheetNavButton extends Sprite{
 }
 
 class CharacterSheet extends Container{
-    constructor(app, clickCooldown, clicking, uiAssets, uiContainer, player){
+    constructor(app, clickCooldown, clicking, uiAssets, uiContainer, player, clickEventManager, iconAssets){
         super()
         this.app = app
         this.uiAssets = uiAssets
+        this.iconAssets = iconAssets
         this.player = player
+        this.clickEventManager = clickEventManager
 
         this.clickCooldown = clickCooldown,
         this.clicking = clicking
@@ -220,8 +388,8 @@ class CharacterSheet extends Container{
         this.frame.label = "ipad_frame"
 
         //this is the screen of the ipad
-        this.equipmentBG = new CharacterSheet_EquipmentScreen(this.uiAssets.UI_IpadEquipmentBG, 150, 67, this.player, this.uiAssets)
-        this.statsBG = new CharacterSheet_StatsScreen(this.uiAssets.UI_IpadStatsBG, 150, 67, this.player, this.uiAssets)
+        this.equipmentBG = new CharacterSheet_EquipmentScreen(this.uiAssets.UI_IpadEquipmentBG, 150, 67, this.player, this.uiAssets, this.iconAssets)
+        this.statsBG = new CharacterSheet_StatsScreen(this.uiAssets.UI_IpadStatsBG, 150, 67, this.player, this.uiAssets, this.iconAssets)
 
         //filters for screenContents container
         this.CRTFilterTime = 0
@@ -263,7 +431,7 @@ class CharacterSheet extends Container{
         return Math.floor(300 + Math.random() * 300) // 300 frames = 5 seconds at 60 fps
     }
 
-    run = () => {
+    run = (player) => {
         // if the glitch is active, animate it briefly
         if (this.glitchActive) {
             this.glitchFilter.seed = Math.random();
@@ -311,14 +479,14 @@ class CharacterSheet_StatsScreen extends Container {
 }
 
 class CharacterSheet_EquipmentScreen extends Container {
-    constructor(backgroundTexture, x, y, player, uiAssets){
+    constructor(backgroundTexture, x, y, player, uiAssets, iconAssets){
         super()
         this.background = new Sprite(backgroundTexture)
         this.background.position.set(x, y)
         this.addChild(this.background)
         
         this.uiAssets = uiAssets
-        console.log("uuuuuuuuuuuiiiii", this.uiAssets)
+        this.iconAssets = iconAssets
         this.player = player
 
         this.x = 0
@@ -328,22 +496,13 @@ class CharacterSheet_EquipmentScreen extends Container {
     }
 
     init = () => {
-        // this.player.equipment.itemSlots.forEach((itemSlot, i) => {
-        //     //if item slot empty, add empty slot sprite
-        //     if(!itemSlot.item){
-        //         const offset = 350
-        //         const blankSlotTexture = this.uiAssets.UI_IpadEmptyCharacterSheetSlot
-        //         const emptySlotSprite = new ItemSlot_UI(blankSlotTexture, offset + (i * (blankSlotTexture.width * 1.5 + UI_SETTINGS.PADDING)) , 517, i, itemSlot.item)
-        //         this.addChild(emptySlotSprite)
-        //     }
-        // })
-        const blankSlotTexture = this.uiAssets.UI_IpadEmptyCharacterSheetSlot
+        const blankSlotTexture = this.iconAssets.Icon_EmptyCharacterSheetSlot
 
-        const handsSlot = new ItemSlot_UI(blankSlotTexture, 509, 406, 0, null)
-        const feetSlot = new ItemSlot_UI(blankSlotTexture, 529, 496, 1, null)
-        const legsSlot = new ItemSlot_UI(blankSlotTexture, 272, 529, 2, null)
-        const chestSlot = new ItemSlot_UI(blankSlotTexture, 257, 426, 3, null)
-        const headSlot = new ItemSlot_UI(blankSlotTexture, 537, 171, 4, null)
+        const handsSlot = new ItemSlot_UI(blankSlotTexture, blankSlotTexture, this.player, "equipment", 509, 406, 0, null, this.clickEventManager)
+        const feetSlot = new ItemSlot_UI(blankSlotTexture, blankSlotTexture, this.player, "equipment", 529, 496, 1, null, this.clickEventManager)
+        const legsSlot = new ItemSlot_UI(blankSlotTexture, blankSlotTexture, this.player, "equipment", 272, 529, 2, null, this.clickEventManager)
+        const chestSlot = new ItemSlot_UI(blankSlotTexture, blankSlotTexture, this.player, "equipment", 257, 426, 3, null, this.clickEventManager)
+        const headSlot = new ItemSlot_UI(blankSlotTexture, blankSlotTexture, this.player, "equipment", 537, 171, 4, null, this.clickEventManager)
         this.addChild(handsSlot, feetSlot, legsSlot, chestSlot, headSlot)
     }
 }

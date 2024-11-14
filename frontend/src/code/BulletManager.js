@@ -68,7 +68,6 @@ class BulletManager extends Container{
                     this.particleManager.createParticle(bullet.x, bullet.y, "bullet_impact", "BulletWall", "BulletWallExplodeParticleSmoke")
                     this.removeChild(bullet)
                     bullet.destroy()
-                    console.log("bullet collided!")
                 }
             })
         })

@@ -4,13 +4,16 @@ import { spritesAreColliding } from "../utils";
 import { Inventory, Equipment, QuickBar } from "./ItemsInventoryEquipment.js";
 
 export default class Character{
-    constructor(app, keysObject, spritesheetAssets, itemAssets, x_pos, y_pos, obstacleSprites, bulletManager, particleManager){
+    constructor(app, keysObject, spritesheetAssets, itemAssets, x_pos, y_pos, obstacleSprites, bulletManager, particleManager, iconAssets){
         this.app = app
         this.keysObject = keysObject
         this.spritesheetAssets = spritesheetAssets
         this.itemAssets = itemAssets
+        this.iconAssets = iconAssets
+
         this.bulletManager = bulletManager
         this.particleManager = particleManager
+        
 
         this.x_pos = x_pos
         this.y_pos = y_pos
@@ -120,9 +123,9 @@ export default class Character{
         //initialize mousePos to prevent error
         this.mousePos = {x: this.sprite.x, y: this.sprite.y}
         //initialize player inventory
-        this.inventory = new Inventory(this.app, this, this.itemAssets)
+        this.inventory = new Inventory(this.app, this, this.itemAssets, this.iconAssets)
         //initialize player equipment, along with weaponSlots and equipmentSlots
-        this.equipment = new Equipment(this.app, this, this.itemAssets)
+        this.equipment = new Equipment(this.app, this, this.itemAssets, this.iconAssets)
         //initialize player quick bar
         this.quickBar = new QuickBar(this.app, this, this.itemAssets)
         this.weaponSlots = this.equipment.weaponSlots
@@ -139,6 +142,8 @@ export default class Character{
         //
         this.app.stage.on('pointerdown', this.mouseDown)
         this.sprite.play()
+
+        console.log("heres the player inventory", this.inventory)
     }
 
     mouseDown = () => {
@@ -330,5 +335,9 @@ export default class Character{
             this.keyboardCooldown -= 1
         }
         this.keyboardCooldown
+
+        //run the inventory, equipment, and quickBar
+        //this keeps them up to date
+        this.inventory.run()
     }
 }

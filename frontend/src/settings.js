@@ -8,8 +8,8 @@ export const settings = {
     UI_CLICK_COOLDOWN: 20,
     UI_SETTINGS: {PADDING: 12},
     PLAYER_SETTINGS: {
-        INVENTORY_SLOTS_AMOUNT: 16,
-        EQUIPMENT_SLOTS: ['weapon', 'weapon', 'hat', 'apron', 'shoes', 'trinket'],
+        INVENTORY_SLOTS_AMOUNT: 40,
+        EQUIPMENT_SLOTS: ["hands", "feet", "chest", "legs", "head"],
         QUICK_BAR_SLOTS_AMOUNT: 8
     },
     WEAPON_SETTINGS: {
@@ -29,9 +29,15 @@ export const settings = {
             damage: 10,
             bulletSpeed: 10
         },
+    },
+    TESTING_ITEMS:{
+        TESTING_INVENTORY: [],
+        TESTING_QUICKBAR: [],
+        TESTING_EQUIPMENT: {}
     }
+    
 };
 
-export const { SCREEN_WIDTH, SCREEN_HEIGHT, TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR, UI_CLICK_COOLDOWN, UI_SETTINGS, PLAYER_SETTINGS,  WEAPON_SETTINGS } = settings;
+export const { SCREEN_WIDTH, SCREEN_HEIGHT, TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR, UI_CLICK_COOLDOWN, UI_SETTINGS, PLAYER_SETTINGS,  WEAPON_SETTINGS, TESTING_ITEMS } = settings;
 
 

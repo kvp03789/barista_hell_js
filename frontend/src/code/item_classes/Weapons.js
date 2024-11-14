@@ -1,12 +1,13 @@
 import { Sprite } from "pixi.js"
 import { WEAPON_SETTINGS } from "../../settings"
+import Item from "./Item"
 
-class Weapon{
-    constructor(app, texturesObject, player){
-        this.app = app
+
+class Weapon extends Item{
+    constructor(app, texturesObject, player, itemType){
+        super(app, "weapon", player)
+        //textures object is all textures for this particular weapon
         this.texturesObject = texturesObject
-        this.player = player
-        this.itemType = 'weapon'
     }
 }
 
@@ -26,6 +27,7 @@ export class BattleRifle extends Weapon{
         this.sprite.anchor.set(0)
         this.sprite.x = this.player.sprite.width - 15
         this.sprite.y = this.player.sprite.height - 15
+        this.sprite.label = this.itemNamewa
     }
 
     run = (angle) => {

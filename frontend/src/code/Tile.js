@@ -32,7 +32,6 @@ export class AnimatedTile extends AnimatedSprite{
         this.alpha = alpha
         this.animationSpeed = animationSpeed;
         this.label = label
-        console.log(`${this.label} filter: `, this.scale)
         this.play()
         //boolean to represent if tile has associated particle effect
         this.isParticleTile = isParticleTile
