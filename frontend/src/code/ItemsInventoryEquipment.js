@@ -1,7 +1,7 @@
 import { Sprite } from "pixi.js"
 import { PLAYER_SETTINGS, WEAPON_SETTINGS } from "../settings"
 import { BattleRifle, Shotgun } from "./item_classes/Weapons"
-import { Beans, Ice, Milk } from "./item_classes/Materials"
+import { Beans, CorruptedBlood, Ice, LargeFang, Milk } from "./item_classes/Materials"
 
 export class ItemSlot{
     constructor(app, player, slotType, slotIndex){
@@ -69,6 +69,12 @@ export class Inventory{
         const someMilk = new Milk(this.app, this.player, this.parsedIconsTextures)
         this.itemSlots[3].item = someMilk
         this.itemSlots[3].quantity = 7
+        const someCorruptedBlood = new CorruptedBlood(this.app, this.player, this.parsedIconsTextures)
+        this.itemSlots[4].item = someCorruptedBlood
+        this.itemSlots[4].quantity = 17
+        const someLargeFangs = new LargeFang(this.app, this.player, this.parsedIconsTextures)
+        this.itemSlots[5].item = someLargeFangs
+        this.itemSlots[5].quantity = 4
     }
 
     run = () => {

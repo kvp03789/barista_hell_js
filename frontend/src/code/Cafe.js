@@ -1,11 +1,11 @@
 import * as PIXI from 'pixi.js'
 import { TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR }from '../settings'
-import { parseMapData, getXYSlice } from '../utils'
+import { parseMapData, getXYSlice, spritesAreColliding } from '../utils'
 import { cafeMapData } from '../map_data/cafeMapData'
 import Character from './Character'
 import YSortCameraSpriteGroup from './YSortCameraSpriteGroup'
 import ObstacleSpriteGroup from './ObstacleSpriteGroup'
-import Tile from './Tile'
+import Tile, { EspressoMachine } from './Tile'
 import { AnimatedTile, HellPortalObject } from './Tile'
 import ParticleManager from './Particles'
 import BulletManager from './BulletManager'
@@ -13,6 +13,7 @@ import { tileSpriteData, hellCircleInactiveData, trashPileData } from '../json/t
 import { GlowFilter, ReflectionFilter, ShockwaveFilter } from 'pixi-filters'
 import UIManager from './UI'
 import { ClickEventManager } from './ClickEventManager'
+import { NPCManager } from './NPCManager'
 
 export default class Cafe{
     constructor(app, keysObject){
@@ -29,7 +30,7 @@ export default class Cafe{
         this.visibleSprites = new YSortCameraSpriteGroup(this.app)
         this.obstacleSprites = new ObstacleSpriteGroup(this.app)
 
-        this.clickEventManager = new ClickEventManager(this.app)
+        this.clickEventManager = new ClickEventManager(this.app, this.visibleSprites)
 
         //used when calculating angle of player
         this.offset = {x: 0, y:0}
@@ -65,6 +66,8 @@ export default class Cafe{
         this.animatedTileAssets = await PIXI.Assets.loadBundle('tile_spritesheets')
         this.uiAssets = await PIXI.Assets.loadBundle('ui_assets')
         this.iconAssets = await PIXI.Assets.loadBundle("icons")
+        this.cafeObjectsAssets = await PIXI.Assets.loadBundle("overworld_objects")
+        this.npcSpritesheets = await PIXI.Assets.loadBundle('npc_spritesheets')
 
         //parse map data...
         this.parsedMapObject = parseMapData(cafeMapData)
@@ -91,6 +94,30 @@ export default class Cafe{
                     const sliceRect = new PIXI.Rectangle(x, y, w, h);
                     const texture = new PIXI.Texture({source: this.cafeAssets.CafeTilesetPng, frame: sliceRect})
                     const tile = new Tile(this.app, x_pos, y_pos, texture, 'boundary', this.obstacleSprites)
+                }
+            })
+        })
+
+        //event tile
+        this.parsedMapObject.event.forEach((row, i) => {
+            row.forEach((col, j) =>{
+                if(col !== 0){
+                    //offset is to adjust for fact that bg png and tiles don't line up
+                    const x_pos = ((j) * TILE_WIDTH) * ZOOM_FACTOR
+                    const y_pos = ((i) * TILE_HEIGHT) * ZOOM_FACTOR
+                    let { x, y } = getXYSlice(col, 28)
+                    let w = TILE_WIDTH
+                    let h = TILE_HEIGHT
+                    const sliceRect = new PIXI.Rectangle(x, y, w, h);
+                    const texture = new PIXI.Texture({source: this.cafeAssets.CafeTilesetPng, frame: sliceRect})
+                    const tile = new Tile(this.app, x_pos, y_pos, texture, 'tile', this.visibleSprites)
+                    this.craftingTile = new PIXI.Sprite(texture)
+                    this.craftingTile.alpha = 0
+                    this.craftingTile.x = x_pos
+                    this.craftingTile.y = y_pos
+                    this.craftingTile.width = w
+                    this.craftingTile.height = h
+                    this.visibleSprites.addChild(this.craftingTile)
                 }
             })
         })
@@ -125,7 +152,8 @@ export default class Cafe{
         this.uiManager = new UIManager(this.app, this.character, this.uiAssets, this.keysObject, this.iconAssets, this.clickEventManager)
         await this.uiManager.init()
         
-        
+        this.npcManager = new NPCManager(this.app, this.player, this.npcSpritesheets, this.visibleSprites)
+        this.npcManager.initRobertNPC()
 
         //add obstacle sprites to stage
         this.app.stage.addChild(this.obstacleSprites)
@@ -154,6 +182,13 @@ export default class Cafe{
         await this.createPuddleTile()
         await this.createHellCircleTile()
         await this.createTrashPile()
+        await this.createEspressoMachine()
+    }
+
+    createEspressoMachine = async () => {
+        const texture = this.cafeObjectsAssets.EspressoMachineActive
+        // const espressoMachine = new EspressoMachine(this.app, 200, 200, texture, "espresso_machine", this.visibleSprites, true, .25, 1, 1, [])
+        const espressoMachine = new Tile(this.app, 374, 289, texture, "espresso_machine", this.visibleSprites)
     }
 
     createPuddleTile = async () => {
@@ -236,5 +271,10 @@ export default class Cafe{
         this.visibleSprites.run(this.character.sprite)
         this.bulletManager.run(this.character.sprite)
         this.uiManager.run()
+        if(spritesAreColliding(this.character.sprite, this.craftingTile)){
+            this.character.inCraftingPosition = true
+            
+        }else this.character.inCraftingPosition = false
+        console.log("player in crafting area? ", this.character.inCraftingPosition)
     }
 }

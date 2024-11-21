@@ -1,4 +1,4 @@
-//character
+//character spritesheets
 import CharacterIdleSpritesheet from './img/spritesheets/character/idle_spritesheet.png'
 import CharacterIdleUpSpritesheet from './img/spritesheets/character/idle_up_spritesheet.png'
 import CharacterIdleRightSpritesheet from './img/spritesheets/character/idle_right_spritesheet.png'
@@ -8,6 +8,8 @@ import CharacterRunLeftSpritesheet from './img/spritesheets/character/run_left_s
 import CharacterRunDownSpritesheet from './img/spritesheets/character/run_down_spritesheet.png'
 import CharacterRunUpSpritesheet from './img/spritesheets/character/run_up_spritesheet.png'
 
+//npc spritesheets
+import NPCSpritesheet_RobertSpritesheet from './img/spritesheets/npc/robert.png'
 //ui
 import UI_IpadTurnOnSpritesheet from './img/spritesheets/ipad/ipad_turn_on.png'
 import UI_HUDHealthBar from './img/ui/health_bar.png'
@@ -18,6 +20,7 @@ import UI_HUDFullBG from './img/ui/full_ui_bg.png'
 import UI_IpadNavRight from './img/ui/ipad_nav_right.png'
 import UI_IpadNavLeft from './img/ui/ipad_nav_left.png'
 import UI_InventoryBG from './img/ui/inventory_bg.png'
+import UI_CraftingBG from './img/ui/crafting_bg.png'
 
 //particles
 import BulletWallExplodeParticleSmoke from './img/spritesheets/particles/bullet_explode_particle_smoke.png'
@@ -47,23 +50,58 @@ import Icon_Ice from './img/materials/ice.png'
 import Icon_WhippedCream from './img/materials/whipped_cream.png'
 import Icon_Syrup from './img/materials/syrup.png'
 import Icon_Milk from './img/materials/milk.png'
+import Icon_LargeFang from './img/materials/large_fang.png'
+import Icon_CorruptedBlood from './img/materials/corrupted_blood.png'
 //equipment
 
 //consumables
-
+import Icon_Frappe from './img/consumables/frappe.png'
+import Icon_Coffee from './img/consumables/coffee.png'
+import Icon_Latte from './img/consumables/latte.png'
+import Icon_IcedCoffee from './img/consumables/iced_coffee.png'
+import Icon_FelFrappe from './img/consumables/demonic_frappe.png'
+import Icon_FelCoffee from './img/consumables/demonic_coffee.png'
+import Icon_FelLatte from './img/consumables/demonic_latte.png'
+import Icon_FelIcedCoffee from './img/consumables/demonic_iced_coffee.png'
+import Icon_CraftingSelected from './img/consumables/selected.png'
 //empty icons
 import Icon_EmptyItemSlot from './img/ui/empty_item_slot.png'
 import Icon_EmptyCharacterSheetSlot from './img/ui/empty_character_sheet_item.png'
-
 
 //bullets
 import BattleRifle1 from './img/weapons/battle_rifle/bullet1.png'
 import BattleRifle2 from './img/weapons/battle_rifle/bullet2.png'
 import BattleRifle3 from './img/weapons/battle_rifle/bullet3.png'
 
+//objects
+import EspressoMachineActive from './img/objects/espresso_machine_active.png'
+import EspressoMachineInactive from './img/objects/espresso_machine_inactive.png'
+
 
 export const assetsManifest = {
     "bundles":[
+      {
+         "name": "npc_spritesheets",
+         "assets": [
+            {
+               "alias": "NPCSpritesheet_RobertSpritesheet",
+               "src": NPCSpritesheet_RobertSpritesheet
+            }
+         ]
+      },
+      {
+         "name": "overworld_objects",
+         "assets": [
+            {
+               "alias": "EspressoMachineActive",
+               "src": EspressoMachineActive
+            },
+            {
+               "alias": "EspressoMachineInactive",
+               "src": EspressoMachineInactive
+            }
+         ]
+      },
       {
          "name": "icons",
          "assets":[
@@ -88,6 +126,14 @@ export const assetsManifest = {
                "src": Icon_Milk
             },
             {
+               "alias": "Icon_LargeFang", 
+               "src": Icon_LargeFang
+            },
+            {
+               "alias": "Icon_CorruptedBlood", 
+               "src": Icon_CorruptedBlood
+            },
+            {
                "alias" :"Icon_EmptyItemSlot",
                "src": Icon_EmptyItemSlot
             },
@@ -95,6 +141,42 @@ export const assetsManifest = {
                "alias": "Icon_EmptyCharacterSheetSlot",
                "src": Icon_EmptyCharacterSheetSlot
             },
+            {
+               "alias": "Icon_Coffee",
+               "src": Icon_Coffee
+            },
+            {
+               "alias": "Icon_Frappe",
+               "src": Icon_Frappe
+            },
+            {
+               "alias": "Icon_Latte",
+               "src": Icon_Latte
+            },
+            {
+               "alias": "Icon_IcedCoffee",
+               "src": Icon_IcedCoffee
+            },
+            {
+               "alias": "Icon_FelCoffee",
+               "src": Icon_FelCoffee
+            },
+            {
+               "alias": "Icon_FelFrappe",
+               "src": Icon_FelFrappe
+            },
+            {
+               "alias": "Icon_FelLatte",
+               "src": Icon_FelLatte
+            },
+            {
+               "alias": "Icon_FelIcedCoffee",
+               "src": Icon_FelIcedCoffee
+            },
+            {
+               "alias": "Icon_CraftingSelected",
+               "src": Icon_CraftingSelected
+            }
          ]
       },
        {
@@ -135,6 +217,10 @@ export const assetsManifest = {
             {
                "alias": "UI_InventoryBG",
                "src": UI_InventoryBG
+            },
+            {
+               "alias": "UI_CraftingBG",
+               "src": UI_CraftingBG
             }
          ]
        },

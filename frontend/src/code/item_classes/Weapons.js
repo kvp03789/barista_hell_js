@@ -62,7 +62,6 @@ export class Shotgun extends Weapon{
     }
 
     run = (angle) => {
-        console.log('Shotgun is running')
         this.sprite.angle = angle
     }
 

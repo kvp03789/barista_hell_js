@@ -2,6 +2,7 @@ import { Spritesheet, AnimatedSprite } from "pixi.js";
 import { characterIdleData, charcterRunRightData, charcterRunLeftData, characterRunDownData, characterRunUpData } from "../json/character/characterSpriteData";
 import { spritesAreColliding } from "../utils";
 import { Inventory, Equipment, QuickBar } from "./ItemsInventoryEquipment.js";
+import { ANIMATION_SPEED } from "../settings.js";
 
 export default class Character{
     constructor(app, keysObject, spritesheetAssets, itemAssets, x_pos, y_pos, obstacleSprites, bulletManager, particleManager, iconAssets){
@@ -31,6 +32,12 @@ export default class Character{
         this.mousePos = {x: 0, y: 0}
 
         this.keyboardCooldown = 0
+
+        //character is in position to craft or not
+        this.inCraftingPosition = false
+        //if inCraftingPosition and player presses E, set to true and open
+        //crafting window
+        this.crafting = false
     }
 
     addSpriteToGroups = (group) => {
@@ -113,7 +120,7 @@ export default class Character{
         await this.initRunUpSpriteSheet()
 
         this.sprite = new AnimatedSprite(this.idle_spritesheet.animations.main)
-        this.sprite.animationSpeed = 0.1666;
+        this.sprite.animationSpeed = ANIMATION_SPEED;
         this.sprite.x = this.x_pos
         this.sprite.y = this.y_pos
         this.sprite.label = 'Character'
@@ -156,8 +163,9 @@ export default class Character{
     //returns bool if a non movement key is pressed
     isKeyPressed = () => {
         if(
-            this.keysObject[69] || //e key
-            this.keysObject[16]    //left shift key
+            // this.keysObject[69] || //e key
+            this.keysObject[16] || //left shift key
+            this.keysObject[81] //q key
         ){
             return true
         }
@@ -165,13 +173,19 @@ export default class Character{
     }
 
     handleActionKeyPress = () => {
-        if(this.keysObject[69]){
-            console.log("E key pressed!")
-            this.setActiveWeaponIndex()
-        }
-        else if(this.keysObject[16]){
+        // if(this.keysObject[69]){
+        //     console.log("E key pressed!")
+        //     if(this.inCraftingPosition){
+        //         this.crafting = true
+        //         console.log("opening crafting window...")
+        //     }
+        // }
+        if(this.keysObject[16]){
             console.log("LSHIFT key pressed!")
         }
+        else if(this.keysObject[81])
+            console.log("Q key pressed!")
+            this.setActiveWeaponIndex()
     }
 
     setActiveWeaponIndex = () => {

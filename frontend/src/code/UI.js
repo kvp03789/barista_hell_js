@@ -1,6 +1,7 @@
 import { Container, Graphics, Sprite, Text, TextStyle } from "pixi.js";
-import { SCREEN_HEIGHT, SCREEN_WIDTH, UI_CLICK_COOLDOWN, UI_SETTINGS } from "../settings";
-import { AdjustmentFilter, CRTFilter, GlitchFilter, GlowFilter } from "pixi-filters";
+import { SCREEN_HEIGHT, SCREEN_WIDTH, UI_CLICK_COOLDOWN, UI_SETTINGS, DRINK_RECIPES } from "../settings";
+import { AdjustmentFilter, BevelFilter, CRTFilter, GlitchFilter, GlowFilter } from "pixi-filters";
+import { Beans, CorruptedBlood, Ice, LargeFang, Milk, Syrup, WhippedCream } from "./item_classes/Materials";
 
 
 export default class UIManager{
@@ -25,6 +26,7 @@ export default class UIManager{
         //display properties
         this.characterSheetDisplaying = false
         this.inventoryDisplaying = false
+        this.craftingIsDisplaying = false
         
         //object to hold parsed ui assets 
         this.UIAssetsObject = {}
@@ -70,7 +72,9 @@ export default class UIManager{
 
          //inventory
         this.inventory = new InventoryUI(this.app, this.player, this.player.inventory.itemSlots, this.clickCooldown, this.clicking, this.UIAssetsObject, this.uiContainer, SCREEN_WIDTH - (this.UIAssetsObject.UI_InventoryBG.width + 20), 50, this.iconAssetsObject, this.clickEventManager)
-         
+        
+        //crafting window
+        this.craftingWindow = new CraftingWindowUI(this.app, this.player, this.clickCooldown, this.clicking, this.UIAssetsObject, this.uiContainer, SCREEN_WIDTH - (this.UIAssetsObject.UI_InventoryBG.width + 20), 50, this.iconAssetsObject, this.clickEventManager, this)
     }     
 
     //returns bool if a non movement key is pressed
@@ -78,7 +82,8 @@ export default class UIManager{
         if(
             this.keysObject[67] || //c key
             this.keysObject[84] || //t key
-            this.keysObject[73]    //i key
+            this.keysObject[73] || //i key
+            this.keysObject[69]    //e key
         ){
             return true
         }
@@ -86,7 +91,6 @@ export default class UIManager{
     }
 
     handleKeyPress = () => {
-        console.log("key pressed!!")
         if(this.keysObject[67]){
             this.characterSheetDisplaying = !this.characterSheetDisplaying
             if(this.characterSheetDisplaying){
@@ -102,6 +106,15 @@ export default class UIManager{
             }
             else this.uiContainer.removeChild(this.inventory)
         }
+
+        if(this.keysObject[69] && this.player.inCraftingPosition == true){
+            console.log("great success")
+            this.craftingIsDisplaying = !this.craftingIsDisplaying
+            if(this.craftingIsDisplaying){
+                this.uiContainer.addChild(this.craftingWindow)
+            }
+            else this.uiContainer.removeChild(this.craftingWindow)
+        }
     }
 
     run = () => {
@@ -114,6 +127,13 @@ export default class UIManager{
             this.keyboardCooldown -= 1
         }
 
+        //automatically close crafting window if player walks away
+        if(!this.player.inCraftingPosition){
+            this.craftingIsDisplaying = false
+            this.uiContainer.removeChild(this.craftingWindow)
+        }
+
+        this.craftingWindow.run()
         this.characterSheet.run(this.player)
         this.inventory.run(this.player)
         this.quickBar.run(this.player)
@@ -184,42 +204,36 @@ class ItemSlot_UI extends Sprite{
             this.addChild(this.slotNumberText)
         }
 
-        
         this.quantityText = new Text({style: this.quantityTextStyle, text: this.quantityTextContent})
+        this.quantityText.position.set(20, 15)
         if(this.item){
             this.addChild(this.quantityText)
         }
+
+        if(this.slotType === "crafting_material"){
+            this.alpha = .5
+            this.quantity = 1
+            this.quantityTextContent = `${this.quantity}`
+            this.quantityText.text = this.quantityTextContent
+        }
     }
 
-    onClick = () => {
-        // if(!this.item){
-        //     //if no item and no event in queue nothing happens
-        //     if(!this.clickEventManager.currentEvent){
-        //         return
-        //     }
-        //     //if no item and there is event in queue player is dropping item
-        //     else if(this.clickEventManager.currentEvent){
-        //         this.clickEventManager.handleDropClick(this)
-        //     }
-        // }
-        // else {
-        //     //if item in slot but there no current event player is picking up item
-        //     if(!this.clickEventManager.currentEvent){
-        //         this.clickEventManager.handlePickupClick(this)
-        //     }
-        //     //if item in slot and there IS current event player
-        //     //is either swapping items or stacking
-        //     else this.clickEventManager.handleStacksAndSwaps(this)
-        // }
-        this.clickEventManager.handleSlotClick(this)
-        console.log("DEBUG player inventory: ", this.player.inventory.itemSlots)
+    onClick = (e) => {
+        if(this.slotType === 'crafting_material'){
+            this.clickEventManager.handleMaterialSlotClick(this, e)
+        }
+        else this.clickEventManager.handleSlotClick(this, e)
+        
     }
 
     run = () => {
         //keep contents of actual player inventory, equip, and char screen  
-        //in sync with ui counterparts
-        this.item = this.player[this.slotType].itemSlots[this.slotIndex].item
-        this.quantity =  this.player[this.slotType].itemSlots[this.slotIndex].quantity
+        //in sync with ui counterparts. only do this if not a crafting material slot
+        if(this.slotType !== "crafting_material"){
+            this.item = this.player[this.slotType].itemSlots[this.slotIndex].item
+            this.quantity =  this.player[this.slotType].itemSlots[this.slotIndex].quantity
+        }
+        
 
         //update textures 
         if(this.item){
@@ -230,6 +244,7 @@ class ItemSlot_UI extends Sprite{
                 this.addChild(this.quantityText)
             }
         }
+
         //remove quantity text if item becomes !item or quantity below 1
         else if((!this.item && this.children.length > 0) || this.quantity < 1){
             this.texture = this.emptyTexture
@@ -237,6 +252,237 @@ class ItemSlot_UI extends Sprite{
         }
     }
 }
+
+class CraftingSelectionButton extends Sprite{
+    constructor(texture, selectedTexture, x, y, craftingWindow, label, index){
+        super(texture)
+        //selected texture is green box that signifies when a recipe is selected
+        this.selectedBox = new Sprite(selectedTexture)
+        this.selectedBox.position.set(0)
+        this.selectedBox.label = "selected_box"
+
+        this.scale.set(1.5)
+        this.label = label
+        this.x = x
+        this.y = y
+        this.craftingWindow = craftingWindow
+        this.index = index
+
+        this.glowFilter = new GlowFilter()
+        this.filters = []
+
+        this.interactive = true
+        this.on("click", this.handleClick)
+        this.on("mouseenter", this.handleMouseEnter)
+        this.on("mouseleave", this.handleMouseLeave)
+
+        this.init()
+    }
+
+    init = () => {
+        //set selection box to first one initially
+        if(this.index === 0){
+            this.addChild(this.selectedBox)
+        }
+    }
+
+    handleMouseEnter = () => {
+        this.filters = [this.glowFilter]
+    }
+
+    handleMouseLeave = () => {
+        //remove glow filter
+        this.filters = []
+    }
+
+    handleClick = () => {
+        //remove any other selection boxes
+        this.craftingWindow.children.forEach((child) => {
+            if(child.label.includes("button")){
+                child.removeChildren()
+            }
+        })
+        
+        this.craftingWindow.recipeIndex = this.index
+        this.craftingWindow.currentRecipe = DRINK_RECIPES[this.index]
+        this.craftingWindow.handleChangeRecipes()
+        this.addChild(this.selectedBox)
+
+    }
+}
+
+class CraftingWindowUI extends Container{
+    constructor(app, player, clickCooldown, clicking, UIAssetsObject, uiContainer, xPos, yPos, iconsAssetsObject, clickEventManager, uiManager){
+        super()
+        this.app = app
+        this.player = player
+        this.uiManager = uiManager
+        this.clickEventManager = clickEventManager
+
+        this.UIAssetsObject = UIAssetsObject
+        this.iconAssets = iconsAssetsObject
+        console.log(this.iconAssets, "icon assets")
+        this.uiContainer = uiContainer
+
+        this.xPos = xPos
+        this.yPos = yPos
+
+        this.clickCooldown = clickCooldown
+        this.clicking = clicking
+
+        this.background = new Sprite(UIAssetsObject.UI_CraftingBG)
+        //container to hold material slots
+        this.craftingSlotsContainer = new Container()
+        this.craftingSlotsContainer.label = "crafting_slots_container"
+        this.addChild(this.background, this.craftingSlotsContainer)
+
+        this.label = "crafting_ui"
+        this.position.set(xPos, yPos)
+
+        this.emptySlotTexture = this.iconAssets.Icon_EmptyItemSlot
+
+        //what is the selected recipe
+        this.recipeIndex = 0
+        this.currentRecipe = DRINK_RECIPES[this.recipeIndex]
+
+        this.init()
+    }
+
+    init = () => {
+        this.initCraftingSelectionButton()
+        this.initMaterialsSlots()
+        this.initResultSlot()
+    }
+
+    initCraftingSelectionButton = ()=> {
+        const buttonWidth = 30 * 1.5
+        const interval = this.background.width / 4
+        const margin = (interval - buttonWidth) / 2
+        console.log(interval)
+        const firstRowY = 15
+        const frappeIcon = new CraftingSelectionButton(this.iconAssets.Icon_Frappe, this.iconAssets.Icon_CraftingSelected, margin, firstRowY, this, "frappe_button", 0)
+        const latteIcon = new CraftingSelectionButton(this.iconAssets.Icon_Latte, this.iconAssets.Icon_CraftingSelected, interval + margin, firstRowY, this, "latte_button", 1)
+        const icedCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_IcedCoffee, this.iconAssets.Icon_CraftingSelected, interval * 2 + margin, firstRowY, this, "iced_coffee_button", 2)
+        const coffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_Coffee, this.iconAssets.Icon_CraftingSelected, interval * 3 + margin, firstRowY, this, "coffee_button", 3)
+
+        const felFrappeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelFrappe, this.iconAssets.Icon_CraftingSelected, margin, firstRowY*5, this, "frappe_button", 4)
+        const felLatteIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelLatte, this.iconAssets.Icon_CraftingSelected, interval + margin, firstRowY*5, this, "latte_button", 5)
+        const felIcedCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelIcedCoffee, this.iconAssets.Icon_CraftingSelected, interval * 2 + margin, firstRowY*5, this, "iced_coffee_button", 6)
+        const felCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelCoffee, this.iconAssets.Icon_CraftingSelected, interval * 3 + margin, firstRowY*5, this, "coffee_button", 7)
+        this.addChild(frappeIcon, latteIcon, icedCoffeeIcon, coffeeIcon, felFrappeIcon, felLatteIcon, felIcedCoffeeIcon, felCoffeeIcon)
+    }
+
+    initMaterialsSlots = () => {
+        const slotSize = 30 * 1.5 
+        for(let i = 0; i < DRINK_RECIPES[this.recipeIndex].length; i++){
+            let item = null
+            switch(DRINK_RECIPES[this.recipeIndex][i]) {
+                case "WhippedCream":
+                    item = new WhippedCream(this.app, this.player, this.iconAssets)
+                    break;
+                case "Syrup":
+                    item = new Syrup(this.app, this.player, this.iconAssets)
+                    break;
+                case "Milk":
+                    item = new Milk(this.app, this.player, this.iconAssets)
+                    break;
+                case "Beans":
+                    item = new Beans(this.app, this.player, this.iconAssets)
+                    break;
+                case "Ice":
+                    item = new Ice(this.app, this.player, this.iconAssets)
+                default:
+                    break;
+            }
+            const slot = new ItemSlot_UI(
+                item.texture,
+                this.iconAssets.Icon_EmptyItemSlot, 
+                this.player, "crafting_material", 
+                i % 2 * slotSize, 
+                i % 3 * slotSize, 
+                i, item, this.clickEventManager)
+            this.craftingSlotsContainer.addChild(slot)
+        }
+        
+        this.craftingSlotsContainer.position.set(50, this.background.height / 2)
+    }
+
+    initResultSlot = () => {
+        const resultSlot = new ItemSlot_UI(
+            this.iconAssets.Icon_EmptyItemSlot, 
+            this.iconAssets.Icon_EmptyItemSlot, 
+            this.player, "crafting_result", 
+            170, 200, 0, 
+            null, this.clickEventManager)
+        this.addChild(resultSlot)
+    }
+
+    populateMaterials = () => {
+        this.craftingSlotsContainer.children.forEach((slot, i) => {
+            slot.item = DRINK_RECIPES[this.recipeIndex][i]
+        })
+        
+    }
+
+    handleChangeRecipes = () => {
+        console.log(this.craftingSlotsContainer)
+        //clear all material slots in craftingSlotsContainer
+        this.craftingSlotsContainer.removeChildren()
+        const slotSize = 30 * 1.5
+        //repopulate with new recipe
+        DRINK_RECIPES[this.recipeIndex].forEach((recipeString, index) => {
+            let item = null
+            switch(recipeString) {
+                case "WhippedCream":
+                    item = new WhippedCream(this.app, this.player, this.iconAssets)
+                    break;
+                case "Syrup":
+                    item = new Syrup(this.app, this.player, this.iconAssets)
+                    break;
+                case "Milk":
+                    item = new Milk(this.app, this.player, this.iconAssets)
+                    break;
+                case "Beans":
+                    item = new Beans(this.app, this.player, this.iconAssets)
+                    break;
+                case "Ice":
+                    item = new Ice(this.app, this.player, this.iconAssets)
+                    break;
+                case "LargeFang":
+                    item = new LargeFang(this.app, this.player, this.iconAssets)
+                    break;
+                case "CorruptedBlood":
+                    item = new CorruptedBlood(this.app, this.player, this.iconAssets)
+                    break;
+                default:
+                    break;
+            }
+            const slot = new ItemSlot_UI(
+                item == null ? this.iconAssets.Icon_EmptyItemSlot : item.sprite.texture,
+                this.iconAssets.Icon_EmptyItemSlot, 
+                this.player, "crafting_material", 
+                index % 2 * slotSize, 
+                index % 3 * slotSize, 
+                index, item, this.clickEventManager)
+            this.craftingSlotsContainer.addChild(slot)
+        })
+    }
+
+    run = () => {
+
+        this.craftingSlotsContainer.children.forEach(child => {
+            child.run()
+        })
+
+        if(this.uiManager.inventoryDisplaying){
+            this.x = 50
+        }
+        else{
+            this.x = this.xPos
+        }
+    }
+}
+
 
 class InventoryUI extends Container{
     constructor(app, player, playerInventoryItemSlots, clickCooldown, clicking, UIAssetsObject, uiContainer, xPos, yPos, iconsAssetsObject, clickEventManager){

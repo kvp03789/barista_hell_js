@@ -52,3 +52,21 @@ export class Ice extends Material{
         this.sprite = new Sprite(this.texture)
     }
 }
+
+export class CorruptedBlood extends Material{
+    constructor(app, player, iconAssets){
+        super(app, player, iconAssets)
+        this.itemName = "CorruptedBlood"
+        this.texture = this.iconAssets[`Icon_${this.itemName}`]
+        this.sprite = new Sprite(this.texture)
+    }
+}
+
+export class LargeFang extends Material{
+    constructor(app, player, iconAssets){
+        super(app, player, iconAssets)
+        this.itemName = "LargeFang"
+        this.texture = this.iconAssets[`Icon_${this.itemName}`]
+        this.sprite = new Sprite(this.texture)
+    }
+}

@@ -63,3 +63,12 @@ export class HellPortalObject extends AnimatedTile{
         // this.filters[0].alpha = this.glowPulse
     }
 }
+
+export class EspressoMachine extends AnimatedTile{
+    constructor(app, x_pos, y_pos, texture, label, group, isParticleTile, animationSpeed, scale, alpha, filters){
+        super(app, x_pos, y_pos, texture, label, group, isParticleTile, animationSpeed, scale, alpha, filters)
+
+    }
+}
+
+    
