@@ -14,12 +14,17 @@ import { GlowFilter, ReflectionFilter, ShockwaveFilter } from 'pixi-filters'
 import UIManager from './UI'
 import { ClickEventManager } from './ClickEventManager'
 import { NPCManager } from './NPCManager'
+import NPCTilesGroup from './NPCTilesGroup'
 
 export default class Cafe{
     constructor(app, keysObject){
         this.app = app
         this.app.stage.interactive = true
         this.app.stage.on('mousemove', this.onMouseMove)
+
+        //used for npc dialogue and other settings that must
+        //change depending on game state
+        this.stateLabel = "cafe_intro"
         
         //display height and width
         this.display_width = this.app.view.width
@@ -29,7 +34,8 @@ export default class Cafe{
         //sprite group/container
         this.visibleSprites = new YSortCameraSpriteGroup(this.app)
         this.obstacleSprites = new ObstacleSpriteGroup(this.app)
-
+        this.npcTiles = new NPCTilesGroup(this.app)
+        
         this.clickEventManager = new ClickEventManager(this.app, this.visibleSprites)
 
         //used when calculating angle of player
@@ -126,8 +132,10 @@ export default class Cafe{
         this.cafeBaseMap = PIXI.Sprite.from(this.cafeAssets.CafeBaseMap)
         this.visibleSprites.addChild(this.cafeBaseMap)
 
+        this.npcManager = new NPCManager(this.app, this.npcSpritesheets, this.visibleSprites, this.obstacleSprites)
+
         //add character as property of level and init, adding to visibleSprites and to stage
-        this.character = new Character(this.app, this.keysObject, this.spritesheetAssets, this.weaponAssets, this.display_width / 2, this.display_height / 2, this.obstacleSprites, this.bulletManager, this.particleManager, this.iconAssets)
+        this.character = new Character(this.app, this.keysObject, this.spritesheetAssets, this.weaponAssets, this.display_width / 2, this.display_height / 2, this.obstacleSprites, this.bulletManager, this.particleManager, this.iconAssets, this.npcManager.npcList)
         await this.character.init(this.visibleSprites, this.particleManager)
         this.mousePos = {x: this.character.sprite.x, y: this.character.sprite.y}
         //add foreground blocks to map
@@ -149,17 +157,40 @@ export default class Cafe{
             })
         })
 
-        this.uiManager = new UIManager(this.app, this.character, this.uiAssets, this.keysObject, this.iconAssets, this.clickEventManager)
+        //parse and handle npc_tiles map layer
+        this.sarahNPCTiles = []
+        this.parsedMapObject.npc_tiles.forEach((row, i) => {
+            row.forEach((col, j) => {
+                if(col !== 0){
+                    const x_pos = ((j) * TILE_WIDTH) * ZOOM_FACTOR
+                    const y_pos = ((i) * TILE_HEIGHT) * ZOOM_FACTOR
+                    // let x = (Math.floor(col / 28) * TILE_WIDTH) + (col % 28 * TILE_WIDTH)
+                    // let y = (Math.floor(col / 28) * TILE_HEIGHT)
+                    let { x, y } = getXYSlice(col, 28)
+                    let w = TILE_WIDTH
+                    let h = TILE_HEIGHT
+                    const sliceRect = new PIXI.Rectangle(x, y, w, h);
+                    const texture = new PIXI.Texture({source: this.cafeAssets.CafeTilesetPng, frame: sliceRect})
+                    const tile = new Tile(this.app, x_pos, y_pos, texture, 'tile', this.npcTiles)
+                    this.sarahNPCTiles.push(tile)
+                }
+            })
+        })
+
+        await this.npcManager.initRobertNPC()
+        await this.npcManager.initSarahNPC(this.sarahNPCTiles)
+
+        this.uiManager = new UIManager(this.app, this.character, this.uiAssets, this.keysObject, this.iconAssets, this.clickEventManager, this.mousePos, this.npcManager.npcList, this.stateLabel)
         await this.uiManager.init()
-        
-        this.npcManager = new NPCManager(this.app, this.player, this.npcSpritesheets, this.visibleSprites)
-        this.npcManager.initRobertNPC()
 
         //add obstacle sprites to stage
         this.app.stage.addChild(this.obstacleSprites)
 
         //add custom camera group to stage
         this.app.stage.addChild(this.visibleSprites)  
+
+        //add npc tiles to stage
+        this.app.stage.addChild(this.npcTiles)
 
         //add animated tiles
         this.initializeAnimatedTiles()
@@ -172,6 +203,7 @@ export default class Cafe{
 
         //append ui to stage
         this.app.stage.addChild(this.uiManager.uiContainer)
+        this.app.stage.addChild(this.uiManager.tooltipContainer)
 
         //init and add clickEventManager to stage, for rendering click event icons
         this.clickEventManager.init(this.character, this.uiManager, this.keysObject)
@@ -268,13 +300,15 @@ export default class Cafe{
         this.character.run(angle)
         this.particleManager.run(this.character.sprite)
         this.obstacleSprites.run(this.character.sprite)
+        this.npcTiles.run(this.character.sprite)
         this.visibleSprites.run(this.character.sprite)
         this.bulletManager.run(this.character.sprite)
         this.uiManager.run()
+        this.npcManager.run(this.character)
+
         if(spritesAreColliding(this.character.sprite, this.craftingTile)){
             this.character.inCraftingPosition = true
             
         }else this.character.inCraftingPosition = false
-        console.log("player in crafting area? ", this.character.inCraftingPosition)
     }
 }

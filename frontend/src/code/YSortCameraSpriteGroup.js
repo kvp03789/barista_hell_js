@@ -1,6 +1,5 @@
 import { Container } from "pixi.js";
 import { ZOOM_FACTOR } from "../settings";
-import { AdvancedBloomFilter } from "pixi-filters";
 
 export default class YSortCameraSpriteGroup extends Container{
     constructor(app){

@@ -14,7 +14,7 @@ export default class Tile extends Sprite{
     }
 
     addSpriteToGroup = (group) => {
-        group.addChild(this)
+        if(group !== null)group.addChild(this)
     }
 }
 
@@ -40,7 +40,8 @@ export class AnimatedTile extends AnimatedSprite{
     }
 
     addSpriteToGroup = (group) => {
-        group.addChild(this)
+        if(group !== null)group.addChild(this)
+        
     }
 }
 

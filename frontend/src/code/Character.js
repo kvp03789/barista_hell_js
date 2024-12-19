@@ -1,11 +1,12 @@
 import { Spritesheet, AnimatedSprite } from "pixi.js";
-import { characterIdleData, charcterRunRightData, charcterRunLeftData, characterRunDownData, characterRunUpData } from "../json/character/characterSpriteData";
+import { playerSpritesheetData, characterIdleData, charcterRunRightData, charcterRunLeftData, characterRunDownData, characterRunUpData } from "../json/character/characterSpriteData";
 import { spritesAreColliding } from "../utils";
 import { Inventory, Equipment, QuickBar } from "./ItemsInventoryEquipment.js";
-import { ANIMATION_SPEED } from "../settings.js";
+import { ANIMATION_SPEED, NPC_DIALOGUE_DISTANCE } from "../settings.js";
+
 
 export default class Character{
-    constructor(app, keysObject, spritesheetAssets, itemAssets, x_pos, y_pos, obstacleSprites, bulletManager, particleManager, iconAssets){
+    constructor(app, keysObject, spritesheetAssets, itemAssets, x_pos, y_pos, obstacleSprites, bulletManager, particleManager, iconAssets, npcList){
         this.app = app
         this.keysObject = keysObject
         this.spritesheetAssets = spritesheetAssets
@@ -38,88 +39,25 @@ export default class Character{
         //if inCraftingPosition and player presses E, set to true and open
         //crafting window
         this.crafting = false
+
+        //bool based on if player is within dialogue distance to npc
+        this.touchingNPC = false        
     }
 
     addSpriteToGroups = (group) => {
         group.addChild(this.sprite)
     }
 
-    initIdleSpriteSheet = async () => {
-        this.idle_spritesheet = new Spritesheet(
-            this.spritesheetAssets.character_idle,
-            characterIdleData
-        )
-        await this.idle_spritesheet.parse()
-    }
-
-    initIdleUpSpriteSheet = async () => {
-        this.idle_up_spritesheet = new Spritesheet(
-            this.spritesheetAssets.character_idle_up,
-            characterIdleData
-        )
-        await this.idle_up_spritesheet.parse()
-    }
-
-    initIdleRightSpriteSheet = async () => {
-        this.idle_right_spritesheet = new Spritesheet(
-            this.spritesheetAssets.character_idle_right,
-            characterIdleData
-        )
-        await this.idle_right_spritesheet.parse()
-    }
-
-    initIdleLeftSpriteSheet = async () => {
-        this.idle_left_spritesheet = new Spritesheet(
-            this.spritesheetAssets.character_idle_left,
-            characterIdleData
-        )
-        await this.idle_left_spritesheet.parse()
-    }
-
-    initRunRightSpriteSheet = async () => {
-        this.run_right_spritesheet = new Spritesheet(
-            this.spritesheetAssets.character_run_right,
-            charcterRunRightData
-        )
-        await this.run_right_spritesheet.parse()
-    }
-
-    initRunLeftSpriteSheet = async () => {
-        this.run_left_spritesheet = new Spritesheet(
-            this.spritesheetAssets.character_run_left,
-            charcterRunLeftData
-        )
-        await this.run_left_spritesheet.parse()
-    }
-
-    initRunDownSpriteSheet = async () => {
-        this.run_down_spritesheet = new Spritesheet(
-            this.spritesheetAssets.character_run_down,
-            characterRunDownData
-        )
-        await this.run_down_spritesheet.parse()
-    }
-
-    initRunUpSpriteSheet = async () => {
-        this.run_up_spritesheet = new Spritesheet(
-            this.spritesheetAssets.character_run_up,
-            characterRunUpData
-        )
-        await this.run_up_spritesheet.parse()
-    }
-
     init = async (group, particleManager) => {
-        
-        await this.initIdleSpriteSheet()
-        await this.initIdleUpSpriteSheet()
-        await this.initIdleRightSpriteSheet()
-        await this.initIdleLeftSpriteSheet()
-        await this.initRunRightSpriteSheet()
-        await this.initRunLeftSpriteSheet()
-        await this.initRunDownSpriteSheet()
-        await this.initRunUpSpriteSheet()
+        //generateAnimations populates parts of characterData json-esque object
+        const generateAnimations = playerSpritesheetData.generateAnimations.bind(playerSpritesheetData);
+        generateAnimations(this.spritesheetAssets.PlayerSpritesheet);
 
-        this.sprite = new AnimatedSprite(this.idle_spritesheet.animations.main)
+        this.mainSpritesheet = new Spritesheet(this.spritesheetAssets.PlayerSpritesheet, playerSpritesheetData)
+        await this.mainSpritesheet.parse()
+        
+        this.sprite = new AnimatedSprite(this.mainSpritesheet.animations.run_down)
+        console.log("a wild debug appeared: ", this.sprite)
         this.sprite.animationSpeed = ANIMATION_SPEED;
         this.sprite.x = this.x_pos
         this.sprite.y = this.y_pos
@@ -160,6 +98,7 @@ export default class Character{
             
         }
     }
+
     //returns bool if a non movement key is pressed
     isKeyPressed = () => {
         if(
@@ -203,41 +142,41 @@ export default class Character{
         let newTextures = null;
     
         // determine direction based on angle
-        //S KEY
+        //DOWN
         if (angle >= 45 && angle <= 135) {
             //check if idle
             if(this.movement.x == 0 && this.movement.y == 0){
                 this.sprite.stop()
-                newTextures = this.idle_spritesheet.animations.main;
+                newTextures = this.mainSpritesheet.animations.idle_down;
                 this.sprite.play()
-            }else newTextures = this.run_down_spritesheet.animations.main;        
+            }else newTextures = this.mainSpritesheet.animations.run_down;        
         } 
-        //A KEY
+        //LEFT
         else if (angle >= 135 || angle <= -135) {
             //check if idle
             if(this.movement.x == 0 && this.movement.y == 0){
                 this.sprite.stop()
-                newTextures = this.idle_left_spritesheet.animations.main;
+                newTextures = this.mainSpritesheet.animations.idle_left;
                 this.sprite.play()
-            }else newTextures = this.run_left_spritesheet.animations.main;
+            }else newTextures = this.mainSpritesheet.animations.run_left;
         } 
-        //W KEY
+        //UP
         else if (angle >= -135 && angle <= -45) {
             //check if idle
             if(this.movement.x == 0 && this.movement.y == 0){
                 this.sprite.stop()
-                newTextures = this.idle_up_spritesheet.animations.main;
+                newTextures = this.mainSpritesheet.animations.idle_up;
                 this.sprite.play()
-            }else newTextures = this.run_up_spritesheet.animations.main;
+            }else newTextures = this.mainSpritesheet.animations.run_up;
         } 
-        //D KEY
+        //RIGHT
         else {
             //check if idle
             if(this.movement.x == 0 && this.movement.y == 0){
                 this.sprite.stop()
-                newTextures = this.idle_right_spritesheet.animations.main;
+                newTextures = this.mainSpritesheet.animations.idle_right;
                 this.sprite.play()
-            }else newTextures = this.run_right_spritesheet.animations.main;
+            }else newTextures = this.mainSpritesheet.animations.run_right;
         }
 
         // update animation based on movement
@@ -247,7 +186,6 @@ export default class Character{
             this.sprite.play();
         }
     }    
-
 
     handleMovement = (angle) => {
         this.movement.x = 0;
@@ -282,7 +220,6 @@ export default class Character{
         this.checkCollision('vertical');
     };
     
-
     checkCollision = (direction) => {
         //the hitbox of the char sprite
         const spriteBounds = {
@@ -353,5 +290,7 @@ export default class Character{
         //run the inventory, equipment, and quickBar
         //this keeps them up to date
         this.inventory.run()
+
+        
     }
 }

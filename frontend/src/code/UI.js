@@ -2,12 +2,15 @@ import { Container, Graphics, Sprite, Text, TextStyle } from "pixi.js";
 import { SCREEN_HEIGHT, SCREEN_WIDTH, UI_CLICK_COOLDOWN, UI_SETTINGS, DRINK_RECIPES } from "../settings";
 import { AdjustmentFilter, BevelFilter, CRTFilter, GlitchFilter, GlowFilter } from "pixi-filters";
 import { Beans, CorruptedBlood, Ice, LargeFang, Milk, Syrup, WhippedCream } from "./item_classes/Materials";
-
+import { TooltipManager } from "./TooltipManager";
+import NPCDialogueManaer from "./NPCDialogueManager";
 
 export default class UIManager{
-    constructor(app, player, uiAssets, keysObject, iconAssets, clickEventManager){
+    constructor(app, player, uiAssets, keysObject, iconAssets, clickEventManager, mousePos, npcList, stateLabel){
         this.app = app
         this.player = player
+
+        this.app.stage.on('mousemove', this.onMouseMove)
 
         this.clickEventManager = clickEventManager
 
@@ -27,6 +30,7 @@ export default class UIManager{
         this.characterSheetDisplaying = false
         this.inventoryDisplaying = false
         this.craftingIsDisplaying = false
+        this.dialogueIsDisplaying = false
         
         //object to hold parsed ui assets 
         this.UIAssetsObject = {}
@@ -35,6 +39,20 @@ export default class UIManager{
         this.uiContainer = new Container()
         // this.uiContainer.zIndex = 100
         this.uiContainer.label = "ui_container"
+
+        this.mousePos = mousePos
+
+        this.tooltipContainer = new Container()
+        this.tooltipContainer.label = "tooltip_container"
+
+        this.npcList = npcList
+
+        this.stateLabel = stateLabel
+    }
+
+    onMouseMove = (e) => {
+        //keep mouse position updated
+        this.mousePos = e.data.global
     }
 
     handleClickCooldown = () => {
@@ -60,21 +78,30 @@ export default class UIManager{
             }
         }
 
+        console.log(this.UIAssetsObject)
+
         //--init all of the components of the UI--//
+        
+        //tooltip manager
+        this.tooltipManager = new TooltipManager(this.app, this.UIAssetsObject.UI_Tooltip_BG_Texture, this.uiContainer, this.tooltipContainer, this.mousePos)
+
         //health bar
-        this.healthBar = new HealthBar(this.app, this.UIAssetsObject.UI_HUDFullBG, this.player,  55, SCREEN_HEIGHT - this.UIAssetsObject.UI_HUDHealthBar.height, this.uiContainer)
+        this.healthBar = new HealthBar(this.app, this.UIAssetsObject.UI_HUDFullBG, this.player,  55, SCREEN_HEIGHT - this.UIAssetsObject.UI_HUDHealthBar.height, this.uiContainer, this.tooltipManager)
 
         //ipad/character sheet
-        this.characterSheet = new CharacterSheet(this.app, this.clickCooldownTimer, this.clicking, this.UIAssetsObject, this.uiContainer, this.player, this.clickEventManager, this.iconAssetsObject)
+        this.characterSheet = new CharacterSheet(this.app, this.clickCooldownTimer, this.clicking, this.UIAssetsObject, this.uiContainer, this.player, this.clickEventManager, this.iconAssetsObject, this.uiManager, this.tooltipManager)
 
          //character inventory, items, and equipment slots
-        this.quickBar = new QuickBarUI(this.app, this.player, this.player.quickBar.itemSlots, this.clickCooldown, this.clicking, this.iconAssetsObject.Icon_EmptyItemSlot, this.uiContainer, this.iconAssetsObject, this.clickEventManager)
+        this.quickBar = new QuickBarUI(this.app, this.player, this.player.quickBar.itemSlots, this.clickCooldown, this.clicking, this.iconAssetsObject.Icon_EmptyItemSlot, this.uiContainer, this.iconAssetsObject, this.clickEventManager, this.uiManager, this.tooltipManager)
 
          //inventory
-        this.inventory = new InventoryUI(this.app, this.player, this.player.inventory.itemSlots, this.clickCooldown, this.clicking, this.UIAssetsObject, this.uiContainer, SCREEN_WIDTH - (this.UIAssetsObject.UI_InventoryBG.width + 20), 50, this.iconAssetsObject, this.clickEventManager)
+        this.inventory = new InventoryUI(this.app, this.player, this.player.inventory.itemSlots, this.clickCooldown, this.clicking, this.UIAssetsObject, this.uiContainer, SCREEN_WIDTH - (this.UIAssetsObject.UI_InventoryBG.width + 20), 50, this.iconAssetsObject, this.clickEventManager, this.uiManager, this.tooltipManager)
         
         //crafting window
-        this.craftingWindow = new CraftingWindowUI(this.app, this.player, this.clickCooldown, this.clicking, this.UIAssetsObject, this.uiContainer, SCREEN_WIDTH - (this.UIAssetsObject.UI_InventoryBG.width + 20), 50, this.iconAssetsObject, this.clickEventManager, this)
+        this.craftingWindow = new CraftingWindowUI(this.app, this.player, this.clickCooldown, this.clicking, this.UIAssetsObject, this.uiContainer, SCREEN_WIDTH - (this.UIAssetsObject.UI_InventoryBG.width + 20), 50, this.iconAssetsObject, this.clickEventManager, this, this.tooltipManager)
+
+        //npc dialogue manager
+        this.npcDialogueManager = new NPCDialogueManaer(this.app, this.player, this.UIAssetsObject, this.uiContainer, this.npcList, this.stateLabel)
     }     
 
     //returns bool if a non movement key is pressed
@@ -91,33 +118,64 @@ export default class UIManager{
     }
 
     handleKeyPress = () => {
+        //c key
         if(this.keysObject[67]){
             this.characterSheetDisplaying = !this.characterSheetDisplaying
             if(this.characterSheetDisplaying){
                 this.uiContainer.addChild(this.characterSheet)
             }
-            else this.uiContainer.removeChild(this.characterSheet)
+            else {
+                //close window
+                this.uiContainer.removeChild(this.characterSheet)
+                //remove any tooltips just in case!
+                this.tooltipManager.removeTooltip()
+            }
         }
-
+        //i key
         if(this.keysObject[73]){
             this.inventoryDisplaying = !this.inventoryDisplaying
             if(this.inventoryDisplaying){
                 this.uiContainer.addChild(this.inventory)
             }
-            else this.uiContainer.removeChild(this.inventory)
+            else {
+                //close inventory window
+                this.uiContainer.removeChild(this.inventory)
+                //remove any tooltips just in case!
+                this.tooltipManager.removeTooltip()
+            }
         }
 
-        if(this.keysObject[69] && this.player.inCraftingPosition == true){
-            console.log("great success")
-            this.craftingIsDisplaying = !this.craftingIsDisplaying
-            if(this.craftingIsDisplaying){
-                this.uiContainer.addChild(this.craftingWindow)
+        //e key
+        if(this.keysObject[69]){
+            //crafting
+            if(this.player.inCraftingPosition){
+                this.craftingIsDisplaying = !this.craftingIsDisplaying
+                if(this.craftingIsDisplaying){
+                    this.uiContainer.addChild(this.craftingWindow)
+                }
+                else {
+                    //close window
+                    this.uiContainer.removeChild(this.craftingWindow)
+                    //remove any tooltips just in case
+                    //remove any tooltips just in case!
+                    this.tooltipManager.removeTooltip()
+                }
             }
-            else this.uiContainer.removeChild(this.craftingWindow)
+
+            //npc dialogue
+            //~~player.canDialogue is an object with a bool called status property
+            //that is set based on player colliding with npc, and an npc property
+            //that gets set to the NPC the player is near~~
+            else if(this.npcDialogueManager.playerCanDialogue.status){
+                //TODO: display npc dialogue here
+                this.npcDialogueManager.playerCanDialogue.npc.handleBeginDialogue()
+                this.uiContainer.addChild(this.npcDialogueManager.dialogueContainer)
+            }
         }
     }
 
     run = () => {
+
         //cooldowns for key presses
         if(this.isKeyPressed() && this.keyboardCooldown == 0){
             this.handleKeyPress()
@@ -133,21 +191,32 @@ export default class UIManager{
             this.uiContainer.removeChild(this.craftingWindow)
         }
 
+        //automatically close dialogue if player walks away from npc
+        if(!this.npcDialogueManager.playerCanDialogue.status){
+            this.dialogueIsDisplaying = false
+            this.uiContainer.removeChild(this.npcDialogueManager.dialogueContainer)
+        }
+
         this.craftingWindow.run()
         this.characterSheet.run(this.player)
         this.inventory.run(this.player)
         this.quickBar.run(this.player)
+        this.tooltipManager.run(this.mousePos)
+        this.npcDialogueManager.run(this.player)
     }
     
 }
 
 class ItemSlot_UI extends Sprite{
-    constructor(texture, emptyTexture, player, type, xPos, yPos, slotIndex, item, clickEventManager){
+    constructor(texture, emptyTexture, player, type, xPos, yPos, slotIndex, item, clickEventManager, uiManager, tooltipManager){
         super(texture)
         this.emptyTexture = emptyTexture
         
         this.player = player
         this.clickEventManager = clickEventManager
+        this.uiManager = uiManager
+        this.tooltipManager = tooltipManager
+        
         //slotType refers to whether item slot is for inventory, quickBar, or equipment
         this.slotType = type
         this.x = xPos
@@ -158,6 +227,9 @@ class ItemSlot_UI extends Sprite{
         this.scale.set(1.5)
         this.interactive = true
         this.on("click", this.onClick)
+        this.on("mouseenter", this.handleMouseEnter)
+        this.on("mouseleave", this.handleMouseLeave)
+    
 
         this.quantityTextStyle = new TextStyle({
             fontFamily: 'roboto',
@@ -216,6 +288,20 @@ class ItemSlot_UI extends Sprite{
             this.quantityTextContent = `${this.quantity}`
             this.quantityText.text = this.quantityTextContent
         }
+    }
+
+    handleMouseEnter = () => {
+        // if(this.item && this.clickEventManager.itemInfoTimer){
+        //     this.clickEventManager.itemInfoTimer--
+        // }
+        // else if(this.item && !this.clickEventManager)
+        if(this.item){
+            this.tooltipManager.displayTooltip(this.item.itemName, this.item.texture)
+        }
+    }
+
+    handleMouseLeave = () => {
+        this.tooltipManager.removeTooltip()
     }
 
     onClick = (e) => {
@@ -312,12 +398,13 @@ class CraftingSelectionButton extends Sprite{
 }
 
 class CraftingWindowUI extends Container{
-    constructor(app, player, clickCooldown, clicking, UIAssetsObject, uiContainer, xPos, yPos, iconsAssetsObject, clickEventManager, uiManager){
+    constructor(app, player, clickCooldown, clicking, UIAssetsObject, uiContainer, xPos, yPos, iconsAssetsObject, clickEventManager, uiManager, tooltipManager){
         super()
         this.app = app
         this.player = player
         this.uiManager = uiManager
         this.clickEventManager = clickEventManager
+        this.tooltipManager = tooltipManager
 
         this.UIAssetsObject = UIAssetsObject
         this.iconAssets = iconsAssetsObject
@@ -358,17 +445,16 @@ class CraftingWindowUI extends Container{
         const buttonWidth = 30 * 1.5
         const interval = this.background.width / 4
         const margin = (interval - buttonWidth) / 2
-        console.log(interval)
         const firstRowY = 15
-        const frappeIcon = new CraftingSelectionButton(this.iconAssets.Icon_Frappe, this.iconAssets.Icon_CraftingSelected, margin, firstRowY, this, "frappe_button", 0)
-        const latteIcon = new CraftingSelectionButton(this.iconAssets.Icon_Latte, this.iconAssets.Icon_CraftingSelected, interval + margin, firstRowY, this, "latte_button", 1)
-        const icedCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_IcedCoffee, this.iconAssets.Icon_CraftingSelected, interval * 2 + margin, firstRowY, this, "iced_coffee_button", 2)
-        const coffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_Coffee, this.iconAssets.Icon_CraftingSelected, interval * 3 + margin, firstRowY, this, "coffee_button", 3)
+        const frappeIcon = new CraftingSelectionButton(this.iconAssets.Icon_Frappe, this.iconAssets.Icon_CraftingSelected, margin, firstRowY, this, "frappe_button", 0, this.tooltipManager)
+        const latteIcon = new CraftingSelectionButton(this.iconAssets.Icon_Latte, this.iconAssets.Icon_CraftingSelected, interval + margin, firstRowY, this, "latte_button", 1, this.tooltipManager)
+        const icedCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_IcedCoffee, this.iconAssets.Icon_CraftingSelected, interval * 2 + margin, firstRowY, this, "iced_coffee_button", 2, this.tooltipManager)
+        const coffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_Coffee, this.iconAssets.Icon_CraftingSelected, interval * 3 + margin, firstRowY, this, "coffee_button", 3, this.tooltipManager)
 
-        const felFrappeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelFrappe, this.iconAssets.Icon_CraftingSelected, margin, firstRowY*5, this, "frappe_button", 4)
-        const felLatteIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelLatte, this.iconAssets.Icon_CraftingSelected, interval + margin, firstRowY*5, this, "latte_button", 5)
-        const felIcedCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelIcedCoffee, this.iconAssets.Icon_CraftingSelected, interval * 2 + margin, firstRowY*5, this, "iced_coffee_button", 6)
-        const felCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelCoffee, this.iconAssets.Icon_CraftingSelected, interval * 3 + margin, firstRowY*5, this, "coffee_button", 7)
+        const felFrappeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelFrappe, this.iconAssets.Icon_CraftingSelected, margin, firstRowY*5, this, "frappe_button", 4, this.tooltipManager)
+        const felLatteIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelLatte, this.iconAssets.Icon_CraftingSelected, interval + margin, firstRowY*5, this, "latte_button", 5, this.tooltipManager)
+        const felIcedCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelIcedCoffee, this.iconAssets.Icon_CraftingSelected, interval * 2 + margin, firstRowY*5, this, "iced_coffee_button", 6, this.tooltipManager)
+        const felCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelCoffee, this.iconAssets.Icon_CraftingSelected, interval * 3 + margin, firstRowY*5, this, "coffee_button", 7, this.tooltipManager)
         this.addChild(frappeIcon, latteIcon, icedCoffeeIcon, coffeeIcon, felFrappeIcon, felLatteIcon, felIcedCoffeeIcon, felCoffeeIcon)
     }
 
@@ -400,7 +486,8 @@ class CraftingWindowUI extends Container{
                 this.player, "crafting_material", 
                 i % 2 * slotSize, 
                 i % 3 * slotSize, 
-                i, item, this.clickEventManager)
+                i, item, this.clickEventManager, this.uiManager, 
+                this.tooltipManager)
             this.craftingSlotsContainer.addChild(slot)
         }
         
@@ -413,7 +500,7 @@ class CraftingWindowUI extends Container{
             this.iconAssets.Icon_EmptyItemSlot, 
             this.player, "crafting_result", 
             170, 200, 0, 
-            null, this.clickEventManager)
+            null, this.clickEventManager, this.uiManager, this.tooltipManager)
         this.addChild(resultSlot)
     }
 
@@ -425,7 +512,6 @@ class CraftingWindowUI extends Container{
     }
 
     handleChangeRecipes = () => {
-        console.log(this.craftingSlotsContainer)
         //clear all material slots in craftingSlotsContainer
         this.craftingSlotsContainer.removeChildren()
         const slotSize = 30 * 1.5
@@ -463,7 +549,7 @@ class CraftingWindowUI extends Container{
                 this.player, "crafting_material", 
                 index % 2 * slotSize, 
                 index % 3 * slotSize, 
-                index, item, this.clickEventManager)
+                index, item, this.clickEventManager, this.uiManager, this.tooltipManager)
             this.craftingSlotsContainer.addChild(slot)
         })
     }
@@ -483,20 +569,22 @@ class CraftingWindowUI extends Container{
     }
 }
 
-
 class InventoryUI extends Container{
-    constructor(app, player, playerInventoryItemSlots, clickCooldown, clicking, UIAssetsObject, uiContainer, xPos, yPos, iconsAssetsObject, clickEventManager){
+    constructor(app, player, playerInventoryItemSlots, clickCooldown, clicking, UIAssetsObject, uiContainer, xPos, yPos, iconsAssetsObject, clickEventManager, uiManager, tooltipManager){
         super()
         this.app = app
         this.player = player
         this.playerInventoryItemSlots = playerInventoryItemSlots
         this.clickEventManager = clickEventManager
+        this.tooltipManager = tooltipManager
+
         this.clickCooldown = clickCooldown
         this.clicking = clicking
 
         this.UIAssetsObject = UIAssetsObject
         this.iconsAssetsObject = iconsAssetsObject
         this.uiContainer = uiContainer
+        this.uiManager = uiManager
 
         this.emptySlotTexture = this.iconsAssetsObject.Icon_EmptyItemSlot
         
@@ -519,12 +607,12 @@ class InventoryUI extends Container{
                 const yPos = 20 + Math.floor(i / columns) * (this.emptySlotTexture.height * 1.5 + 10)
             //if item slot empty, add empty slot sprite
             if(!itemSlot.item){
-                const slotSprite = new ItemSlot_UI(this.emptySlotTexture, this.emptySlotTexture, this.player, "inventory", xPos, yPos, i, itemSlot.item, this.clickEventManager)
+                const slotSprite = new ItemSlot_UI(this.emptySlotTexture, this.emptySlotTexture, this.player, "inventory", xPos, yPos, i, itemSlot.item, this.clickEventManager, this.uiManager, this.tooltipManager)
                 this.addChild(slotSprite)
             }else{
                 const textureIdentifier = `Icon_${itemSlot.item.itemName}`
                 const texture = this.iconsAssetsObject[textureIdentifier]
-                const slotSprite = new ItemSlot_UI(texture, this.emptySlotTexture, this.player, "inventory", xPos, yPos, i, itemSlot.item, this.clickEventManager)
+                const slotSprite = new ItemSlot_UI(texture, this.emptySlotTexture, this.player, "inventory", xPos, yPos, i, itemSlot.item, this.clickEventManager, this.uiManager, this.tooltipManager)
                 this.addChild(slotSprite)
             }
         })
@@ -538,12 +626,14 @@ class InventoryUI extends Container{
 }
 
 class QuickBarUI extends Container{
-    constructor(app, player, playerQuickBarItemSlots, clickCooldown, clicking, emptySlotTexture, uiContainer, iconsAssetsObject, clickEventManager){
+    constructor(app, player, playerQuickBarItemSlots, clickCooldown, clicking, emptySlotTexture, uiContainer, iconsAssetsObject, clickEventManager, uiManager, tooltipManager){
         super()
         this.app = app  
         this.player = player
         this.playerQuickBarItemSlots = playerQuickBarItemSlots
         this.clickEventManager = clickEventManager
+        this.uiManager = uiManager
+        this.tooltipManager = tooltipManager
 
         this.iconsAssetsObject = iconsAssetsObject
         this.emptySlotTexture = emptySlotTexture
@@ -561,7 +651,7 @@ class QuickBarUI extends Container{
             //if item slot empty, add empty slot sprite
             if(!itemSlot.item){
                 const offset = 350
-                const emptySlotSprite = new ItemSlot_UI(this.emptySlotTexture, this.emptySlotTexture, this.player, "quickBar", offset + (i * (this.emptySlotTexture.width * 1.5 + UI_SETTINGS.PADDING)) , 517, i, itemSlot.item, this.clickEventManager)
+                const emptySlotSprite = new ItemSlot_UI(this.emptySlotTexture, this.emptySlotTexture, this.player, "quickBar", offset + (i * (this.emptySlotTexture.width * 1.5 + UI_SETTINGS.PADDING)) , 517, i, itemSlot.item, this.clickEventManager, this.uiManager, this.tooltipManager)
                 this.addChild(emptySlotSprite)
             }
             
@@ -612,13 +702,15 @@ class CharacterSheetNavButton extends Sprite{
 }
 
 class CharacterSheet extends Container{
-    constructor(app, clickCooldown, clicking, uiAssets, uiContainer, player, clickEventManager, iconAssets){
+    constructor(app, clickCooldown, clicking, uiAssets, uiContainer, player, clickEventManager, iconAssets, uiManager, tooltipManager){
         super()
         this.app = app
         this.uiAssets = uiAssets
         this.iconAssets = iconAssets
         this.player = player
         this.clickEventManager = clickEventManager
+        this.uiManager = uiManager
+        this.tooltipManager = tooltipManager
 
         this.clickCooldown = clickCooldown,
         this.clicking = clicking
@@ -634,8 +726,8 @@ class CharacterSheet extends Container{
         this.frame.label = "ipad_frame"
 
         //this is the screen of the ipad
-        this.equipmentBG = new CharacterSheet_EquipmentScreen(this.uiAssets.UI_IpadEquipmentBG, 150, 67, this.player, this.uiAssets, this.iconAssets)
-        this.statsBG = new CharacterSheet_StatsScreen(this.uiAssets.UI_IpadStatsBG, 150, 67, this.player, this.uiAssets, this.iconAssets)
+        this.equipmentBG = new CharacterSheet_EquipmentScreen(this.uiAssets.UI_IpadEquipmentBG, 150, 67, this.player, this.uiAssets, this.iconAssets, this.uiManager, this.tooltipManager)
+        this.statsBG = new CharacterSheet_StatsScreen(this.uiAssets.UI_IpadStatsBG, 150, 67, this.player, this.uiAssets, this.iconAssets, this.uiManager)
 
         //filters for screenContents container
         this.CRTFilterTime = 0
@@ -709,7 +801,7 @@ class CharacterSheet extends Container{
 }
 
 class CharacterSheet_StatsScreen extends Container {
-    constructor(backgroundTexture, x, y, player, uiAssets){
+    constructor(backgroundTexture, x, y, player, uiAssets, uiManager){
         super()
         this.background = new Sprite(backgroundTexture)
         this.background.position.set(x, y)
@@ -717,6 +809,7 @@ class CharacterSheet_StatsScreen extends Container {
 
         this.uiAssets = uiAssets
         this.player = player
+        this.uiManager = uiManager
 
         this.x = 0
         this.y = 0
@@ -725,7 +818,7 @@ class CharacterSheet_StatsScreen extends Container {
 }
 
 class CharacterSheet_EquipmentScreen extends Container {
-    constructor(backgroundTexture, x, y, player, uiAssets, iconAssets){
+    constructor(backgroundTexture, x, y, player, uiAssets, iconAssets, uiManager, tooltipManager){
         super()
         this.background = new Sprite(backgroundTexture)
         this.background.position.set(x, y)
@@ -734,6 +827,8 @@ class CharacterSheet_EquipmentScreen extends Container {
         this.uiAssets = uiAssets
         this.iconAssets = iconAssets
         this.player = player
+        this.uiManager = uiManager
+        this.tooltipManager = tooltipManager
 
         this.x = 0
         this.y = 0
@@ -744,22 +839,23 @@ class CharacterSheet_EquipmentScreen extends Container {
     init = () => {
         const blankSlotTexture = this.iconAssets.Icon_EmptyCharacterSheetSlot
 
-        const handsSlot = new ItemSlot_UI(blankSlotTexture, blankSlotTexture, this.player, "equipment", 509, 406, 0, null, this.clickEventManager)
-        const feetSlot = new ItemSlot_UI(blankSlotTexture, blankSlotTexture, this.player, "equipment", 529, 496, 1, null, this.clickEventManager)
-        const legsSlot = new ItemSlot_UI(blankSlotTexture, blankSlotTexture, this.player, "equipment", 272, 529, 2, null, this.clickEventManager)
-        const chestSlot = new ItemSlot_UI(blankSlotTexture, blankSlotTexture, this.player, "equipment", 257, 426, 3, null, this.clickEventManager)
-        const headSlot = new ItemSlot_UI(blankSlotTexture, blankSlotTexture, this.player, "equipment", 537, 171, 4, null, this.clickEventManager)
+        const handsSlot = new ItemSlot_UI(blankSlotTexture, blankSlotTexture, this.player, "equipment", 509, 406, 0, null, this.clickEventManager, this.uiManager, this.tooltipManager)
+        const feetSlot = new ItemSlot_UI(blankSlotTexture, blankSlotTexture, this.player, "equipment", 529, 496, 1, null, this.clickEventManager, this.uiManager, this.tooltipManager)
+        const legsSlot = new ItemSlot_UI(blankSlotTexture, blankSlotTexture, this.player, "equipment", 272, 529, 2, null, this.clickEventManager, this.uiManager, this.tooltipManager)
+        const chestSlot = new ItemSlot_UI(blankSlotTexture, blankSlotTexture, this.player, "equipment", 257, 426, 3, null, this.clickEventManager, this.uiManager, this.tooltipManager)
+        const headSlot = new ItemSlot_UI(blankSlotTexture, blankSlotTexture, this.player, "equipment", 537, 171, 4, null, this.clickEventManager, this.uiManager, this.tooltipManager)
         this.addChild(handsSlot, feetSlot, legsSlot, chestSlot, headSlot)
     }
 }
 
 class HealthBar extends Sprite{
-    constructor(app, texture, player, xPos, yPos, uiContainer){
+    constructor(app, texture, player, xPos, yPos, uiContainer, tooltipManager){
         super(texture)
         this.app = app
         this.player = player
         this.label = "health_bar"
         this.uiContainer = uiContainer
+        this.tooltipManager = tooltipManager
 
         this.x = xPos
         this.y = yPos
@@ -772,3 +868,4 @@ class HealthBar extends Sprite{
         this.uiContainer.addChild(this.healthFill, this)
     }
 }
+

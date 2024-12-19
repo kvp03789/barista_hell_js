@@ -1,15 +1,10 @@
-//character spritesheets
-import CharacterIdleSpritesheet from './img/spritesheets/character/idle_spritesheet.png'
-import CharacterIdleUpSpritesheet from './img/spritesheets/character/idle_up_spritesheet.png'
-import CharacterIdleRightSpritesheet from './img/spritesheets/character/idle_right_spritesheet.png'
-import CharacterIdleLeftSpritesheet from './img/spritesheets/character/idle_left_spritesheet.png'
-import CharacterRunRightSpritesheet from './img/spritesheets/character/run_right_spritesheet.png'
-import CharacterRunLeftSpritesheet from './img/spritesheets/character/run_left_spritesheet.png'
-import CharacterRunDownSpritesheet from './img/spritesheets/character/run_down_spritesheet.png'
-import CharacterRunUpSpritesheet from './img/spritesheets/character/run_up_spritesheet.png'
+//character spritesheet
+import PlayerSpritesheet from './img/spritesheets/character/player_animations_combined.png'
 
 //npc spritesheets
 import NPCSpritesheet_RobertSpritesheet from './img/spritesheets/npc/robert.png'
+import NPCSpritesheet_SarahSpritesheet from './img/spritesheets/npc/sarah.png'
+
 //ui
 import UI_IpadTurnOnSpritesheet from './img/spritesheets/ipad/ipad_turn_on.png'
 import UI_HUDHealthBar from './img/ui/health_bar.png'
@@ -21,6 +16,8 @@ import UI_IpadNavRight from './img/ui/ipad_nav_right.png'
 import UI_IpadNavLeft from './img/ui/ipad_nav_left.png'
 import UI_InventoryBG from './img/ui/inventory_bg.png'
 import UI_CraftingBG from './img/ui/crafting_bg.png'
+import UI_Tooltip_BG_Texture from './img/ui/tooltip_bg_texture.png'
+import UI_Dialogue_BG from './img/ui/dialogue_bg.png'
 
 //particles
 import BulletWallExplodeParticleSmoke from './img/spritesheets/particles/bullet_explode_particle_smoke.png'
@@ -80,15 +77,21 @@ import EspressoMachineInactive from './img/objects/espresso_machine_inactive.png
 
 export const assetsManifest = {
     "bundles":[
+      //npc
       {
          "name": "npc_spritesheets",
          "assets": [
             {
                "alias": "NPCSpritesheet_RobertSpritesheet",
                "src": NPCSpritesheet_RobertSpritesheet
+            },
+            {
+               "alias": "NPCSpritesheet_SarahSpritesheet",
+               "src": NPCSpritesheet_SarahSpritesheet
             }
          ]
       },
+      //overworld objects
       {
          "name": "overworld_objects",
          "assets": [
@@ -102,6 +105,7 @@ export const assetsManifest = {
             }
          ]
       },
+      //icons
       {
          "name": "icons",
          "assets":[
@@ -179,6 +183,7 @@ export const assetsManifest = {
             }
          ]
       },
+      //ui assets
        {
          "name": "ui_assets",
          "assets":[
@@ -221,45 +226,25 @@ export const assetsManifest = {
             {
                "alias": "UI_CraftingBG",
                "src": UI_CraftingBG
+            }, 
+            {
+               "alias": "UI_Tooltip_BG_Texture",
+               "src": UI_Tooltip_BG_Texture
+            },
+            {
+               "alias": "UI_Dialogue_BG",
+               "src": UI_Dialogue_BG
             }
          ]
        },
+       //character spritesheet
        {
           "name":"character_spritesheets",
           "assets":[
-             {
-                "alias":"character_idle",
-                "src":CharacterIdleSpritesheet
-             },
-             {
-               "alias":"character_idle_up",
-               "src":CharacterIdleUpSpritesheet
-            },
             {
-               "alias":"character_idle_right",
-               "src":CharacterIdleRightSpritesheet
-            },
-            {
-               "alias":"character_idle_left",
-               "src":CharacterIdleLeftSpritesheet
-            },
-             {
-               "alias":"character_run_right",
-               "src":CharacterRunRightSpritesheet
-            },
-            {
-               "alias":"character_run_down",
-               "src":CharacterRunDownSpritesheet
-            },
-            {
-               "alias":"character_run_up",
-               "src":CharacterRunUpSpritesheet
-            },
-            
-            {
-               "alias":"character_run_left",
-               "src":CharacterRunLeftSpritesheet
-            },
+               "alias":"PlayerSpritesheet",
+               "src":PlayerSpritesheet
+            }
           ]
        },
        {
