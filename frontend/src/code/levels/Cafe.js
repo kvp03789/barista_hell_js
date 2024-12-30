@@ -1,68 +1,33 @@
 import * as PIXI from 'pixi.js'
-import { TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR }from '../settings'
-import { parseMapData, getXYSlice, spritesAreColliding } from '../utils'
-import { cafeMapData } from '../map_data/cafeMapData'
-import Character from './Character'
-import YSortCameraSpriteGroup from './YSortCameraSpriteGroup'
-import ObstacleSpriteGroup from './ObstacleSpriteGroup'
-import Tile, { EspressoMachine } from './Tile'
-import { AnimatedTile, HellPortalObject } from './Tile'
-import ParticleManager from './Particles'
-import BulletManager from './BulletManager'
-import { tileSpriteData, hellCircleInactiveData, trashPileData } from '../json/tiles/tileSpriteData'
+import { TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR }from '../../settings'
+import { parseMapData, getXYSlice, spritesAreColliding } from '../../utils'
+import { cafeMapData } from '../../map_data/cafeMapData'
+import Character from '../Character'
+import YSortCameraSpriteGroup from '../YSortCameraSpriteGroup'
+import ObstacleSpriteGroup from '../ObstacleSpriteGroup'
+import Tile from '../Tile'
+import { AnimatedTile, HellPortalObject } from '../Tile'
+import ParticleManager from '../Particles'
+import BulletManager from '../BulletManager'
+import { tileSpriteData, hellCircleInactiveData, trashPileData } from '../../json/tiles/tileSpriteData'
 import { GlowFilter, ReflectionFilter, ShockwaveFilter } from 'pixi-filters'
-import UIManager from './UI'
-import { ClickEventManager } from './ClickEventManager'
-import { NPCManager } from './NPCManager'
-import NPCTilesGroup from './NPCTilesGroup'
+import UIManager from '../UI'
+import { ClickEventManager } from '../ClickEventManager'
+import { NPCManager } from '../NPCManager'
+import NPCTilesGroup from '../NPCTilesGroup'
+import Level from './Level'
 
-export default class Cafe{
-    constructor(app, keysObject){
-        this.app = app
-        this.app.stage.interactive = true
-        this.app.stage.on('mousemove', this.onMouseMove)
-
-        //used for npc dialogue and other settings that must
-        //change depending on game state
-        this.stateLabel = "cafe_intro"
-        
-        //display height and width
-        this.display_width = this.app.view.width
-        this.display_height = this.app.view.height
-        //"controller" object that manages keydown and up events
-        this.keysObject = keysObject
-        //sprite group/container
-        this.visibleSprites = new YSortCameraSpriteGroup(this.app)
-        this.obstacleSprites = new ObstacleSpriteGroup(this.app)
-        this.npcTiles = new NPCTilesGroup(this.app)
-        
-        this.clickEventManager = new ClickEventManager(this.app, this.visibleSprites)
-
-        //used when calculating angle of player
-        this.offset = {x: 0, y:0}
-        
-        //key events
-        window.addEventListener("keydown", e => this.handleKeyDown(e))
-        window.addEventListener("keyup", e => this.handleKeyUp(e))
+export default class Cafe extends Level{
+    constructor(app, keysObject, stateLabel){
+        super(app, keysObject, stateLabel)
     }
 
-    handleKeyDown = (e) => {
-        this.keysObject[e.keyCode] = true
-        //create walking particle
-        if(this.character.movement.x !== 0 || this.character.movement.y !== 0){
-            this.particleManager.createParticle(this.character.sprite.x, this.character.sprite.y, "character_walking", "Character", "CharacterWalkingParticle")
-        }
-    }
-
-    handleKeyUp = (e) => {
-        this.keysObject[e.keyCode] = false
-    }
-
-    onMouseMove = (e) => {
-        this.mousePos = e.data.global
-    }
 
     initMap = async () => {
+        //sets up even listener used by keysObject to handle key events
+        //HAS TO BE CALLED HERE...cant be called in constructor
+        this.setUpKeyEvents()
+
         //initialize assets used in this level
         this.cafeAssets = await PIXI.Assets.loadBundle('cafe_assets');
         this.spritesheetAssets = await PIXI.Assets.loadBundle('character_spritesheets');
@@ -74,9 +39,13 @@ export default class Cafe{
         this.iconAssets = await PIXI.Assets.loadBundle("icons")
         this.cafeObjectsAssets = await PIXI.Assets.loadBundle("overworld_objects")
         this.npcSpritesheets = await PIXI.Assets.loadBundle('npc_spritesheets')
+        this.fonts = await PIXI.Assets.loadBundle("fonts")
 
         //parse map data...
         this.parsedMapObject = parseMapData(cafeMapData)
+        //width of entire map in tiles, set in Tiled program and obtained from parsedMapObject
+        this.levelRowWidth = this.parsedMapObject.width
+        this.levelRowHeight = this.parsedMapObject.height
 
         //init the particleManager
         this.particleManager = new ParticleManager(this.app, this.particleAssets)
@@ -85,6 +54,9 @@ export default class Cafe{
         //init bulletManager
         this.bulletManager = new BulletManager(this.app, this.bulletAssets, this.obstacleSprites, this.particleManager)
         ////ORDER MATTERS HERE/////
+
+        const tilesetPngWidth = this.cafeAssets.CafeTilesetPng.width / TILE_WIDTH
+        const tilesetPngHeight = this.cafeAssets.CafeTilesetPng.height / TILE_HEIGHT
         
         //add collision blocks to map
         this.parsedMapObject.collision.forEach((row, i) => {
@@ -111,7 +83,7 @@ export default class Cafe{
                     //offset is to adjust for fact that bg png and tiles don't line up
                     const x_pos = ((j) * TILE_WIDTH) * ZOOM_FACTOR
                     const y_pos = ((i) * TILE_HEIGHT) * ZOOM_FACTOR
-                    let { x, y } = getXYSlice(col, 28)
+                    let { x, y } = getXYSlice(col - 1, tilesetPngWidth)
                     let w = TILE_WIDTH
                     let h = TILE_HEIGHT
                     const sliceRect = new PIXI.Rectangle(x, y, w, h);
@@ -145,9 +117,9 @@ export default class Cafe{
                 if(col !== 0){
                     const x_pos = ((j) * TILE_WIDTH) * ZOOM_FACTOR
                     const y_pos = ((i) * TILE_HEIGHT) * ZOOM_FACTOR
-                    // let x = (Math.floor(col / 28) * TILE_WIDTH) + (col % 28 * TILE_WIDTH)
-                    // let y = (Math.floor(col / 28) * TILE_HEIGHT)
-                    let { x, y } = getXYSlice(col, 28)
+                    // let x = (Math.floor(col / levelRowWidth) * TILE_WIDTH) + (col % levelRowWidth * TILE_WIDTH)
+                    // let y = (Math.floor(col / levelRowWidth) * TILE_HEIGHT)
+                    let { x, y } = getXYSlice(col - 1, tilesetPngWidth)
                     let w = TILE_WIDTH
                     let h = TILE_HEIGHT
                     const sliceRect = new PIXI.Rectangle(x, y, w, h);
@@ -164,9 +136,9 @@ export default class Cafe{
                 if(col !== 0){
                     const x_pos = ((j) * TILE_WIDTH) * ZOOM_FACTOR
                     const y_pos = ((i) * TILE_HEIGHT) * ZOOM_FACTOR
-                    // let x = (Math.floor(col / 28) * TILE_WIDTH) + (col % 28 * TILE_WIDTH)
-                    // let y = (Math.floor(col / 28) * TILE_HEIGHT)
-                    let { x, y } = getXYSlice(col, 28)
+                    // let x = (Math.floor(col / levelRowWidth) * TILE_WIDTH) + (col % levelRowWidth * TILE_WIDTH)
+                    // let y = (Math.floor(col / levelRowWidth) * TILE_HEIGHT)
+                    let { x, y } = getXYSlice(col - 1, tilesetPngWidth)
                     let w = TILE_WIDTH
                     let h = TILE_HEIGHT
                     const sliceRect = new PIXI.Rectangle(x, y, w, h);
@@ -180,7 +152,7 @@ export default class Cafe{
         await this.npcManager.initRobertNPC()
         await this.npcManager.initSarahNPC(this.sarahNPCTiles)
 
-        this.uiManager = new UIManager(this.app, this.character, this.uiAssets, this.keysObject, this.iconAssets, this.clickEventManager, this.mousePos, this.npcManager.npcList, this.stateLabel)
+        this.uiManager = new UIManager(this.app, this.character, this.uiAssets, this.fonts, this.keysObject, this.iconAssets, this.clickEventManager, this.mousePos, this.npcManager.npcList, this.stateLabel)
         await this.uiManager.init()
 
         //add obstacle sprites to stage
@@ -271,21 +243,6 @@ export default class Cafe{
         const scale = 1.5
         const alpha = 1
         const animatedTile = new AnimatedTile(this.app, x_pos, y_pos, spritesheet.animations.main, label, this.visibleSprites, isParticleTile, animationSpeed, scale, alpha)
-    }
-
-    getPlayerAngle = (mousePos) => {
-        if(mousePos.x && mousePos.y){
-            
-            this.offset.x = this.character.sprite.x + (this.character.sprite.width / 2) - (this.display_width / 2)
-            this.offset.y = this.character.sprite.y + (this.character.sprite.height / 2) - (this.display_width / 2)
-            const dx = mousePos.x - this.character.sprite.x - (this.character.sprite.width / 2)
-            const dy = mousePos.y - this.character.sprite.y - (this.character.sprite.height / 2)
-            
-            //calculate angle and convert from rads to degrees
-            const angle = (Math.atan2(dy, dx) * 180) / Math.PI
-
-            return angle
-        }
     }
 
     //the level's run method is added to the stage by the Application class

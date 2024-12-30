@@ -20,17 +20,25 @@ import UI_Tooltip_BG_Texture from './img/ui/tooltip_bg_texture.png'
 import UI_Dialogue_BG from './img/ui/dialogue_bg.png'
 
 //particles
-import BulletWallExplodeParticleSmoke from './img/spritesheets/particles/bullet_explode_particle_smoke.png'
-import CharacterWalkingParticle from './img/spritesheets/particles/walking_particle_spritesheet.png'
+import Particle_BulletWallExplodeParticleSmoke from './img/spritesheets/particles/bullet_explode_particle_smoke.png'
+import Particle_CharacterWalkingParticle from './img/spritesheets/particles/walking_particle_spritesheet.png'
+import Particle_AshParticle from './img/spritesheets/particles/ash_particle_spritesheet.png'
 
 //tiles
 import PuddleTile from './img/spritesheets/tiles/puddle_spritesheet.png'
 import HellCircleInactive from './img/spritesheets/tiles/hell_circle_inactive_spritesheet.png'
 import TrashPile from './img/spritesheets/tiles/trash_pile_spritesheet.png'
+import Torch from './img/spritesheets/tiles/torch_spritesheet.png'
 
-//guns
+//cafe map assets
 import CafeBaseMap from './img/map_pngs/cafe_base_map.png'
 import CafeTilesetPng from './img/tileset_pngs/cafe_tileset_1.png'
+
+//hell overworld map assets
+import HellOverworldBaseMap from './img/map_pngs/hell_overworld_base_map.png'
+import HellOverworldTilesetPng from './img/tileset_pngs/hell_overworld_tileset_1.png'
+
+//guns
 import BattleRifleLeft from './img/weapons/battle_rifle/br_left.png'
 import BattleRifleRight from './img/weapons/battle_rifle/br_right.png'
 import BattleRifleUp from './img/weapons/battle_rifle/br_up.png'
@@ -73,7 +81,22 @@ import BattleRifle3 from './img/weapons/battle_rifle/bullet3.png'
 //objects
 import EspressoMachineActive from './img/objects/espresso_machine_active.png'
 import EspressoMachineInactive from './img/objects/espresso_machine_inactive.png'
+import HellArch from './img/objects/hell_arch.png'
 
+//parallax background
+import HellParallax1 from './img/map_pngs/hell_bg/hell_bg_1.png'
+import HellParallax2 from './img/map_pngs/hell_bg/hell_bg_2.png'
+import HellParallax3 from './img/map_pngs/hell_bg/hell_bg_3.png'
+import HellParallax4 from './img/map_pngs/hell_bg/hell_bg_4.png'
+import HellParallax5 from './img/map_pngs/hell_bg/hell_bg_5.png'
+import HellParallax6 from './img/map_pngs/hell_bg/hell_bg_6.png'
+
+import FogHellParallax1 from './img/map_pngs/hell_bg/hell_bg_fog_1.png'
+import FogHellParallax2 from './img/map_pngs/hell_bg/hell_bg_fog_2.png'
+
+
+//fonts
+import Font_AdvancedPixel7 from './fonts/advanced_pixel-7.ttf'
 
 export const assetsManifest = {
     "bundles":[
@@ -102,6 +125,10 @@ export const assetsManifest = {
             {
                "alias": "EspressoMachineInactive",
                "src": EspressoMachineInactive
+            },
+            {
+               "alias": "HellArch",
+               "src": HellArch
             }
          ]
       },
@@ -247,19 +274,26 @@ export const assetsManifest = {
             }
           ]
        },
+       //particles
        {
             "name": "particle_spritesheets",
             "assets": [
                {
-                  "alias": "BulletWallExplodeParticleSmoke",
-                  "src": BulletWallExplodeParticleSmoke
+                  "alias": "Particle_BulletWallExplodeParticleSmoke",
+                  "src": Particle_BulletWallExplodeParticleSmoke
                },
                {
-                  "alias": "CharacterWalkingParticle",
-                  "src": CharacterWalkingParticle
+                  "alias": "Particle_CharacterWalkingParticle",
+                  "src": Particle_CharacterWalkingParticle
+               },
+               {
+                  "alias": "Particle_AshParticle",
+                  "src": Particle_AshParticle
                }
-         ]
+         ],
+         
        },
+       //animated tile spritesheets
        {
          "name": "tile_spritesheets",
          "assets": [
@@ -274,9 +308,14 @@ export const assetsManifest = {
             {
                "alias": "TrashPile",
                "src": TrashPile
+            },
+            {
+               "alias": "Torch",
+               "src": Torch
             }
       ]
        },
+       //cafe map assets
        {
          "name": "cafe_assets",
          "assets":[
@@ -290,6 +329,21 @@ export const assetsManifest = {
             }
          ]
        },
+       //hell overworld map assets
+       {
+         "name": "hell_overworld_assets",
+         "assets":[
+            {
+               "alias": "HellOverworldBaseMap",
+               "src": HellOverworldBaseMap
+            },
+            {
+               "alias": "HellOverworldTilesetPng",
+               "src": HellOverworldTilesetPng
+            }
+         ]
+       },
+       //weapon_assets
        {
          "name": "weapon_assets",
          "assets":[
@@ -327,6 +381,7 @@ export const assetsManifest = {
             }
          ]
        },
+       //bullet assets
        {
          "name": "bullet_assets",
          "assets":[
@@ -342,6 +397,54 @@ export const assetsManifest = {
                "alias": "BattleRifle3",
                "src": BattleRifle3
             }
+         ]
+       },
+       //hell parallax bg
+       {
+         "name": "hell_parallax_background_assets",
+         "assets":[
+            {
+               "alias": "HellParallax1",
+               "src": HellParallax1
+            },
+            {
+               "alias": "HellParallax2",
+               "src": HellParallax2
+            },
+            {
+               "alias": "HellParallax3",
+               "src": HellParallax3
+            },
+            {
+               "alias": "HellParallax4",
+               "src": HellParallax4
+            },
+            {
+               "alias": "HellParallax5",
+               "src": HellParallax5
+            },
+            {
+               "alias": "HellParallax6",
+               "src": HellParallax6
+            },
+            {
+               "alias": "FogHellParallax1",
+               "src": FogHellParallax1
+            },
+            {
+               "alias": "FogHellParallax2",
+               "src": FogHellParallax2
+            },
+         ]
+       },
+       //fonts
+       {
+         "name": "fonts",
+         "assets":[
+            {
+               "alias": "Font_AdvancedPixel7",
+               "src": Font_AdvancedPixel7
+            },
          ]
        }
     ]

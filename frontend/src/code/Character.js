@@ -3,6 +3,7 @@ import { playerSpritesheetData, characterIdleData, charcterRunRightData, charcte
 import { spritesAreColliding } from "../utils";
 import { Inventory, Equipment, QuickBar } from "./ItemsInventoryEquipment.js";
 import { ANIMATION_SPEED, NPC_DIALOGUE_DISTANCE } from "../settings.js";
+import { DropShadowFilter } from "pixi-filters";
 
 
 export default class Character{
@@ -40,8 +41,8 @@ export default class Character{
         //crafting window
         this.crafting = false
 
-        //bool based on if player is within dialogue distance to npc
-        this.touchingNPC = false        
+        //bool used for checking if player is already in dialogue, crafting, etc.
+        this.busy = false      
     }
 
     addSpriteToGroups = (group) => {
@@ -78,6 +79,8 @@ export default class Character{
         //set active weapon index
         this.activeWeaponIndex = 0
         this.activeWeapon = this.weaponSlots[this.activeWeaponIndex].item
+
+        this.sprite.filters = [new DropShadowFilter({offset: {x: 5, y: 10}, alpha: 1 })]
         
         //add character sprite to visible sprite group
         this.addSpriteToGroups(group)

@@ -2,8 +2,9 @@ import * as PIXI from 'pixi.js'
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from './settings'
 import { assetsManifest } from './assetsManifest'
 import Character from './code/Character'
-import Cafe from './code/Cafe'
+import Cafe from './code/levels/Cafe'
 import './styles/main.css'
+import HellOverWorld from './code/levels/HellOverworld'
 
 
 const body = document.querySelector('body')
@@ -20,7 +21,7 @@ class Application{
         //this is for te pixij debugger
         globalThis.__PIXI_APP__ = this.app;
 
-        this.state_manager = new State_Manager('cafe')
+        this.state_manager = new State_Manager('hell_overworld')
     }
 
     async init(){
@@ -28,9 +29,12 @@ class Application{
         body.append(this.app.canvas)
         await PIXI.Assets.init({manifest: assetsManifest})
 
-        this.cafe = new Cafe(this.app, this.keysObject)
+        this.cafe = new Cafe(this.app, this.keysObject, 'cafe_intro')
+        this.hellOverworld = new HellOverWorld(this.app, this.keysObject, 'hell_overworld')
+
         this.statesObject = {
-            'cafe': this.cafe
+            'cafe_intro': this.cafe,
+            'hell_overworld': this.hellOverworld
         }
         await this.statesObject[this.state_manager.currentState].initMap()
         this.app.ticker.add(this.statesObject[this.state_manager.currentState].run)

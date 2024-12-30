@@ -291,6 +291,83 @@ export const trashPileData =
   }
 }
 
+export const torchData =
+{ "frames": {
+  "torch_animation_0.png": {
+   "frame": { "x": 0, "y": 0, "w": 30, "h": 49 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 49 },
+   "sourceSize": { "w": 30, "h": 49 },
+   "duration": 100
+  },
+  "torch_animation_1.png": {
+   "frame": { "x": 30, "y": 0, "w": 30, "h": 49 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 49 },
+   "sourceSize": { "w": 30, "h": 49 },
+   "duration": 100
+  },
+  "torch_animation_2.png": {
+   "frame": { "x": 60, "y": 0, "w": 30, "h": 49 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 49 },
+   "sourceSize": { "w": 30, "h": 49 },
+   "duration": 100
+  },
+  "torch_animation_3.png": {
+   "frame": { "x": 90, "y": 0, "w": 30, "h": 49 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 49 },
+   "sourceSize": { "w": 30, "h": 49 },
+   "duration": 100
+  },
+  "torch_animation_4.png": {
+   "frame": { "x": 120, "y": 0, "w": 30, "h": 49 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 49 },
+   "sourceSize": { "w": 30, "h": 49 },
+   "duration": 100
+  },
+  "torch_animation_5.png": {
+   "frame": { "x": 150, "y": 0, "w": 30, "h": 49 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 49 },
+   "sourceSize": { "w": 30, "h": 49 },
+   "duration": 100
+  }
+},
+"meta": {
+ "app": "https://www.aseprite.org/",
+ "version": "1.3.10.1-x64",
+ "image": "torch_spritesheet.png",
+ "format": "RGBA8888",
+ "size": { "w": 180, "h": 49 },
+ "scale": "1",
+ "frameTags": [
+ ],
+ "layers": [
+  { "name": "Layer 1", "opacity": 255, "blendMode": "normal" },
+  { "name": "Layer 2", "opacity": 255, "blendMode": "normal" },
+  { "name": "Layer 3", "opacity": 128, "blendMode": "normal" }
+ ],
+ "slices": [
+ ]
+},
+"animations":{
+  "main": ['torch_animation_0.png', 'torch_animation_1.png', 
+      'torch_animation_2.png', 'torch_animation_3.png', 'torch_animation_4.png',
+      'torch_animation_5.png'
+    ]
+  }
+}
+
+
 
 
  

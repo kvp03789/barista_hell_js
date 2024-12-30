@@ -65,7 +65,7 @@ class BulletManager extends Container{
         this.obstacleSprites.children.forEach((obstacle, i) => {
             this.children.forEach((bullet, j) => {
                 if(spritesAreColliding(bullet, obstacle)){
-                    this.particleManager.createParticle(bullet.x, bullet.y, "bullet_impact", "BulletWall", "BulletWallExplodeParticleSmoke")
+                    this.particleManager.createAnimatedParticle(bullet.x, bullet.y, "BulletWallExplodeParticleSmoke")
                     this.removeChild(bullet)
                     bullet.destroy()
                 }

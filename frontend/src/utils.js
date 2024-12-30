@@ -3,7 +3,7 @@ import { TILE_WIDTH, TILE_HEIGHT } from "./settings"
 
 //parse map data from 1d array into 2d array 
 export function parseMapData(mapData) {
-    const parsedMapObject = {}
+    const parsedMapObject = {height: mapData.height, width: mapData.width}
     mapData.layers.forEach(layer => {
         parsedMapObject[layer.name] = []
         for(let i = 0; i < layer.data.length; i += layer.width){
@@ -28,14 +28,21 @@ export function spritesAreColliding(rect1, rect2){
 }
 
 //derive x and y for slicing tilemap png tiles
-export function getXYSlice(tileId, rowWidth){
+export function getXYSlice(tileId, rowWidth) {
+    //rowWidth is the width of the tilesetPng that will be sliced from
     return {
-        x: (Math.floor(tileId / rowWidth) * TILE_WIDTH) + (tileId % rowWidth * TILE_WIDTH),
-        y: (Math.floor(tileId / rowWidth) * TILE_HEIGHT)
-    }
+        x: (tileId % rowWidth) * TILE_WIDTH, 
+        y: Math.floor(tileId / rowWidth) * TILE_HEIGHT // Row index determines y
+    };
 }
 
 //generate random number between min and max
 export function randomNumber(min, max){
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+//generate seed for randomness
+export function generateSeed(min = 0.5, max = 1.5) {
+    // Generate a random decimal number between min and max
+    return Math.random() * (max - min) + min;
 }

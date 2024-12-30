@@ -1,9 +1,33 @@
-import { AnimatedSprite, Container, Spritesheet } from 'pixi.js'
+import { AnimatedSprite, Container, Rectangle, Sprite, Spritesheet, Texture } from 'pixi.js'
 import { bulletExplodeParticleData } from '../json/particles/particleSpriteData.js'
-import { ZOOM_FACTOR } from '../settings.js'
+import { SCREEN_HEIGHT, SCREEN_WIDTH, ZOOM_FACTOR } from '../settings.js'
+import { generateSeed, randomNumber } from '../utils.js'
+import { GlowFilter, RGBSplitFilter } from 'pixi-filters'
 
+class StaticParticle extends Sprite{
+    constructor(texture, x, y, label, type){
+        super(texture)
+        this.x = x
+        this.y = y
+        this.label = label
+        this.type = type
 
-class Particle extends AnimatedSprite{
+        this.anchor.set(.5)
+        this.scale.set(ZOOM_FACTOR)
+    }
+}
+
+class Ash extends StaticParticle{
+    constructor(texture, x, y, label, type){
+        super(texture, x, y, label, type)
+        this.seed = generateSeed()
+        this.ashSpeed = .02 * this.seed
+        this.ashDriftSpeed = generateSeed(-.05, 0.05) * this.seed
+        this.dieY = randomNumber(700, 1000)
+    }
+}
+
+class AnimatedParticle extends AnimatedSprite{
     constructor(spritesheet, x, y, animationLength, type){
         super(spritesheet)
         this.x = x
@@ -29,6 +53,25 @@ class Particle extends AnimatedSprite{
     }
 }
 
+class AshParticleSubContainer extends Container{
+    constructor(){
+        super()
+        this.alpha = .8
+    }
+
+    run = () => {
+        this.children.forEach((ash) => {
+            ash.scale.set(.7 * ash.seed)
+            ash.y += (ash.ashSpeed * ash.seed)
+            ash.x += ash.ashDriftSpeed
+            //if at die point, kill particle
+            if(ash.y >= ash.dieY){
+                this.removeChild(ash)
+            }
+        })
+    }
+}
+
 class ParticleManager extends Container{
     constructor(app, particleAssets){
         super()
@@ -36,47 +79,58 @@ class ParticleManager extends Container{
         this.half_width = this.app.view.width / 2
         this.half_height = this.app.view.height / 2
         this.particleAssets = particleAssets
-        this.particleDictionary = {
-            BulletWall: {}, Character: {}
-        },
-        
-        //parse particleAssets so that during init the particleDictionary 
-        //can be easily populated
-        this.parseParticleAssets()
+        this.particleDictionary = {},
 
+        //bespoke container for ash particles to make filter more efficient
+        this.ashParticleSubContainer = new AshParticleSubContainer()
+        this.ashParticleSubContainer.label = "ash_particle_sub_container"
+        this.ashParticleSubContainer.filters=[new GlowFilter({alpha: 0.37}), new RGBSplitFilter({red: {x: -1, y: 0}, blue: {x: 0, y: 0}, green:{x: 0, y: 1}})]
+        this.addChild(this.ashParticleSubContainer)
+        
         this.offset = {x: 0, y: 0}
     }
 
-    parseParticleAssets = () => {
-        for(let obj in this.particleDictionary){
-                for (let key2 in this.particleAssets){
-                    if(key2.startsWith(obj)){
-                        this.particleDictionary[obj][key2] = {texture: null, spritesheet: null}
-                        this.particleDictionary[obj][key2].texture = this.particleAssets[key2]
-                    }
-                }
-            }
-    }
-
-
-    init = async () => {
-        for (let obj in this.particleDictionary) {
-            for (let key in this.particleDictionary[obj]) {
-                this.particleDictionary[obj][key].spritesheet = new Spritesheet(
-                    this.particleDictionary[obj][key].texture,
-                    bulletExplodeParticleData
-                )
-                await this.particleDictionary[obj][key].spritesheet.parse();
+    //parsed raw assets into organized list of unique values
+    parseParticleAssets = async () => {
+        for(let key in this.particleAssets){
+            if(key.startsWith('Particle_')){
+                const spritesheet = new Spritesheet(this.particleAssets[key], bulletExplodeParticleData)
+                this.particleDictionary[key] = spritesheet
+                await this.particleDictionary[key].parse()
             }
         }
     }
 
-    createParticle = (particleX, particleY, type, category, subCategory) => {
-        let animationLength = this.particleDictionary.BulletWall.BulletWallExplodeParticleSmoke.spritesheet.animations.main.length
-        const animatedParticle = new Particle(this.particleDictionary[category][subCategory].spritesheet.animations.main, particleX - this.offset.x * ZOOM_FACTOR, particleY - this.offset.y * ZOOM_FACTOR, animationLength, type)
+    init = async () => {
+        await this.parseParticleAssets()
+    }
+
+    //init some falling ash particles unique to the hell level
+    initializeAshParticles = () => {
+        const numberOfParticles = 5000
+        const particleSize = 5
+        for(let i = 0; i < numberOfParticles; i++){
+            const randomXSlice = randomNumber(0, 2)
+            const randomYSlice = randomNumber(0, 1)           
+            const sliceRect = new Rectangle(randomXSlice * particleSize, randomYSlice * particleSize, particleSize, particleSize)
+            const randomXPos = randomNumber(-200, SCREEN_WIDTH + 700)
+            const randomYPos = randomNumber(-720, SCREEN_HEIGHT - 20)
+            const texture = new Texture({source: this.particleAssets.Particle_AshParticle, frame: sliceRect})
+            const ashParticle = new Ash(texture, randomXPos, randomYPos, 'ash_particle', 'AshParticle')
+            this.ashParticleSubContainer.addChild(ashParticle)
+            
+        }
+    }
+
+    createAnimatedParticle = (particleX, particleY, type) => {
+        let animationLength = this.particleDictionary[`Particle_${type}`].animations.main.length
+        const animatedParticle = new AnimatedParticle(this.particleDictionary[`Particle_${type}`].animations.main, particleX - this.offset.x * ZOOM_FACTOR, particleY - this.offset.y * ZOOM_FACTOR, animationLength, type)
         this.addChild(animatedParticle)
     }
     
+    createStaticParticle = (x, y, texture) => {
+
+    }
 
     run = (player) => {
         this.offset.x = player.x + (player.width / 2) - this.half_width;
@@ -95,15 +149,17 @@ class ParticleManager extends Container{
 
             //set scale for different particle types
             switch(particle.type){
-                case "bullet_impact":
+                case "BulletWallExplodeParticleSmoke":
                     return particle.scale.set(3)
-                case "character_walking":
+                case "CharacterWalkingParticle":
                     return particle.scale.set(3)
-                default: particle.scale.set(1.5)
+                default: particle.scale.set(3)
             }
 
             
         });
+
+        this.ashParticleSubContainer.run()
     };
 }
 

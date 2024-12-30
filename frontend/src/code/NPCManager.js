@@ -1,10 +1,10 @@
 import { AnimatedSprite, Spritesheet } from "pixi.js"
 import { robertSpriteData, sarahSpriteData } from '../json/npc/npcSpriteData'
-import { ANIMATION_SPEED, TILE_WIDTH, TILE_HEIGHT, ZOOM_FACTOR, NPC_DIALOGUE_DISTANCE } from "../settings"
+import { ANIMATION_SPEED, TILE_WIDTH, TILE_HEIGHT, ZOOM_FACTOR, NPC_DIALOGUE_DISTANCE, NPC_DIALOGUE } from "../settings"
 import { randomNumber } from "../utils"
 
 class NPC extends AnimatedSprite{
-    constructor(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, patrolTiles){
+    constructor(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, patrolTiles, stateLabel){
         super(initialTexture)
         this.app = app
         this.player = player
@@ -22,8 +22,11 @@ class NPC extends AnimatedSprite{
 
         this.currentAnimation = null
 
-
         this.label = label
+
+        //counter to determine which dialogue option the player should see
+        this.dialogueOptionCounter = 0
+
         this.position.set(xPos, yPos)
         //animation speed comes form settins
         this.animationSpeed = ANIMATION_SPEED

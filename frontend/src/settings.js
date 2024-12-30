@@ -59,16 +59,23 @@ export const settings = {
 
     },
     NPC_DIALOGUE_DISTANCE: 50,
+    NPC_DIALOGUE_SECTION_LENGTH: 100,
     NPC_DIALOGUE: {
+        //dialogue options that have a repsonse should have 'hasResponse' boolean
+        //dialogue that is with a vendor/trainer should have 'isStore' boolean
+        //see first sarah_npc example 
         cafe_intro:{
             sarah_npc:{
-                1: 'Yo dude....',
-                2: 'Yea this portal to hell is really spiking my anxiety. Did you clock in?'
+                DIALOGUE_TOTAL: 3,
+                1: {text: 'Yo dude....', hasResponse: false, isStore: false},
+                2: {text:  'Yea this portal to hell is really spiking my anxiety. Did you clock in?'},
+                3: {text: 'This is just a really long dialogue section to test multiple pages of dialogue on an NPC. Just need a bunch of filler here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'}
             },
             robert_npc:{
-                1: `Oh hey PLAYER NAME...didn't see you walk in.`,
-                2: 'Yea looks like a portal to hell opened up right in the cafe earlier. \
-                I\'m looking it up now. Always something, huh?'
+                DIALOGUE_TOTAL: 2,
+                1: {text: `Oh hey PLAYER NAME...didn't see you walk in.`},
+                2: {text: 'Yea looks like a portal to hell opened up right in the cafe earlier. \
+                I\'m looking it up now. Always something, huh?'}
             }
         }
         
@@ -76,6 +83,6 @@ export const settings = {
     
 };
 
-export const { SCREEN_WIDTH, SCREEN_HEIGHT, ANIMATION_SPEED, TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR, UI_CLICK_COOLDOWN, UI_SETTINGS, PLAYER_SETTINGS,  WEAPON_SETTINGS, TESTING_ITEMS, DRINK_RECIPES, ITEM_DESCRIPTIONS, NPC_DIALOGUE_DISTANCE } = settings;
+export const { SCREEN_WIDTH, SCREEN_HEIGHT, ANIMATION_SPEED, TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR, UI_CLICK_COOLDOWN, UI_SETTINGS, PLAYER_SETTINGS,  WEAPON_SETTINGS, TESTING_ITEMS, DRINK_RECIPES, ITEM_DESCRIPTIONS, NPC_DIALOGUE_DISTANCE, NPC_DIALOGUE_SECTION_LENGTH, NPC_DIALOGUE } = settings;
 
 

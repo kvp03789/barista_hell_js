@@ -3,10 +3,10 @@ import { SCREEN_HEIGHT, SCREEN_WIDTH, UI_CLICK_COOLDOWN, UI_SETTINGS, DRINK_RECI
 import { AdjustmentFilter, BevelFilter, CRTFilter, GlitchFilter, GlowFilter } from "pixi-filters";
 import { Beans, CorruptedBlood, Ice, LargeFang, Milk, Syrup, WhippedCream } from "./item_classes/Materials";
 import { TooltipManager } from "./TooltipManager";
-import NPCDialogueManaer from "./NPCDialogueManager";
+import NPCDialogueManager from "./NPCDialogueManager";
 
 export default class UIManager{
-    constructor(app, player, uiAssets, keysObject, iconAssets, clickEventManager, mousePos, npcList, stateLabel){
+    constructor(app, player, uiAssets, fonts, keysObject, iconAssets, clickEventManager, mousePos, npcList, stateLabel){
         this.app = app
         this.player = player
 
@@ -18,6 +18,8 @@ export default class UIManager{
         this.uiAssets = uiAssets
         this.iconAssets = iconAssets
         this.keysObject = keysObject
+
+        this.fonts = fonts
 
         //things to do with click cooldown
         this.clicking = false
@@ -101,7 +103,7 @@ export default class UIManager{
         this.craftingWindow = new CraftingWindowUI(this.app, this.player, this.clickCooldown, this.clicking, this.UIAssetsObject, this.uiContainer, SCREEN_WIDTH - (this.UIAssetsObject.UI_InventoryBG.width + 20), 50, this.iconAssetsObject, this.clickEventManager, this, this.tooltipManager)
 
         //npc dialogue manager
-        this.npcDialogueManager = new NPCDialogueManaer(this.app, this.player, this.UIAssetsObject, this.uiContainer, this.npcList, this.stateLabel)
+        this.npcDialogueManager = new NPCDialogueManager(this.app, this.player, this.UIAssetsObject, this.fonts, this.uiContainer, this.npcList, this.stateLabel)
     }     
 
     //returns bool if a non movement key is pressed
@@ -163,13 +165,21 @@ export default class UIManager{
             }
 
             //npc dialogue
-            //~~player.canDialogue is an object with a bool called status property
-            //that is set based on player colliding with npc, and an npc property
+            //~~npcDialogueManager.playerCanDialogue is an object with a property called status,  
+            //a bool that is set based on player colliding with npc, and an npc property
             //that gets set to the NPC the player is near~~
             else if(this.npcDialogueManager.playerCanDialogue.status){
-                //TODO: display npc dialogue here
-                this.npcDialogueManager.playerCanDialogue.npc.handleBeginDialogue()
-                this.uiContainer.addChild(this.npcDialogueManager.dialogueContainer)
+                const npc = this.npcDialogueManager.playerCanDialogue.npc
+                if(!this.npcDialogueManager.dialogueIsDisplaying){
+                    //function on the NPCDialogueManager to handle begining dialogue
+                    this.npcDialogueManager.handleBeginDialogue(npc)
+                }
+                else{
+                    //if dialogue IS currently being displayed, pass control over
+                    //to NpcDialogueManager to continue scrolling through dialogue or
+                    //to close the window
+                    this.npcDialogueManager.handleDialogueContinue(npc)
+                }  
             }
         }
     }
@@ -194,7 +204,9 @@ export default class UIManager{
         //automatically close dialogue if player walks away from npc
         if(!this.npcDialogueManager.playerCanDialogue.status){
             this.dialogueIsDisplaying = false
-            this.uiContainer.removeChild(this.npcDialogueManager.dialogueContainer)
+            if(this.dialogueIsDisplaying){
+                this.uiContainer.removeChild(this.npcDialogueManager.dialogueContainer)
+            }
         }
 
         this.craftingWindow.run()

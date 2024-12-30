@@ -1,10 +1,14 @@
 import { TILE_HEIGHT, TILE_WIDTH } from "../settings"
 
+//measurement in TILES
+const cafeOverworldMapHeight = 28
+const cafeOverworldMapWidth = 28
+
 export const cafeMapData = {
     tileHeight: TILE_HEIGHT,
     tilewidth: TILE_WIDTH,
-    height: 28,
-    width:28,
+    height: cafeOverworldMapHeight,
+    width:cafeOverworldMapWidth,
     renderOrientation:"orthogonal",
     renderOrder:"right-down",
     tiledVersion:"1.10.2",
