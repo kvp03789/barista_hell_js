@@ -10,6 +10,7 @@ export class TooltipManager{
         this.mousePos = mousePos
 
         this.currentTooltip = new Container()
+        this.currentTooltip.interactive = false
         this.tooltipBG = new Sprite(tooltipBackgroundTexture) 
         
         this.mouseOverTimer = 0

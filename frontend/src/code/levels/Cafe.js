@@ -9,7 +9,7 @@ import Tile from '../Tile'
 import { AnimatedTile, HellPortalObject } from '../Tile'
 import ParticleManager from '../Particles'
 import BulletManager from '../BulletManager'
-import { tileSpriteData, hellCircleInactiveData, trashPileData } from '../../json/tiles/tileSpriteData'
+import { tileSpriteData, hellCircleData, trashPileData } from '../../json/tiles/tileSpriteData'
 import { GlowFilter, ReflectionFilter, ShockwaveFilter } from 'pixi-filters'
 import UIManager from '../UI'
 import { ClickEventManager } from '../ClickEventManager'
@@ -18,11 +18,14 @@ import NPCTilesGroup from '../NPCTilesGroup'
 import Level from './Level'
 
 export default class Cafe extends Level{
-    constructor(app, keysObject, stateLabel){
+    constructor(app, keysObject, stateLabel, setState){
         super(app, keysObject, stateLabel)
+
+        //a function from teh state manager to change states
+        this.setState = setState
     }
 
-
+    
     initMap = async () => {
         //sets up even listener used by keysObject to handle key events
         //HAS TO BE CALLED HERE...cant be called in constructor
@@ -149,6 +152,13 @@ export default class Cafe extends Level{
             })
         })
 
+        //object layer
+        this.parsedMapObject.objects.forEach(async (object) => {
+            if(object.name.startsWith("hell_circle")){
+                await this.createHellCircleTile(object)      
+            }
+        })
+
         await this.npcManager.initRobertNPC()
         await this.npcManager.initSarahNPC(this.sarahNPCTiles)
 
@@ -184,7 +194,6 @@ export default class Cafe extends Level{
 
     initializeAnimatedTiles = async () => {
         await this.createPuddleTile()
-        await this.createHellCircleTile()
         await this.createTrashPile()
         await this.createEspressoMachine()
     }
@@ -211,22 +220,24 @@ export default class Cafe extends Level{
         const animatedTile = new AnimatedTile(this.app, x_pos, y_pos, spritesheet.animations.main, label, this.visibleSprites, isParticleTile, animationSpeed, scale, alpha)
     }
 
-    createHellCircleTile = async () => {
-        //create hell portal
-        const spritesheet = new PIXI.Spritesheet(this.animatedTileAssets.HellCircleInactive,
-            hellCircleInactiveData)
-        await spritesheet.parse()
+    createHellCircleTile = async (object) => {
         
-        const x_pos = 600 * ZOOM_FACTOR
-        const y_pos = 500 * ZOOM_FACTOR
+        //generateAnimations populates parts of characterData json-esque object
+        const generateAnimations = hellCircleData.generateAnimations.bind(hellCircleData);
+        generateAnimations(this.animatedTileAssets.HellCircle);
+        //create hell portal
+        const spritesheet = new PIXI.Spritesheet(this.animatedTileAssets.HellCircle,
+            hellCircleData)
+        await spritesheet.parse()
+        console.log("HELL CIRCLE SPRITESHEET", spritesheet)
         const label = "animated_tile_hell_circle"
         const isParticleTile = false
-        const animationSpeed = .25
-        const scale = 1
+        const animationSpeed = .27
+        const scale = ZOOM_FACTOR
         const alpha = 1
         //some animated tiles have their own bespoke class
         //hell portal is assigned as object proerty so values can be animated in run
-        this.animatedTile = new HellPortalObject(this.app, x_pos, y_pos, spritesheet.animations.main, label, this.visibleSprites, isParticleTile, animationSpeed, scale, alpha, new GlowFilter({alpha: 0.4, distance: 20}))
+        this.hellPortal = new HellPortalObject(this.app, (object.x * ZOOM_FACTOR) - object.width, (object.y * ZOOM_FACTOR) - object.height, spritesheet.animations.idle, label, this.visibleSprites, isParticleTile, animationSpeed, scale, alpha, null, this.setState, spritesheet, object)
     }
 
     createTrashPile = async () => {
@@ -255,6 +266,7 @@ export default class Cafe extends Level{
         //ORDER MATTERS HERE
         let angle = this.getPlayerAngle(this.mousePos)
         this.character.run(angle)
+        
         this.particleManager.run(this.character.sprite)
         this.obstacleSprites.run(this.character.sprite)
         this.npcTiles.run(this.character.sprite)
@@ -262,6 +274,7 @@ export default class Cafe extends Level{
         this.bulletManager.run(this.character.sprite)
         this.uiManager.run()
         this.npcManager.run(this.character)
+        this.hellPortal.run(this.character)
 
         if(spritesAreColliding(this.character.sprite, this.craftingTile)){
             this.character.inCraftingPosition = true

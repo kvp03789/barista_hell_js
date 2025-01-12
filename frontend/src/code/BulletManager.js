@@ -1,7 +1,8 @@
 import { Container, Sprite } from "pixi.js"
-import { WEAPON_SETTINGS, ZOOM_FACTOR } from "../settings"
-import { randomNumber, spritesAreColliding } from '../utils'
+import { SCREEN_HEIGHT, SCREEN_WIDTH, WEAPON_SETTINGS, ZOOM_FACTOR } from "../settings"
+import { checkPolygonCollision, createSATPolygonFromPoints, createSATPolygonFromSprite, getSpriteVertices, randomNumber, spritesAreColliding } from '../utils'
 import { MotionBlurFilter } from 'pixi-filters'
+import SAT from 'sat'
 
 class Bullet extends Sprite{
     constructor(texture, angle, speed, playerX, playerY){
@@ -64,12 +65,21 @@ class BulletManager extends Container{
         //wall block/obstacle collision
         this.obstacleSprites.children.forEach((obstacle, i) => {
             this.children.forEach((bullet, j) => {
-                if(spritesAreColliding(bullet, obstacle)){
-                    this.particleManager.createAnimatedParticle(bullet.x, bullet.y, "BulletWallExplodeParticleSmoke")
-                    this.removeChild(bullet)
-                    bullet.destroy()
+                if(spritesAreColliding(bullet, obstacle.getBounds())){
+                    if(!obstacle.bulletsPassThrough){
+                        this.particleManager.createAnimatedParticle(bullet.x, bullet.y, "BulletWallExplodeParticleSmoke")
+                        this.removeChild(bullet)
+                        bullet.destroy()
+                    }
+                    
                 }
             })
+        })
+    }
+
+    bulletCleanUp = () => {
+        this.children.forEach(bullet => {
+            
         })
     }
 
@@ -80,6 +90,9 @@ class BulletManager extends Container{
         this.offset.x = player.x + (player.width / 2) - this.half_width
         this.offset.y = player.y + (player.height / 2) - this.half_height
 
+        //check collisions
+        this.checkBulletCollision()
+
         this.children.forEach((bullet, i) => {
             bullet.vx = Math.cos(bullet.rotation) * bullet.speed;
             bullet.vy = Math.sin(bullet.rotation) * bullet.speed;
@@ -89,14 +102,13 @@ class BulletManager extends Container{
 
             bullet.scale.set(ZOOM_FACTOR)
 
-            //check collisions
-            this.checkBulletCollision()
+            
 
             // remove bullets that are out off screen
-            // if (bullet.x < 0 || bullet.x > this.app.view.width || bullet.y < 0 || bullet.y > this.app.view.height) {
-            //     this.removeChild(bullet)
-            //     bullet.destroy()
-            // }
+            if(bullet.x >= SCREEN_WIDTH || bullet.x <= 0 || bullet.y > SCREEN_HEIGHT || bullet.y < 0){
+                this.removeChild(bullet)
+                bullet.destroy()
+            }
         })
     }
 }

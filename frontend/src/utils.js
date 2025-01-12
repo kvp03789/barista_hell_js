@@ -1,13 +1,25 @@
 import parse from "parse-svg-path"
-import { TILE_WIDTH, TILE_HEIGHT } from "./settings"
+import SAT from 'sat';
+import { Point } from "pixi.js";
+import { TILE_WIDTH, TILE_HEIGHT, ZOOM_FACTOR, SCREEN_WIDTH, SCREEN_HEIGHT } from "./settings"
+
 
 //parse map data from 1d array into 2d array 
 export function parseMapData(mapData) {
     const parsedMapObject = {height: mapData.height, width: mapData.width}
     mapData.layers.forEach(layer => {
-        parsedMapObject[layer.name] = []
-        for(let i = 0; i < layer.data.length; i += layer.width){
-            parsedMapObject[layer.name].push(layer.data.slice(i, layer.width + i))
+        if(layer.name != "objects"){
+            parsedMapObject[layer.name] = []
+            for(let i = 0; i < layer.data.length; i += layer.width){
+                parsedMapObject[layer.name].push(layer.data.slice(i, layer.width + i))
+            }
+        }
+        //every layer should have objects in an object layer called "objects"
+        else{
+            parsedMapObject.objects = []
+            layer.objects.forEach(obj => {
+                parsedMapObject.objects.push(obj)
+            })
         }
     })
     return parsedMapObject
@@ -41,8 +53,29 @@ export function randomNumber(min, max){
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-//generate seed for randomness
+//generate seed for randomness (holds up spork)
 export function generateSeed(min = 0.5, max = 1.5) {
     // Generate a random decimal number between min and max
     return Math.random() * (max - min) + min;
+}
+
+/**
+ * Checks if a point (playerX, playerY) is within an ellipse.
+ * 
+ * @param {number} playerX - X-coordinate of the player's position.
+ * @param {number} playerY - Y-coordinate of the player's position.
+ * @param {number} ellipseX - X-coordinate of the center of the ellipse.
+ * @param {number} ellipseY - Y-coordinate of the center of the ellipse.
+ * @param {number} ellipseRadiusX - Horizontal radius of the ellipse.
+ * @param {number} ellipseRadiusY - Vertical radius of the ellipse.
+ * @returns {boolean} True if the player is inside the ellipse, false otherwise.
+ */
+export function isPlayerInEllipse(playerX, playerY, ellipseX, ellipseY, ellipseRadiusX, ellipseRadiusY) {
+    // console.log("DEBUGGING: ", playerX, playerY, ellipseX, ellipseY, )
+    // Calculate the normalized position of the player relative to the ellipse
+    const normX = (playerX - ellipseX) / ellipseRadiusX;
+    const normY = (playerY - ellipseY) / ellipseRadiusY;
+
+    // Check if the normalized distance is less than or equal to 1
+    return (normX ** 2 + normY ** 2) <= 1;
 }

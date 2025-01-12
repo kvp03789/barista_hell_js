@@ -28,6 +28,9 @@ export default class YSortCameraSpriteGroup extends Container{
             if(!sprite.label.startsWith("animated")){
                 sprite.scale.set(ZOOM_FACTOR)
             }
+            if(sprite.label.startsWith("hell_collision")){
+                // console.log("HELL IS HERE",sprite.position)
+            }
         })
     }
 }

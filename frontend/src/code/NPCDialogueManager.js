@@ -33,8 +33,6 @@ export default class NPCDialogueManager{
         this.dialogueBackground.position.set(0,0)
         this.dialogueBackground.label = "Dialogue_BG"
 
-        console.log('DEBUUUUUUUUUUUUUUUG JEEEEENKINSSS', this.fonts.DialogueFont)
-
         this.dialogueTextStyle = new TextStyle({
             // fontFamily: 'roboto',
             fontFamily: "Font_AdvancedPixel7",

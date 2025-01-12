@@ -164,6 +164,29 @@ export const cafeMapData = {
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        },
+        {
+            "draworder":"topdown",
+            "id":12,
+            "name":"objects",
+            "objects":[
+                    {
+                    "ellipse":true,
+                    "height":60,
+                    "id":1,
+                    "name":"hell_circle_collision",
+                    "rotation":0,
+                    "type":"",
+                    "visible":true,
+                    "width":80,
+                    "x":558,
+                    "y":438.666666666667
+                    }],
+            "opacity":1,
+            "type":"objectgroup",
+            "visible":true,
+            "x":0,
+            "y":0
         }
     ]
 }

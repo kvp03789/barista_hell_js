@@ -21,16 +21,15 @@ class Application{
         //this is for te pixij debugger
         globalThis.__PIXI_APP__ = this.app;
 
-        this.state_manager = new State_Manager('hell_overworld')
+        this.state_manager = new State_Manager('cafe_intro', this.app)
     }
 
     async init(){
         await this.app.init({width: SCREEN_WIDTH, height: SCREEN_HEIGHT, preference: 'webgl'})
         body.append(this.app.canvas)
         await PIXI.Assets.init({manifest: assetsManifest})
-
-        this.cafe = new Cafe(this.app, this.keysObject, 'cafe_intro')
-        this.hellOverworld = new HellOverWorld(this.app, this.keysObject, 'hell_overworld')
+        this.cafe = new Cafe(this.app, this.keysObject, 'cafe_intro', this.state_manager.setState)
+        this.hellOverworld = new HellOverWorld(this.app, this.keysObject, 'hell_overworld', this.state_manager.setState)
 
         this.statesObject = {
             'cafe_intro': this.cafe,
@@ -54,14 +53,21 @@ class Application{
 }
 
 class State_Manager{
-    constructor(currentState){
+    constructor(currentState, app){
+        this.app = app
         this.previousState = currentState
         this.currentState = currentState
     }
 
     setState = (newState) => {
+        console.log("ZOMG IT HAPPENED")
+
         this.previousState = this.currentState
         this.currentState = newState
+
+        this.app.ticker.remove(this.previousState.run)
+        this.app.ticker.add(this.currentState.run)
+
     }
 
     getState = () => {

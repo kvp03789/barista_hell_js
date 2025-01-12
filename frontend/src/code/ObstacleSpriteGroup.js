@@ -21,12 +21,23 @@ export default class ObstacleSpriteGroup extends Container{
         // update position of each child sprite based oncalculated offset
         this.children.forEach(sprite => {
             
-            sprite.x -= this.offset.x * ZOOM_FACTOR
-            sprite.y -= this.offset.y * ZOOM_FACTOR
-            sprite.scale.set(ZOOM_FACTOR)
+            if(!sprite.label.startsWith("collision_polygon")){
+                sprite.x -= this.offset.x * ZOOM_FACTOR
+                sprite.y -= this.offset.y * ZOOM_FACTOR
+                sprite.scale.set(ZOOM_FACTOR)
 
-            //reduce alpha for obstacles:
-            sprite.alpha = 0
+                //reduce alpha for obstacles:
+                sprite.alpha = 0
+            }
+            else{
+                sprite.x -= this.offset.x * ZOOM_FACTOR
+                sprite.y -= this.offset.y * ZOOM_FACTOR
+                
+                // sprite.scale.set(ZOOM_FACTOR)
+                //reduce alpha for obstacles:
+                sprite.alpha = 0
+                
+            }
         })
     }
 }

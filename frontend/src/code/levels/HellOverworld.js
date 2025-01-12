@@ -1,23 +1,26 @@
 import Level from './Level'
 import Character from '../Character'
-import Tile, { AnimatedTile, HellPortalObject } from '../Tile'
+import Tile, { AnimatedTile, HellPortalObject, PolygonCollisionShape, Stairs } from '../Tile'
 import ParticleManager from '../Particles'
 import BulletManager from '../BulletManager'
-import { Assets, Sprite, Rectangle, Texture, Spritesheet } from 'pixi.js'
+import { Assets, Sprite, Rectangle, Texture, Spritesheet, Container, Graphics } from 'pixi.js'
 import { NPCManager } from '../NPCManager'
 import { TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR }from '../../settings'
-import { parseMapData, getXYSlice, spritesAreColliding, randomNumber } from '../../utils'
+import { parseMapData, getXYSlice, spritesAreColliding, randomNumber, createSATPolygonFromPoints } from '../../utils'
 import { hellOverworldMapData } from '../../map_data/hellOverworldMapData'
 import UIManager from '../UI'
 import ParallaxBackgroundManager from '../ParallaxBackgroundManager'
-import { torchData, hellCircleInactiveData } from '../../json/tiles/tileSpriteData'
+import { torchData, hellCircleData } from '../../json/tiles/tileSpriteData'
 import { GlowFilter } from 'pixi-filters'
 import ForegroundSprites from '../ForegroundSprites'
 
 export default class HellOverWorld extends Level{
-    constructor(app, keysObject, stateLabel){
+    constructor(app, keysObject, stateLabel, setState){
         super(app, keysObject, stateLabel)
         this.foregroundSpriteGroup = new ForegroundSprites(app)
+
+        //a function from teh state manager to change states
+        this.setState = setState
         }
 
         initMap = async () => {
@@ -42,6 +45,7 @@ export default class HellOverWorld extends Level{
     
             //parse map data...
             this.parsedMapObject = parseMapData(hellOverworldMapData)
+            console.log("DEBUG: parsedMapObject", this.parsedMapObject)
             //width of entire map in tiles, set in Tiled program
             this.levelRowWidth = this.parsedMapObject.width
             this.levelRowHeight = this.parsedMapObject.height
@@ -73,7 +77,7 @@ export default class HellOverWorld extends Level{
                                 let h = TILE_HEIGHT
                                 const sliceRect = new Rectangle(x, y, w, h);
                                 const texture = new Texture({source: this.hellOverworldAssets.HellOverworldTilesetPng, frame: sliceRect})
-                                const tile = new Tile(this.app, x_pos, y_pos, texture, 'boundary', this.obstacleSprites)
+                                const tile = new Tile(this.app, x_pos, y_pos, texture, 'boundary', this.obstacleSprites, col == 312 ? false : true)
                             }
                         })
                     })
@@ -93,21 +97,49 @@ export default class HellOverWorld extends Level{
             this.parallaxBackgroundManager = new ParallaxBackgroundManager(this.app, this.character, this.parallaxBackgroundAssets)
 
             //these are NOT obstacle sprites, just decoration
-            this.parsedMapObject.facade.forEach((row, i) => {
-                row.forEach((col, j) => {
-                    if(col !== 0){
-                        const x_pos = ((j) * TILE_WIDTH) * ZOOM_FACTOR
-                        const y_pos = ((i) * TILE_HEIGHT) * ZOOM_FACTOR
-                        // let x = (Math.floor(col / 28) * TILE_WIDTH) + (col % 28 * TILE_WIDTH)
-                        // let y = (Math.floor(col / 28) * TILE_HEIGHT)
-                        let { x, y } = getXYSlice(col - 1, tilesetPngWidth)
-                        let w = TILE_WIDTH
-                        let h = TILE_HEIGHT
-                        const sliceRect = new Rectangle(x, y, w, h);
-                        const texture = new Texture({source: this.hellOverworldAssets.HellOverworldTilesetPng, frame: sliceRect})
-                        const tile = new Tile(this.app, x_pos, y_pos, texture, 'tile', this.visibleSprites)
+            // this.parsedMapObject.facade.forEach((row, i) => {
+            //     row.forEach((col, j) => {
+            //         if(col !== 0){
+            //             const x_pos = ((j) * TILE_WIDTH) * ZOOM_FACTOR
+            //             const y_pos = ((i) * TILE_HEIGHT) * ZOOM_FACTOR
+            //             // let x = (Math.floor(col / 28) * TILE_WIDTH) + (col % 28 * TILE_WIDTH)
+            //             // let y = (Math.floor(col / 28) * TILE_HEIGHT)
+            //             let { x, y } = getXYSlice(col - 1, tilesetPngWidth)
+            //             let w = TILE_WIDTH
+            //             let h = TILE_HEIGHT
+            //             const sliceRect = new Rectangle(x, y, w, h);
+            //             const texture = new Texture({source: this.hellOverworldAssets.HellOverworldTilesetPng, frame: sliceRect})
+            //             const tile = new Tile(this.app, x_pos, y_pos, texture, 'tile', this.visibleSprites)
+            //         }, bulletsPassThrough
+            //     })
+            // })
+
+            //debug only, non-scaled container
+            this.debugContainer = new DebugContainer(this.app)
+            this.debugContainer.label = "debug_container"
+            this.debugContainer.label = "debug_POLYGON"
+            //end debug only
+
+            //object layer
+            this.parsedMapObject.objects.forEach((object, i) => {
+                if(object.name.startsWith("collision_polygon")){
+                    //collision polygon objects
+                    console.log(object)
+                    const x = object.x 
+                    const y = object.y
+                    const polygon = new PolygonCollisionShape(this.app, x, y, object.width, object.height, object.name, this.obstacleSprites, false)
+                }
+                else{
+                    const texture = this.hellOverworldAssets[object.name]
+                    const x = object.x * ZOOM_FACTOR
+                    const y = object.y - ((object.height * ZOOM_FACTOR) / 2)
+                    if(object.name === "Stairs"){
+                        this.stairs = new Stairs(this.app, x, y, texture, `object_${object.name}`, this.visibleSprites)
+                    }else{
+                        const objectTile = new Tile(this.app, x, y, texture, `object_${object.name}`, this.visibleSprites, false)
                     }
-                })
+                    
+                }
             })
 
             //animatedTiles
@@ -121,8 +153,8 @@ export default class HellOverWorld extends Level{
                             this.initTorchTile(xPos, yPos)
                         }
                         else if(col === 310){
-                            console.log(`THE COL IS ${col}, ${xPos, yPos}`)
-                            this.initHellCircleTile(xPos, yPos)
+                            //THIS NEEDS FIXING
+                            // this.initHellCircleTile(xPos, yPos)
                         }
                         
                     }
@@ -161,7 +193,11 @@ export default class HellOverWorld extends Level{
             this.clickEventManager.init(this.character, this.uiManager, this.keysObject)
             this.app.stage.addChild(this.clickEventManager)
             this.initHellArch()
-            
+
+
+            //debug only
+            // this.app.stage.addChild(this.debugContainer)
+            //end debug only
         }
 
         initializeAnimatedTiles = () => {
@@ -178,20 +214,20 @@ export default class HellOverWorld extends Level{
             this.foregroundSpriteGroup.addChild(hellArch)
         }
 
-        initHellCircleTile = async (x, y) => {
-                //create hell portal
-                const spritesheet = new Spritesheet(this.animatedTileAssets.HellCircleInactive,
-                    hellCircleInactiveData)
-                await spritesheet.parse()
-                const label = "animated_tile_hell_circle"
-                const isParticleTile = false
-                const animationSpeed = .25
-                const scale = 1
-                const alpha = 1
-                //some animated tiles have their own bespoke class
-                //hell portal is assigned as object proerty so values can be animated in run
-                this.animatedTile = new HellPortalObject(this.app, x, y, spritesheet.animations.main, label, this.visibleSprites, isParticleTile, animationSpeed, scale, alpha, new GlowFilter({alpha: 0.4, distance: 20}))
-            }
+        // initHellCircleTile = async (x, y) => {
+        //         //create hell portal
+        //         const spritesheet = new Spritesheet(this.animatedTileAssets.HellCircleInactive,
+        //             hellCircleInactiveData)
+        //         await spritesheet.parse()
+        //         const label = "animated_tile_hell_circle"
+        //         const isParticleTile = false
+        //         const animationSpeed = .25
+        //         const scale = 1
+        //         const alpha = 1
+        //         //some animated tiles have their own bespoke class
+        //         //hell portal is assigned as object proerty so values can be animated in run
+        //         this.animatedTile = new HellPortalObject(this.app, x, y, spritesheet.animations.main, label, this.visibleSprites, isParticleTile, animationSpeed, scale, alpha, new GlowFilter({alpha: 0.4, distance: 20}))
+        //     }
 
         initTorchTile = async(x, y) => {
             //create puddle with drips
@@ -219,10 +255,61 @@ export default class HellOverWorld extends Level{
             this.particleManager.run(this.character.sprite)
             this.obstacleSprites.run(this.character.sprite)
             this.npcTiles.run(this.character.sprite)
+            //debug only
+            // this.debugContainer.run(this.character.sprite)
+            //end debug only
             this.visibleSprites.run(this.character.sprite)
             this.bulletManager.run(this.character.sprite)
             this.uiManager.run()
             this.npcManager.run(this.character)
             this.foregroundSpriteGroup.run(this.character)
+
+            this.stairs.run(this.character)
+
+            console.log("STAIRS BABY", this.character.isOnStairs)
         }
+}
+
+class DebugContainer extends Container{
+    constructor(app){
+        super()
+        this.app = app
+        this.half_width = this.app.view.width / 2
+        this.half_height = this.app.view.height / 2
+        this.label = "Obstacle_Sprite_Group"
+        this.position.set(0,0)
+
+        this.offset = {x: 0, y: 0}
+    }
+
+    run = (player) => {
+        // calculate offsets based on player's position. its basically the difference
+        // in the center of the player and the center of the screen
+        this.offset.x = player.x + (player.width / 2) - this.half_width
+        this.offset.y = player.y + (player.height / 2) - this.half_height
+        
+        // update position of each child sprite based oncalculated offset
+        this.children.forEach(sprite => {
+            
+            if(!sprite.label.startsWith("collision_polygon")){
+                sprite.x -= this.offset.x * ZOOM_FACTOR
+                sprite.y -= this.offset.y * ZOOM_FACTOR
+                sprite.scale.set(ZOOM_FACTOR)
+
+                //reduce alpha for obstacles:
+                sprite.alpha = 1
+            }
+            else{
+                sprite.x -= this.offset.x * ZOOM_FACTOR
+                sprite.y -= this.offset.y * ZOOM_FACTOR
+                sprite.scale.set(ZOOM_FACTOR)
+
+                //reduce alpha for obstacles:
+                sprite.alpha = 0
+                //collision polygons have a run method that updates their sat coords
+                //with the offset calculated here
+                
+            }
+        })
+    }
 }

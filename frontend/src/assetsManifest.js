@@ -26,7 +26,7 @@ import Particle_AshParticle from './img/spritesheets/particles/ash_particle_spri
 
 //tiles
 import PuddleTile from './img/spritesheets/tiles/puddle_spritesheet.png'
-import HellCircleInactive from './img/spritesheets/tiles/hell_circle_inactive_spritesheet.png'
+import HellCircle from './img/spritesheets/tiles/hell_circle_spritesheet.png'
 import TrashPile from './img/spritesheets/tiles/trash_pile_spritesheet.png'
 import Torch from './img/spritesheets/tiles/torch_spritesheet.png'
 
@@ -35,8 +35,11 @@ import CafeBaseMap from './img/map_pngs/cafe_base_map.png'
 import CafeTilesetPng from './img/tileset_pngs/cafe_tileset_1.png'
 
 //hell overworld map assets
-import HellOverworldBaseMap from './img/map_pngs/hell_overworld_base_map.png'
+import HellOverworldBaseMap from './img/map_pngs/hell_overworld_base_map_test.png'
 import HellOverworldTilesetPng from './img/tileset_pngs/hell_overworld_tileset_1.png'
+import Platform from './img/map_pngs/hell_overworld_objects/platform.png'
+import Stairs from './img/map_pngs/hell_overworld_objects/platform_stairs.png'
+import Ruins from './img/map_pngs/hell_overworld_objects/ruins.png'
 
 //guns
 import BattleRifleLeft from './img/weapons/battle_rifle/br_left.png'
@@ -302,8 +305,8 @@ export const assetsManifest = {
                "src": PuddleTile
             },
             {
-               "alias": "HellCircleInactive",
-               "src": HellCircleInactive
+               "alias": "HellCircle",
+               "src": HellCircle
             },
             {
                "alias": "TrashPile",
@@ -340,7 +343,19 @@ export const assetsManifest = {
             {
                "alias": "HellOverworldTilesetPng",
                "src": HellOverworldTilesetPng
-            }
+            },
+            {
+               "alias": "Platform",
+               "src": Platform
+            },
+            {
+               "alias": "Stairs",
+               "src": Stairs
+            },
+            {
+               "alias": "Ruins",
+               "src": Ruins
+            },
          ]
        },
        //weapon_assets

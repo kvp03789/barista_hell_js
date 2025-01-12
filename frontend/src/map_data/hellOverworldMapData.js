@@ -16,6 +16,7 @@ export const hellOverworldMapData = {
     type:"map",
     version:1.10,
     layers:[
+        //animated tiles
         {
             name: "animatedTiles",
             zIndex: 1,
@@ -50,6 +51,205 @@ export const hellOverworldMapData = {
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         },
+        //object layer
+        {
+        "draworder":"topdown",
+        "id":8,
+        "name":"objects",
+        "objects":[
+                {
+                    "gid":541,
+                    "height":134,
+                    "id":2,
+                    "name":"Platform",
+                    "rotation":0,
+                    "type":"",
+                    "visible":true,
+                    "width":254,
+                    "x":298,
+                    "y":824
+                }, 
+                {
+                "gid":542,
+                "height":30,
+                "id":3,
+                "name":"Stairs",
+                "rotation":0,
+                "type":"",
+                "visible":true,
+                "width":161,
+                "x":320.25,
+                "y":711.25
+                }, 
+                {
+                "gid":543,
+                "height":271,
+                "id":4,
+                "name":"Ruins",
+                "rotation":0,
+                "type":"",
+                "visible":true,
+                "width":212,
+                "x":934,
+                "y":285.333333333333
+                },
+                {
+                    "height":15,
+                    "id":48,
+                    "name":"collision_polygon_bottom",
+                    "rotation":0,
+                    "type":"",
+                    "visible":true,
+                    "width":200,
+                    "x":300,
+                    "y":510
+                }, 
+                {
+                "height":100,
+                "id":49,
+                "name":"collision_polygon_left",
+                "rotation":0,
+                "type":"",
+                "visible":true,
+                "width":15,
+                "x":300,
+                "y":413.25
+                }, 
+                {
+                "height":100,
+                "id":50,
+                "name":"collision_polygon_right",
+                "rotation":0,
+                "type":"",
+                "visible":true,
+                "width":15,
+                "x":490,
+                "y":413.25
+                },
+                {
+                "height":20,
+                "id":51,
+                "name":"collision_polygon_rune_base_1",
+                "rotation":0,
+                "type":"",
+                "visible":true,
+                "width":20,
+                "x":955,
+                "y":248.333333333333
+                }, 
+                {
+                "height":20,
+                "id":52,
+                "name":"collision_polygon_rune_base_2",
+                "rotation":0,
+                "type":"",
+                "visible":true,
+                "width":20,
+                "x":975.625,
+                "y":244.75
+                }, 
+                {
+                "height":20,
+                "id":53,
+                "name":"collision_polygon_rune_base_3",
+                "rotation":0,
+                "type":"",
+                "visible":true,
+                "width":20,
+                "x":986.25,
+                "y":244.5
+                }, 
+                {
+                "height":20,
+                "id":54,
+                "name":"collision_polygon_rune_base_4",
+                "rotation":0,
+                "type":"",
+                "visible":true,
+                "width":20,
+                "x":1001.875,
+                "y":226.625
+                }, 
+                {
+                "height":20,
+                "id":55,
+                "name":"collision_polygon_rune_base_5",
+                "rotation":0,
+                "type":"",
+                "visible":true,
+                "width":20,
+                "x":1021.5,
+                "y":241.125
+                }, 
+                {
+                "height":165,
+                "id":56,
+                "name":"collision_polygon_ruin_left",
+                "rotation":0,
+                "type":"",
+                "visible":true,
+                "width":75,
+                "x":953.875,
+                "y":65
+                }, 
+                {
+                "height":20,
+                "id":57,
+                "name":"collision_polygon_rune_base_6",
+                "rotation":0,
+                "type":"",
+                "visible":true,
+                "width":20,
+                "x":1090.25,
+                "y":260.75
+                }, 
+                {
+                "height":20,
+                "id":58,
+                "name":"collision_polygon_rune_base_7",
+                "rotation":0,
+                "type":"",
+                "visible":true,
+                "width":20,
+                "x":1107.75,
+                "y":265
+                }, 
+                {
+                "height":20,
+                "id":59,
+                "name":"collision_polygon_rune_base_8",
+                "rotation":0,
+                "type":"",
+                "visible":true,
+                "width":20,
+                "x":1124,
+                "y":272.25
+                }, 
+                {
+                "height":200,
+                "id":60,
+                "name":"collision_polygon_ruin_right",
+                "rotation":0,
+                "type":"",
+                "visible":true,
+                "width":60,
+                "x":1090.75,
+                "y":45
+                }, 
+                {
+                "height":30,
+                "id":61,
+                "name":"collision_polygon_ruin_top1",
+                "rotation":0,
+                "type":"",
+                "visible":true,
+                "width":40,
+                "x":1034.5,
+                "y":80
+                }
+            ]
+        }, 
+        //facade layer
         {
             name: "facade",
             zIndex: 1,
@@ -79,6 +279,7 @@ export const hellOverworldMapData = {
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 257, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         },
+        //obstacles layer
         {
             name: "obstacles",
             zIndex: 1,
@@ -106,7 +307,12 @@ export const hellOverworldMapData = {
                 313, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 313, 0, 0, 0,
                 313, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 313, 0, 0, 0, 0,
                 313, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 313, 0, 0, 0, 0, 0,
-                313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 0, 0, 0, 0, 0, 0],
+                313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 313, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         },
     ]
 }

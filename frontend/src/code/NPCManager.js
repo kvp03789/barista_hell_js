@@ -108,7 +108,6 @@ class NPC extends AnimatedSprite{
     }
 
     handleBeginDialogue = () => {
-        console.log("handle dialogue", this.label)
         this.isInDialogue = true
     }
 
@@ -134,24 +133,20 @@ class SarahNPC extends NPC {
 
         //movement
         this.speed = 2
-        console.log("SARAH DEBUG: patrol tiles: ", this.patrolTiles)
     }
 
     patrol = () => {
         if(!this.patrolling){
             if(!this.randomAmountOfFrames){
                 this.randomAmountOfFrames = randomNumber(180, 400)
-                // console.log(`SARAH DEBUG: randomAMountOfFrames generated: ${this.randomAmountOfFrames}`)
             }
             else {
                 if(this.patrolTimer !== this.randomAmountOfFrames){
                     this.patrolTimer--
-                    // console.log(`SARAH DEBUG: randomAMountOfFrames generated: ${this.randomAmountOfFrames} vs ${this.patrolTimer}`)
 
                 }
                 else if(this.patrolTimer === this.randomAmountOfFrames){
                     this.patrolling = true
-                    console.log(' SARAH DEBUG: BEGINNING PATROL!!')
                 }
             }
         }
@@ -165,14 +160,12 @@ class SarahNPC extends NPC {
                 } while (randomTileIndex === this.tileIndex);
                 this.tileIndex = randomTileIndex;
                 this.tileToMoveTo = this.patrolTiles[this.tileIndex];
-                console.log(`SARAH DEBUG: OK PICKED A TILE TO MOVE TO: ${this.tileToMoveTo.x}, ${this.tileToMoveTo.y}`)
             }
             else if(this.tileToMoveTo){ 
                 const adjustedTilePosition = { 
                     x: this.tileToMoveTo.x, 
                     y: this.tileToMoveTo.y 
                 };
-                // console.log(`SARAH DEBUG: MOVING TOWARDS TILE: sarah position: ${this.x},${this.y} -- tile psition:  ${adjustedTilePosition.x},${adjustedTilePosition.y}, ${this.movement.x}, ${this.movement.y}`)
                 
                 if(!this.isCloseEnough(this.x, adjustedTilePosition.x)){
                     if(this.x < adjustedTilePosition.x){
@@ -196,7 +189,6 @@ class SarahNPC extends NPC {
                 }
 
                 else if(this.isCloseEnough(this.x, adjustedTilePosition.x) && this.isCloseEnough(this.y, adjustedTilePosition.y)){
-                    console.log("SARAH DEBUG: DESTINATION REACHED! RESETTING...")
                     //reset everything
                     this.reset()
                 }
@@ -252,7 +244,6 @@ export class NPCManager{
                 this.parsedAssetsObject[key.replace("NPCSpritesheet_", "")] = this.npcSpritesheets[key]
             }
         }
-        console.log("SARAH DEBUG: ASSETS: ", this.parsedAssetsObject)
     }
 
     initRobertNPC = async () => {

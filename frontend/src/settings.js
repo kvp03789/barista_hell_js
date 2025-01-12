@@ -10,6 +10,7 @@ export const settings = {
     UI_CLICK_COOLDOWN: 20,
     UI_SETTINGS: {PADDING: 12},
     PLAYER_SETTINGS: {
+        BASE_SPEED: 7,
         INVENTORY_SLOTS_AMOUNT: 40,
         EQUIPMENT_SLOTS: ["hands", "feet", "chest", "legs", "head"],
         QUICK_BAR_SLOTS_AMOUNT: 8

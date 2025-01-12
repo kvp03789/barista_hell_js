@@ -6,14 +6,14 @@ import NPCTilesGroup from '../NPCTilesGroup'
 import { ClickEventManager } from '../ClickEventManager'
 
 export default class Level{
-    constructor(app, keysObject, stateLabel){
+    constructor(app, keysObject, stateLabel, setState){
             this.app = app
             this.app.stage.interactive = true
             this.app.stage.on('mousemove', this.onMouseMove)
     
             //used for npc dialogue and other settings that must
             //change depending on game state
-            this.stateLabel = stateLabel
+            this.stateLabel = stateLabel            
             
             //display height and width
             this.display_width = this.app.view.width

@@ -2,7 +2,7 @@ import { Spritesheet, AnimatedSprite } from "pixi.js";
 import { playerSpritesheetData, characterIdleData, charcterRunRightData, charcterRunLeftData, characterRunDownData, characterRunUpData } from "../json/character/characterSpriteData";
 import { spritesAreColliding } from "../utils";
 import { Inventory, Equipment, QuickBar } from "./ItemsInventoryEquipment.js";
-import { ANIMATION_SPEED, NPC_DIALOGUE_DISTANCE } from "../settings.js";
+import { ANIMATION_SPEED, NPC_DIALOGUE_DISTANCE, PLAYER_SETTINGS } from "../settings.js";
 import { DropShadowFilter } from "pixi-filters";
 
 
@@ -22,7 +22,7 @@ export default class Character{
         this.y_pos = y_pos
 
         //movement
-        this.speed = 7
+        this.speed = PLAYER_SETTINGS.BASE_SPEED
         
         //movement vector
         this.movement = { x: 0, y: 0 };
@@ -43,6 +43,9 @@ export default class Character{
 
         //bool used for checking if player is already in dialogue, crafting, etc.
         this.busy = false      
+
+        //bool to use for stairs to adjust speed
+        this.isOnStairs = false
     }
 
     addSpriteToGroups = (group) => {
@@ -277,6 +280,11 @@ export default class Character{
         //angle passed in from level class
         this.angle = angle
         this.activeWeapon.run(angle)
+
+        //stairs check to slow movement
+        if(this.isOnStairs)this.speed =5
+        else this.speed = PLAYER_SETTINGS.BASE_SPEED
+
         this.handleMovement(angle)
         this.handleDirection(angle)  
         
