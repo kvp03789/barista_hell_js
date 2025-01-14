@@ -47,25 +47,122 @@ export class AnimatedTile extends AnimatedSprite{
     }
 }
 
-export class HellPortalObject extends AnimatedTile{
-    constructor(app, x_pos, y_pos, texture, label, group, isParticleTile, animationSpeed, scale, alpha, filters, setState, spritesheet, collisionObject){
+// export class HellPortalObject extends AnimatedTile{
+//     constructor(app, x_pos, y_pos, texture, label, group, isParticleTile, animationSpeed, scale, alpha, filters, setState, spritesheet, collisionObject){
+//         super(app, x_pos, y_pos, texture, label, group, isParticleTile, animationSpeed, scale, alpha, filters)
+//         this.glowPulse = 0.01
+//         this.spritesheet = spritesheet
+
+//         this.isActivated = false
+//         this.activationStatus = 'idle'  //either 'idle' or 'activated'
+//         this.currentFrame = 0
+        
+//         this.setState = setState
+
+//         //this is the object from tiled that represents where "collision box" of 
+//         // the portal is, aka where the player has to be to activate
+//         this.collisionObject = collisionObject
+//         this.collisionObject.center = {x: this.collisionObject.x + this.collisionObject.width / 2, y: this.collisionObject.y + this.collisionObject.height / 2}
+        
+//         this.collisionObjectPolygon = new Graphics()
+//         this.group.addChild(this.collisionObjectPolygon)        
+
+//         this.collisionObjectPolygon.ellipse(
+//             0,
+//             0,
+//             this.collisionObject.width,
+//             this.collisionObject.height
+//         )
+//         this.collisionObjectPolygon.position.set(this.collisionObject.x*ZOOM_FACTOR + 195, this.collisionObject.y*ZOOM_FACTOR + 95)
+//         this.collisionObjectPolygon.fill(0xde3249)
+//         this.collisionObjectPolygon.label = "hell_collision_circle"
+//         //this alpha for debugging. should be 0
+//         this.collisionObjectPolygon.alpha = 0   
+//     }
+
+//     run(player) {
+//         console.log(this.currentFrame)
+//         const polygonX = this.collisionObjectPolygon.x
+//         const polygonY = this.collisionObjectPolygon.y
+
+//         // check if the player is inside the ellipse
+//         const playerIsInside = isPlayerInEllipse(player.sprite.x, player.sprite.y, polygonX, polygonY, this.collisionObjectPolygon.width / 2, this.collisionObjectPolygon.height / 2)
+        
+//         if (playerIsInside) {
+//             console.log("player in portal!")
+//             this.isActivated = true
+//             this.activatePortal()  // activate the portal and change animation
+//         } else {
+//             this.isActivated = false
+//             this.deactivatePortal() // revert animation if player is not inside
+//         }
+//     }
+    
+//     activatePortal = () => {
+//         if (!this.isActivated) return // prevent re-activating if already activated
+        
+//         if(this.activationStatus == 'idle'){ //check if current animation is the idle one
+            
+//             this.stop() // stop current animations
+//             this.textures = this.spritesheet.animations.activate // set the "activated" animation
+//             this.activationStatus = 'activated'
+//             this.play() // play the "activated" animation
+//             // this.setState("hell_overworld") new game state
+//         }
+        
+//     }
+
+//     deactivatePortal = () => {
+//         // if (this.isActivated) return // Prevent re-deactivating if already deactivated
+
+//         if(this.activationStatus == 'activated'){
+            
+//             // get index of current frame
+//             const currentFrameIndex = this.textures.findIndex(texture => texture === this.textures[this.currentFrame])
+
+//             if (currentFrameIndex !== -1) {
+                
+//                 // reverse the animation frames starting from the current frame
+//                 const reversedFrames = this.textures.slice(0, currentFrameIndex + 1).reverse()
+//                 this.textures = reversedFrames  // apply reversed frames
+//                 this.currentFrame = reversedFrames.length - 1  // track the current frame in the reversed sequence
+//                 this.play() // play the reversed animation
+                
+                
+//                 if(this.currentFrame == reversedFrames.length) {
+//                     console.log("reverse complete")
+//                     this.activationStatus = 'idle'
+//                 }
+                
+//                 // // set back to idle animation once reversed animation is done
+//                 // this.textures = this.spritesheet.animations.idle 
+//                 // this.play() // play the "idle" animation
+//                 // this.stop()
+//             }
+//         }
+//     }
+// }
+
+export class HellPortalObject extends AnimatedTile {
+    constructor(app, x_pos, y_pos, texture, label, group, isParticleTile, animationSpeed, scale, alpha, filters, setState, spritesheet, collisionObject) {
         super(app, x_pos, y_pos, texture, label, group, isParticleTile, animationSpeed, scale, alpha, filters)
+        
         this.glowPulse = 0.01
         this.spritesheet = spritesheet
 
         this.isActivated = false
-        this.activationStatus = 'idle'  //either 'idle' or 'activated'
-        this.currentFrame = 0
-        
+        this.activationStatus = 'idle' // 'idle' or 'activated'
+
         this.setState = setState
 
-        //this is the object from tiled that represents where "collision box" of 
-        // the portal is, aka where the player has to be to activate
         this.collisionObject = collisionObject
-        this.collisionObject.center = {x: this.collisionObject.x + this.collisionObject.width / 2, y: this.collisionObject.y + this.collisionObject.height / 2}
-        
+        this.collisionObject.center = {
+            x: this.collisionObject.x + this.collisionObject.width / 2,
+            y: this.collisionObject.y + this.collisionObject.height / 2,
+        }
+
         this.collisionObjectPolygon = new Graphics()
-        this.group.addChild(this.collisionObjectPolygon)        
+        this.group.addChild(this.collisionObjectPolygon)
 
         this.collisionObjectPolygon.ellipse(
             0,
@@ -73,66 +170,84 @@ export class HellPortalObject extends AnimatedTile{
             this.collisionObject.width,
             this.collisionObject.height
         )
-        this.collisionObjectPolygon.position.set(this.collisionObject.x*ZOOM_FACTOR + 195, this.collisionObject.y*ZOOM_FACTOR + 95)
+        this.collisionObjectPolygon.position.set(this.collisionObject.x * ZOOM_FACTOR + 195, this.collisionObject.y * ZOOM_FACTOR + 95)
         this.collisionObjectPolygon.fill(0xde3249)
         this.collisionObjectPolygon.label = "hell_collision_circle"
-        //this alpha for debugging. should be 0
-        this.collisionObjectPolygon.alpha = 0   
+        this.collisionObjectPolygon.alpha = 0 // Debugging alpha, should be 0.
     }
 
     run(player) {
+        if(this.activationStatus == 'activated'){
+            this.loop = false
+        }
+        else this.loop = true
+        // console.log(this.currentFrame)
         const polygonX = this.collisionObjectPolygon.x
         const polygonY = this.collisionObjectPolygon.y
 
-        // check if the player is inside the ellipse
-        const playerIsInside = isPlayerInEllipse(player.sprite.x, player.sprite.y, polygonX, polygonY, this.collisionObjectPolygon.width / 2, this.collisionObjectPolygon.height / 2)
-        
-        if (playerIsInside) {
-            console.log("player in portal!")
+        // Check if the player is inside the ellipse
+        const playerIsInside = isPlayerInEllipse(
+            player.sprite.x,
+            player.sprite.y,
+            polygonX,
+            polygonY,
+            this.collisionObjectPolygon.width / 2,
+            this.collisionObjectPolygon.height / 2
+        )
+
+        if (playerIsInside && !this.isActivated) {
             this.isActivated = true
-            this.activatePortal()  // activate the portal and change animation
-        } else {
+            this.activatePortal(player)
+        } else if (!playerIsInside && this.isActivated) {
             this.isActivated = false
-            this.deactivatePortal() // revert animation if player is not inside
+            this.deactivatePortal()
         }
     }
-    
-    activatePortal = () => {
-        if (!this.isActivated) return // prevent re-activating if already activated
-        
-        if(this.activationStatus == 'idle'){ //check if current animation is the idle one
-            
-            this.stop() // stop current animations
-            this.textures = this.spritesheet.animations.activate // set the "activated" animation
+
+    activatePortal(player) {
+        if (this.activationStatus === 'idle') {
+            this.stop() // Stop current animation
+            this.textures = this.spritesheet.animations.activate // Set "activated" animation
             this.activationStatus = 'activated'
-            this.play() // play the "activated" animation
-            // this.setState("hell_overworld") new game state
+            this.play()
+    
+            this.onComplete = () => {
+                this.off('complete') // Remove listener
+                console.log("TELEPORTING!!!", this)
+                player.setAnimation('teleport') // Trigger player's teleport animation
+                player.sprite.onComplete = () => {
+                    player.sprite.off('complete') // Remove listener
+                    player.setAnimation('idle_down') // Return to idle_down after teleport
+                    player.teleporting = false // Allow movement again
+                }
+                player.teleporting = true
+                this.setState("hell_overworld") // Example state transition
+            }
         }
-        
     }
 
-    deactivatePortal = () => {
-        if (this.isActivated) return // Prevent re-deactivating if already deactivated
-
-        if(this.activationStatus == 'activated'){
-            this.stop() // Stop any current animations
-
-            // To reverse the animation:
-            const currentFrameIndex = this.textures.findIndex(texture => texture === this.textures[this.currentFrame]);
-
-            if (currentFrameIndex !== -1) {
-                // Reverse the animation frames starting from the current frame
-                const reversedFrames = this.textures.slice(0, currentFrameIndex + 1).reverse();
-                this.textures = reversedFrames;  // Apply the reversed frames
-                this.currentFrame = reversedFrames.length - 1;  // Track the current frame in the reversed sequence
-                this.play() // Play the reversed animation
-                this.onComplete = () => {
-                    // Set back to the "idle" animation once reversed playback is done
-                    this.textures = this.spritesheet.animations.idle; 
-                    this.play(); // Play the "idle" animation
-                    this.activationStatus = 'idle'
-                    this.stop()
-                }
+    deactivatePortal() {
+        if (this.activationStatus === 'activated') {
+            this.stop() 
+    
+            // reverse the animation starting from the current frame
+            const currentFrameIndex = this.textures.findIndex(
+                texture => texture === this.textures[this.currentFrame]
+            )
+            const reversedFrames = this.textures.slice(0, currentFrameIndex + 1).reverse()
+    
+            this.textures = reversedFrames // change to reversed frames
+            this.loop = false //shouldn't  loop reversed frames
+            this.play()
+    
+            // listen for when reversed animation complete
+            this.onComplete = () => {
+                this.off('complete') // remove the listener to avoid duplicates
+                // switch back to the idle animation
+                this.textures = this.spritesheet.animations.idle // set to idle animation
+                this.activationStatus = 'idle'
+                this.loop = true // idle animation loops
+                this.play()
             }
         }
     }

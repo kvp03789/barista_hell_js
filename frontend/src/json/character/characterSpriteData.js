@@ -419,14 +419,102 @@ export const playerSpritesheetData =
    "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 30 },
    "sourceSize": { "w": 30, "h": 30 },
    "duration": 100
+  },
+  "player_teleport_52.png": {
+   "frame": { "x": 1560, "y": 0, "w": 30, "h": 30 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 30 },
+   "sourceSize": { "w": 30, "h": 30 },
+   "duration": 100
+  },
+  "player_teleport_53.png": {
+   "frame": { "x": 1590, "y": 0, "w": 30, "h": 30 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 30 },
+   "sourceSize": { "w": 30, "h": 30 },
+   "duration": 100
+  },
+  "player_teleport_54.png": {
+   "frame": { "x": 1620, "y": 0, "w": 30, "h": 30 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 30 },
+   "sourceSize": { "w": 30, "h": 30 },
+   "duration": 100
+  },
+  "player_teleport_55.png": {
+   "frame": { "x": 1650, "y": 0, "w": 30, "h": 30 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 30 },
+   "sourceSize": { "w": 30, "h": 30 },
+   "duration": 100
+  },
+  "player_teleport_56.png": {
+   "frame": { "x": 1680, "y": 0, "w": 30, "h": 30 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 30 },
+   "sourceSize": { "w": 30, "h": 30 },
+   "duration": 100
+  },
+  "player_teleport_57.png": {
+   "frame": { "x": 1710, "y": 0, "w": 30, "h": 30 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 30 },
+   "sourceSize": { "w": 30, "h": 30 },
+   "duration": 100
+  },
+  "player_teleport_58.png": {
+   "frame": { "x": 1740, "y": 0, "w": 30, "h": 30 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 30 },
+   "sourceSize": { "w": 30, "h": 30 },
+   "duration": 100
+  },
+  "player_teleport_59.png": {
+   "frame": { "x": 1770, "y": 0, "w": 30, "h": 30 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 30 },
+   "sourceSize": { "w": 30, "h": 30 },
+   "duration": 100
+  },
+  "player_teleport_60.png": {
+   "frame": { "x": 1800, "y": 0, "w": 30, "h": 30 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 30 },
+   "sourceSize": { "w": 30, "h": 30 },
+   "duration": 100
+  },
+  "player_teleport_61.png": {
+   "frame": { "x": 1830, "y": 0, "w": 30, "h": 30 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 30 },
+   "sourceSize": { "w": 30, "h": 30 },
+   "duration": 100
+  },
+  "player_teleport_62.png": {
+   "frame": { "x": 1860, "y": 0, "w": 30, "h": 30 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 30 },
+   "sourceSize": { "w": 30, "h": 30 },
+   "duration": 100
   }
 },
 "meta": {
- "app": "https://www.aseprite.org/",
- "version": "1.3.9.2-x64",
- "image": PlayerSpritesheet,
+ "app": "https://www.png.org/",
+ "version": "1.3.11-x64",
+ "image": "player_animations_combined.png",
  "format": "RGBA8888",
- "size": { "w": 1560, "h": 30 },
+ "size": { "w": 1890, "h": 30 },
  "scale": "1",
  "frameTags": [
   { "name": "idle_down", "from": 0, "to": 5, "direction": "forward", "color": "#000000ff" },
@@ -436,13 +524,14 @@ export const playerSpritesheetData =
   { "name": "run_down", "from": 24, "to": 30, "direction": "forward", "color": "#000000ff" },
   { "name": "run_right", "from": 31, "to": 37, "direction": "forward", "color": "#000000ff" },
   { "name": "run_left", "from": 38, "to": 44, "direction": "forward", "color": "#000000ff" },
-  { "name": "run_up", "from": 45, "to": 51, "direction": "forward", "color": "#000000ff" }
+  { "name": "run_up", "from": 45, "to": 51, "direction": "forward", "color": "#000000ff" },
+  { "name": "teleport", "from": 52, "to": 62, "direction": "forward", "color": "#000000ff" }
  ],
  "layers": [
   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
  ],
  "slices": [
- ],
+ ]
 },
 "animations": {},
 

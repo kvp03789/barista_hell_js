@@ -60,8 +60,6 @@ class State_Manager{
     }
 
     setState = (newState) => {
-        console.log("ZOMG IT HAPPENED")
-
         this.previousState = this.currentState
         this.currentState = newState
 

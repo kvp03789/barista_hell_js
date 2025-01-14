@@ -232,7 +232,7 @@ export default class Cafe extends Level{
         console.log("HELL CIRCLE SPRITESHEET", spritesheet)
         const label = "animated_tile_hell_circle"
         const isParticleTile = false
-        const animationSpeed = .27
+        const animationSpeed = .3
         const scale = ZOOM_FACTOR
         const alpha = 1
         //some animated tiles have their own bespoke class

@@ -42,7 +42,10 @@ export default class Character{
         this.crafting = false
 
         //bool used for checking if player is already in dialogue, crafting, etc.
-        this.busy = false      
+        this.busy = false  
+        
+        //used to stop movement when player is teleporting
+        this.teleporting = false
 
         //bool to use for stairs to adjust speed
         this.isOnStairs = false
@@ -61,7 +64,7 @@ export default class Character{
         await this.mainSpritesheet.parse()
         
         this.sprite = new AnimatedSprite(this.mainSpritesheet.animations.run_down)
-        console.log("a wild debug appeared: ", this.sprite)
+        console.log("a wild debug appeared: ", this.mainSpritesheet)
         this.sprite.animationSpeed = ANIMATION_SPEED;
         this.sprite.x = this.x_pos
         this.sprite.y = this.y_pos
@@ -276,17 +279,42 @@ export default class Character{
         }
     }
 
+    // handleTeleport = () => {
+    //     //change animation and play
+    //     this.sprite.textures = this.mainSpritesheet.animations.teleport
+    //     this.sprite.play()
+    //     this.teleporting = false
+    //     this.sprite.onLoop = () => this.sprite.textures = this.mainSpritesheet.animations.idle_down
+    //     this.sprite.off('loop')
+    // }
+
+    setAnimation(animationKey) {
+        console.log('setting animation......')
+        const newTextures = this.mainSpritesheet.animations[animationKey];
+        if (newTextures && this.sprite.textures !== newTextures) {
+            this.sprite.textures = newTextures;
+            this.sprite.play();
+        }
+    }
+
     run = (angle) => {
         //angle passed in from level class
         this.angle = angle
         this.activeWeapon.run(angle)
 
         //stairs check to slow movement
-        if(this.isOnStairs)this.speed =5
+        if(this.isOnStairs)this.speed = this.speed - 2
         else this.speed = PLAYER_SETTINGS.BASE_SPEED
 
-        this.handleMovement(angle)
-        this.handleDirection(angle)  
+        if(!this.teleporting){
+            this.sprite.loop = true
+            this.handleMovement(angle)
+            this.handleDirection(angle)
+        }
+        else{
+            this.sprite.loop = false
+        }
+          
         
         //cooldowns for key presses
         if(this.isKeyPressed() && this.keyboardCooldown == 0){
