@@ -17,12 +17,13 @@ export default class Character{
         this.bulletManager = bulletManager
         this.particleManager = particleManager
         
-
         this.x_pos = x_pos
         this.y_pos = y_pos
 
         //movement
         this.speed = PLAYER_SETTINGS.BASE_SPEED
+
+        this.stairSpeed = this.speed - 2 
         
         //movement vector
         this.movement = { x: 0, y: 0 };
@@ -55,7 +56,7 @@ export default class Character{
         group.addChild(this.sprite)
     }
 
-    init = async (group, particleManager) => {
+    init = async (group, particleManager, playerSpawnPoint) => {
         //generateAnimations populates parts of characterData json-esque object
         const generateAnimations = playerSpritesheetData.generateAnimations.bind(playerSpritesheetData);
         generateAnimations(this.spritesheetAssets.PlayerSpritesheet);
@@ -64,10 +65,17 @@ export default class Character{
         await this.mainSpritesheet.parse()
         
         this.sprite = new AnimatedSprite(this.mainSpritesheet.animations.run_down)
-        console.log("a wild debug appeared: ", this.mainSpritesheet)
-        this.sprite.animationSpeed = ANIMATION_SPEED;
-        this.sprite.x = this.x_pos
-        this.sprite.y = this.y_pos
+        this.sprite.animationSpeed = ANIMATION_SPEED
+
+        if(playerSpawnPoint){
+            this.sprite.x = playerSpawnPoint.x 
+            this.sprite.y = playerSpawnPoint.y 
+        }
+        else{
+            this.sprite.x = this.x_pos
+            this.sprite.y = this.y_pos
+        }
+
         this.sprite.label = 'Character'
         this.sprite.hitboxWidth = this.sprite.width
         this.sprite.hitboxHeight = this.sprite.height - 10
@@ -88,13 +96,13 @@ export default class Character{
 
         this.sprite.filters = [new DropShadowFilter({offset: {x: 5, y: 10}, alpha: 1 })]
         
-        //add character sprite to visible sprite group
+        // //add character sprite to visible sprite group
         this.addSpriteToGroups(group)
 
         //add active weapon sprite to stage as child of character
         this.sprite.addChild(this.activeWeapon.sprite)
         //
-        this.app.stage.on('pointerdown', this.mouseDown)
+        // this.app.stage.on('pointerdown', this.mouseDown)
         this.sprite.play()
 
         console.log("heres the player inventory", this.inventory)
@@ -104,7 +112,6 @@ export default class Character{
         if(this.activeWeapon){
             // this.activeWeapon.fire()
             this.bulletManager.fireWeapon(this.activeWeapon, this.angle, this.sprite.x, this.sprite.y)
-            
         }
     }
 
@@ -303,7 +310,7 @@ export default class Character{
         this.activeWeapon.run(angle)
 
         //stairs check to slow movement
-        if(this.isOnStairs)this.speed = this.speed - 2
+        if(this.isOnStairs)this.speed = this.stairSpeed
         else this.speed = PLAYER_SETTINGS.BASE_SPEED
 
         if(!this.teleporting){

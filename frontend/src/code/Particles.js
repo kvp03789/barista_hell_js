@@ -1,12 +1,13 @@
 import { AnimatedSprite, Container, Rectangle, Sprite, Spritesheet, Texture } from 'pixi.js'
-import { bulletExplodeParticleData } from '../json/particles/particleSpriteData.js'
-import { SCREEN_HEIGHT, SCREEN_WIDTH, ZOOM_FACTOR } from '../settings.js'
+import { bulletExplodeParticleData, teleportBeamData, walkingParticleData } from '../json/particles/particleSpriteData.js'
+import { SCREEN_HEIGHT, SCREEN_WIDTH, ZOOM_FACTOR, PARTICLE_ANIMATION_SETTINGS } from '../settings.js'
 import { generateSeed, randomNumber } from '../utils.js'
 import { GlowFilter, RGBSplitFilter } from 'pixi-filters'
 
 class StaticParticle extends Sprite{
     constructor(texture, x, y, label, type){
         super(texture)
+        this.isAnimatedParticle = false
         this.x = x
         this.y = y
         this.label = label
@@ -28,16 +29,23 @@ class Ash extends StaticParticle{
 }
 
 class AnimatedParticle extends AnimatedSprite{
-    constructor(spritesheet, x, y, animationLength, type){
+    constructor(spritesheet, x, y, animationLength, type, animationSpeed, anchor, alpha, scale, hasRandomness, filters){
         super(spritesheet)
+        this.isAnimatedParticle = true
+        this.seed = generateSeed()
         this.x = x
         this.y = y
         this.type = type
-        this.anchor.set(.5)
+        this.anchor.set(anchor)
         this.animationLength = animationLength
-        this.scale.set(ZOOM_FACTOR)
+        this.filters = filters
         // this.currentFrame = 0
-        this.animationSpeed = 0.166
+        this.animationSpeed = animationSpeed
+        this.alpha = alpha
+        this.hasRandomness = hasRandomness
+
+        hasRandomness ? this.scale.set(scale * this.seed) : this.scale.set(scale)
+
         this.loop = false
         this.shouldDestroy = false;
 
@@ -45,7 +53,7 @@ class AnimatedParticle extends AnimatedSprite{
         this.onComplete = () => {
             this.shouldDestroy = true;
         };
-        this.alpha = .6
+
         
         //play the animation
         this.play()
@@ -91,18 +99,35 @@ class ParticleManager extends Container{
     }
 
     //parsed raw assets into organized list of unique values
-    parseParticleAssets = async () => {
+    parseAnimatedParticleAssets = async () => {
         for(let key in this.particleAssets){
             if(key.startsWith('Particle_')){
-                const spritesheet = new Spritesheet(this.particleAssets[key], bulletExplodeParticleData)
-                this.particleDictionary[key] = spritesheet
-                await this.particleDictionary[key].parse()
+                //bullet smoke
+                if(key.includes('Bullet')){
+                    const spritesheet = new Spritesheet(this.particleAssets[key], bulletExplodeParticleData)
+                    this.particleDictionary[key] = spritesheet
+                    await this.particleDictionary[key].parse()
+                }
+                //teleport beam in hell
+                else if(key.includes('Teleport')){
+                    const spritesheet = new Spritesheet(this.particleAssets[key], teleportBeamData)
+                    this.particleDictionary[key] = spritesheet
+                    await this.particleDictionary[key].parse()
+                }
+                //character walking particles
+                else if(key.includes('Walking')){
+                    const spritesheet = new Spritesheet(this.particleAssets[key], walkingParticleData)
+                    this.particleDictionary[key] = spritesheet
+                    await this.particleDictionary[key].parse()
+                }
             }
         }
+
+        console.log("Particleeeeeee ", this.particleDictionary)
     }
 
     init = async () => {
-        await this.parseParticleAssets()
+        await this.parseAnimatedParticleAssets()
     }
 
     //init some falling ash particles unique to the hell level
@@ -124,7 +149,19 @@ class ParticleManager extends Container{
 
     createAnimatedParticle = (particleX, particleY, type) => {
         let animationLength = this.particleDictionary[`Particle_${type}`].animations.main.length
-        const animatedParticle = new AnimatedParticle(this.particleDictionary[`Particle_${type}`].animations.main, particleX - this.offset.x * ZOOM_FACTOR, particleY - this.offset.y * ZOOM_FACTOR, animationLength, type)
+
+        //DEBUG//
+        if(type == 'Teleport_Beam'){
+            console.log('DEBUG: ', animationLength, this.particleDictionary)
+        }
+        
+        const animationSpeed = PARTICLE_ANIMATION_SETTINGS[type].animationSpeed
+        const anchor = PARTICLE_ANIMATION_SETTINGS[type].anchor
+        const alpha = PARTICLE_ANIMATION_SETTINGS[type].alpha
+        const scale = PARTICLE_ANIMATION_SETTINGS[type].scale
+        const hasRandomness = PARTICLE_ANIMATION_SETTINGS[type].hasRandomness
+
+        const animatedParticle = new AnimatedParticle(this.particleDictionary[`Particle_${type}`].animations.main, particleX - this.offset.x * ZOOM_FACTOR, particleY - this.offset.y * ZOOM_FACTOR, animationLength, type, animationSpeed, anchor, alpha, scale, hasRandomness)
         this.addChild(animatedParticle)
     }
     
@@ -137,9 +174,11 @@ class ParticleManager extends Container{
         this.offset.y = player.y + (player.height / 2) - this.half_height;
 
         this.children.forEach((particle, i) => {
+            // this is for animated sprites atm
             // check if the particles animation is complete and destroy it if so
             if (particle.shouldDestroy) {
                 particle.destroy();
+                console.log("DESTROYED  A PARTICLE ")
                 this.removeChild(particle);
                 return
             }

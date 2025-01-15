@@ -79,11 +79,15 @@ export const settings = {
                 I\'m looking it up now. Always something, huh?'}
             }
         }
-        
+    },
+    PARTICLE_ANIMATION_SETTINGS: {
+        Teleport_Beam: {animationSpeed: 0.3, anchor: (1, 1), alpha: 1, scale: 1.8, hasRandomness: 0},
+        BulletWallExplodeParticleSmoke: {animationSpeed: 0.166, anchor: (.5), alpha: .6, scale: 1.8, hasRandomness: 1},
+        CharacterWalkingParticle: {animationSpeed: 0.5, anchor: (.5), alpha: .5, scale: 1.8, hasRandomness: 1}
     }
     
-};
+}
 
-export const { SCREEN_WIDTH, SCREEN_HEIGHT, ANIMATION_SPEED, TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR, UI_CLICK_COOLDOWN, UI_SETTINGS, PLAYER_SETTINGS,  WEAPON_SETTINGS, TESTING_ITEMS, DRINK_RECIPES, ITEM_DESCRIPTIONS, NPC_DIALOGUE_DISTANCE, NPC_DIALOGUE_SECTION_LENGTH, NPC_DIALOGUE } = settings;
+export const { SCREEN_WIDTH, SCREEN_HEIGHT, ANIMATION_SPEED, TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR, UI_CLICK_COOLDOWN, UI_SETTINGS, PLAYER_SETTINGS,  WEAPON_SETTINGS, TESTING_ITEMS, DRINK_RECIPES, ITEM_DESCRIPTIONS, NPC_DIALOGUE_DISTANCE, NPC_DIALOGUE_SECTION_LENGTH, NPC_DIALOGUE, PARTICLE_ANIMATION_SETTINGS } = settings;
 
 

@@ -23,12 +23,14 @@ import UI_Dialogue_BG from './img/ui/dialogue_bg.png'
 import Particle_BulletWallExplodeParticleSmoke from './img/spritesheets/particles/bullet_explode_particle_smoke.png'
 import Particle_CharacterWalkingParticle from './img/spritesheets/particles/walking_particle_spritesheet.png'
 import Particle_AshParticle from './img/spritesheets/particles/ash_particle_spritesheet.png'
+import Particle_Teleport_Beam from './img/spritesheets/particles/teleport_beam.png'
 
 //tiles
 import PuddleTile from './img/spritesheets/tiles/puddle_spritesheet.png'
 import HellCircle from './img/spritesheets/tiles/hell_circle_spritesheet.png'
 import TrashPile from './img/spritesheets/tiles/trash_pile_spritesheet.png'
-import Torch from './img/spritesheets/tiles/torch_spritesheet.png'
+import Torch_Pole from './img/spritesheets/tiles/torch_pole_spritesheet.png'
+import Torch_Flame from './img/spritesheets/tiles/torch_flame_spritesheet.png'
 
 //cafe map assets
 import CafeBaseMap from './img/map_pngs/cafe_base_map.png'
@@ -292,6 +294,10 @@ export const assetsManifest = {
                {
                   "alias": "Particle_AshParticle",
                   "src": Particle_AshParticle
+               },
+               {
+                  "alias": "Particle_Teleport_Beam",
+                  "src": Particle_Teleport_Beam
                }
          ],
          
@@ -313,8 +319,12 @@ export const assetsManifest = {
                "src": TrashPile
             },
             {
-               "alias": "Torch",
-               "src": Torch
+               "alias": "Torch_Pole",
+               "src": Torch_Pole
+            },
+            {
+               "alias": "Torch_Flame",
+               "src": Torch_Flame
             }
       ]
        },

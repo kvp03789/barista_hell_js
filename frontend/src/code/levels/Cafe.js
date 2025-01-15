@@ -3,18 +3,13 @@ import { TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR }from '../../settings'
 import { parseMapData, getXYSlice, spritesAreColliding } from '../../utils'
 import { cafeMapData } from '../../map_data/cafeMapData'
 import Character from '../Character'
-import YSortCameraSpriteGroup from '../YSortCameraSpriteGroup'
-import ObstacleSpriteGroup from '../ObstacleSpriteGroup'
 import Tile from '../Tile'
 import { AnimatedTile, HellPortalObject } from '../Tile'
 import ParticleManager from '../Particles'
 import BulletManager from '../BulletManager'
 import { tileSpriteData, hellCircleData, trashPileData } from '../../json/tiles/tileSpriteData'
-import { GlowFilter, ReflectionFilter, ShockwaveFilter } from 'pixi-filters'
 import UIManager from '../UI'
-import { ClickEventManager } from '../ClickEventManager'
 import { NPCManager } from '../NPCManager'
-import NPCTilesGroup from '../NPCTilesGroup'
 import Level from './Level'
 
 export default class Cafe extends Level{
@@ -23,17 +18,25 @@ export default class Cafe extends Level{
 
         //a function from teh state manager to change states
         this.setState = setState
+
     }
 
     
     initMap = async () => {
+        //initialized the level's master container. this is the
+        //container that holds all other containers and the one
+        //that is 'cleaned up' in each level's destroy method
+        // this.initMasterLevelContainer()
+
         //sets up even listener used by keysObject to handle key events
         //HAS TO BE CALLED HERE...cant be called in constructor
         this.setUpKeyEvents()
+        
+        this.app.stage.on('mousemove', this.onMouseMove)
 
         //initialize assets used in this level
-        this.cafeAssets = await PIXI.Assets.loadBundle('cafe_assets');
-        this.spritesheetAssets = await PIXI.Assets.loadBundle('character_spritesheets');
+        this.cafeAssets = await PIXI.Assets.loadBundle('cafe_assets')
+        this.spritesheetAssets = await PIXI.Assets.loadBundle('character_spritesheets')
         this.weaponAssets = await PIXI.Assets.loadBundle('weapon_assets')
         this.particleAssets = await PIXI.Assets.loadBundle('particle_spritesheets')
         this.bulletAssets = await PIXI.Assets.loadBundle('bullet_assets')
@@ -72,7 +75,7 @@ export default class Cafe extends Level{
                     let y = 510
                     let w = TILE_WIDTH
                     let h = TILE_HEIGHT
-                    const sliceRect = new PIXI.Rectangle(x, y, w, h);
+                    const sliceRect = new PIXI.Rectangle(x, y, w, h)
                     const texture = new PIXI.Texture({source: this.cafeAssets.CafeTilesetPng, frame: sliceRect})
                     const tile = new Tile(this.app, x_pos, y_pos, texture, 'boundary', this.obstacleSprites)
                 }
@@ -89,7 +92,7 @@ export default class Cafe extends Level{
                     let { x, y } = getXYSlice(col - 1, tilesetPngWidth)
                     let w = TILE_WIDTH
                     let h = TILE_HEIGHT
-                    const sliceRect = new PIXI.Rectangle(x, y, w, h);
+                    const sliceRect = new PIXI.Rectangle(x, y, w, h)
                     const texture = new PIXI.Texture({source: this.cafeAssets.CafeTilesetPng, frame: sliceRect})
                     const tile = new Tile(this.app, x_pos, y_pos, texture, 'tile', this.visibleSprites)
                     this.craftingTile = new PIXI.Sprite(texture)
@@ -125,7 +128,7 @@ export default class Cafe extends Level{
                     let { x, y } = getXYSlice(col - 1, tilesetPngWidth)
                     let w = TILE_WIDTH
                     let h = TILE_HEIGHT
-                    const sliceRect = new PIXI.Rectangle(x, y, w, h);
+                    const sliceRect = new PIXI.Rectangle(x, y, w, h)
                     const texture = new PIXI.Texture({source: this.cafeAssets.CafeTilesetPng, frame: sliceRect})
                     const tile = new Tile(this.app, x_pos, y_pos, texture, 'tile', this.visibleSprites)
                 }
@@ -144,7 +147,7 @@ export default class Cafe extends Level{
                     let { x, y } = getXYSlice(col - 1, tilesetPngWidth)
                     let w = TILE_WIDTH
                     let h = TILE_HEIGHT
-                    const sliceRect = new PIXI.Rectangle(x, y, w, h);
+                    const sliceRect = new PIXI.Rectangle(x, y, w, h)
                     const texture = new PIXI.Texture({source: this.cafeAssets.CafeTilesetPng, frame: sliceRect})
                     const tile = new Tile(this.app, x_pos, y_pos, texture, 'tile', this.npcTiles)
                     this.sarahNPCTiles.push(tile)
@@ -190,6 +193,16 @@ export default class Cafe extends Level{
         //init and add clickEventManager to stage, for rendering click event icons
         this.clickEventManager.init(this.character, this.uiManager, this.keysObject)
         this.app.stage.addChild(this.clickEventManager)
+
+        //weapon fire event
+        this.app.stage.on('pointerdown', this.handleMouseDown)
+    }
+
+    handleMouseDown = () => {
+        if(this.character.activeWeapon){
+            // this.activeWeapon.fire()
+            this.bulletManager.fireWeapon(this.character.activeWeapon, this.angle, this.character.sprite.x, this.character.sprite.y)
+        }
     }
 
     initializeAnimatedTiles = async () => {
@@ -223,8 +236,8 @@ export default class Cafe extends Level{
     createHellCircleTile = async (object) => {
         
         //generateAnimations populates parts of characterData json-esque object
-        const generateAnimations = hellCircleData.generateAnimations.bind(hellCircleData);
-        generateAnimations(this.animatedTileAssets.HellCircle);
+        const generateAnimations = hellCircleData.generateAnimations.bind(hellCircleData)
+        generateAnimations(this.animatedTileAssets.HellCircle)
         //create hell portal
         const spritesheet = new PIXI.Spritesheet(this.animatedTileAssets.HellCircle,
             hellCircleData)
@@ -256,6 +269,30 @@ export default class Cafe extends Level{
         const animatedTile = new AnimatedTile(this.app, x_pos, y_pos, spritesheet.animations.main, label, this.visibleSprites, isParticleTile, animationSpeed, scale, alpha)
     }
 
+    //cleanup function
+    destroy() {
+        // stop animations/tickers
+        this.app.ticker.remove(this.run)
+
+        //remove weapon fire event
+        this.app.stage.off('pointerdown', this.handleMouseDown)
+
+        //remove keyDown and keyUp events
+        this.removeKeyEvents()
+
+        if(this.character){
+            this.character.sprite.destroy()
+            this.character = null
+        }
+
+        // remove all containers 
+        while (this.app.stage.children.length > 0) {
+            const child = this.app.stage.children[0]
+            this.app.stage.removeChild(child)
+            child.destroy({ children: true })
+        }
+    }
+
     //the level's run method is added to the stage by the Application class
     run = () => {
         //run the click event manager
@@ -264,8 +301,8 @@ export default class Cafe extends Level{
         //for calculating offset, keeping character centered
 
         //ORDER MATTERS HERE
-        let angle = this.getPlayerAngle(this.mousePos)
-        this.character.run(angle)
+        this.angle = this.getPlayerAngle(this.mousePos)
+        this.character.run(this.angle)
         
         this.particleManager.run(this.character.sprite)
         this.obstacleSprites.run(this.character.sprite)

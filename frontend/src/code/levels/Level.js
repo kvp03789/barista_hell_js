@@ -4,13 +4,13 @@ import ObstacleSpriteGroup from '../ObstacleSpriteGroup'
 import Tile from '../Tile'
 import NPCTilesGroup from '../NPCTilesGroup'
 import { ClickEventManager } from '../ClickEventManager'
+import { Container } from 'pixi.js'
 
 export default class Level{
     constructor(app, keysObject, stateLabel, setState){
             this.app = app
             this.app.stage.interactive = true
-            this.app.stage.on('mousemove', this.onMouseMove)
-    
+
             //used for npc dialogue and other settings that must
             //change depending on game state
             this.stateLabel = stateLabel            
@@ -30,14 +30,19 @@ export default class Level{
             //used when calculating angle of player
             this.offset = {x: 0, y:0}
 
+            this.angle = null
         }
     
+        // initMasterLevelContainer = () => {
+        //     this.app.stage.addChild(this.levelMasterContainer)
+        // }
+
         handleKeyDown = (e) => {
             this.keysObject[e.keyCode] = true
             //create walking particle
-            if(this.character.movement.x !== 0 || this.character.movement.y !== 0){
+            if(this.character){if(this.character.movement.x !== 0 || this.character.movement.y !== 0){
                 this.particleManager.createAnimatedParticle(this.character.sprite.x, this.character.sprite.y, "CharacterWalkingParticle")
-            }
+            }}
         }
     
         handleKeyUp = (e) => {
@@ -51,6 +56,11 @@ export default class Level{
         setUpKeyEvents = () => {
             window.addEventListener("keydown", e => this.handleKeyDown(e))
             window.addEventListener("keyup", e => this.handleKeyUp(e))
+        }
+
+        removeKeyEvents = () => {
+            window.removeEventListener("keydown", this.handleKeyDown);
+            window.removeEventListener("keyup", this.handleKeyUp);
         }
 
         getPlayerAngle = (mousePos) => {

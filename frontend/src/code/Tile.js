@@ -1,6 +1,7 @@
 import { Sprite, AnimatedSprite, Graphics, Point, Ellipse, ObservablePoint } from 'pixi.js'
 import { ZOOM_FACTOR } from '../settings'
 import { isPlayerInEllipse, spritesAreColliding } from '../utils'
+import { DropShadowFilter, GlowFilter, RadialBlurFilter, SimpleLightmapFilter, TiltShiftFilter, ZoomBlurFilter } from 'pixi-filters'
 
 export default class Tile extends Sprite{
     constructor(app, x_pos, y_pos, texture, label, group, bulletsPassThrough){
@@ -47,101 +48,30 @@ export class AnimatedTile extends AnimatedSprite{
     }
 }
 
-// export class HellPortalObject extends AnimatedTile{
-//     constructor(app, x_pos, y_pos, texture, label, group, isParticleTile, animationSpeed, scale, alpha, filters, setState, spritesheet, collisionObject){
-//         super(app, x_pos, y_pos, texture, label, group, isParticleTile, animationSpeed, scale, alpha, filters)
-//         this.glowPulse = 0.01
-//         this.spritesheet = spritesheet
-
-//         this.isActivated = false
-//         this.activationStatus = 'idle'  //either 'idle' or 'activated'
-//         this.currentFrame = 0
+export class Torch extends AnimatedTile{
+    constructor(app, x_pos, y_pos, texture, label, group, isParticleTile, animationSpeed, scale, alpha, filters, flameSpritesheet){
+        super(app, x_pos, y_pos, texture, label, group, isParticleTile, animationSpeed, scale, alpha, filters)
+        console.log('SUMMERS IN CYRODIL', animationSpeed)
+        this.flameSpritesheet = flameSpritesheet
+        this.torchFlame = new AnimatedSprite(this.flameSpritesheet.animations.main)
+        this.torchFlame.label = "torch_flame"
+        this.torchFlame.position.set(-3,0)
+        this.addChild(this.torchFlame)
+        this.torchFlame.animationSpeed = animationSpeed
+        this.torchFlame.play()
         
-//         this.setState = setState
+        this.glowFilterSettings = {
+            distance: 40,
+            quality: 1,
+            alpha: .3,
+            outerStrength: 20,
+            color: 0xbea85b,
+        }
+        this.glowFilter = new GlowFilter(this.glowFilterSettings)
 
-//         //this is the object from tiled that represents where "collision box" of 
-//         // the portal is, aka where the player has to be to activate
-//         this.collisionObject = collisionObject
-//         this.collisionObject.center = {x: this.collisionObject.x + this.collisionObject.width / 2, y: this.collisionObject.y + this.collisionObject.height / 2}
-        
-//         this.collisionObjectPolygon = new Graphics()
-//         this.group.addChild(this.collisionObjectPolygon)        
-
-//         this.collisionObjectPolygon.ellipse(
-//             0,
-//             0,
-//             this.collisionObject.width,
-//             this.collisionObject.height
-//         )
-//         this.collisionObjectPolygon.position.set(this.collisionObject.x*ZOOM_FACTOR + 195, this.collisionObject.y*ZOOM_FACTOR + 95)
-//         this.collisionObjectPolygon.fill(0xde3249)
-//         this.collisionObjectPolygon.label = "hell_collision_circle"
-//         //this alpha for debugging. should be 0
-//         this.collisionObjectPolygon.alpha = 0   
-//     }
-
-//     run(player) {
-//         console.log(this.currentFrame)
-//         const polygonX = this.collisionObjectPolygon.x
-//         const polygonY = this.collisionObjectPolygon.y
-
-//         // check if the player is inside the ellipse
-//         const playerIsInside = isPlayerInEllipse(player.sprite.x, player.sprite.y, polygonX, polygonY, this.collisionObjectPolygon.width / 2, this.collisionObjectPolygon.height / 2)
-        
-//         if (playerIsInside) {
-//             console.log("player in portal!")
-//             this.isActivated = true
-//             this.activatePortal()  // activate the portal and change animation
-//         } else {
-//             this.isActivated = false
-//             this.deactivatePortal() // revert animation if player is not inside
-//         }
-//     }
-    
-//     activatePortal = () => {
-//         if (!this.isActivated) return // prevent re-activating if already activated
-        
-//         if(this.activationStatus == 'idle'){ //check if current animation is the idle one
-            
-//             this.stop() // stop current animations
-//             this.textures = this.spritesheet.animations.activate // set the "activated" animation
-//             this.activationStatus = 'activated'
-//             this.play() // play the "activated" animation
-//             // this.setState("hell_overworld") new game state
-//         }
-        
-//     }
-
-//     deactivatePortal = () => {
-//         // if (this.isActivated) return // Prevent re-deactivating if already deactivated
-
-//         if(this.activationStatus == 'activated'){
-            
-//             // get index of current frame
-//             const currentFrameIndex = this.textures.findIndex(texture => texture === this.textures[this.currentFrame])
-
-//             if (currentFrameIndex !== -1) {
-                
-//                 // reverse the animation frames starting from the current frame
-//                 const reversedFrames = this.textures.slice(0, currentFrameIndex + 1).reverse()
-//                 this.textures = reversedFrames  // apply reversed frames
-//                 this.currentFrame = reversedFrames.length - 1  // track the current frame in the reversed sequence
-//                 this.play() // play the reversed animation
-                
-                
-//                 if(this.currentFrame == reversedFrames.length) {
-//                     console.log("reverse complete")
-//                     this.activationStatus = 'idle'
-//                 }
-                
-//                 // // set back to idle animation once reversed animation is done
-//                 // this.textures = this.spritesheet.animations.idle 
-//                 // this.play() // play the "idle" animation
-//                 // this.stop()
-//             }
-//         }
-//     }
-// }
+        this.torchFlame.filters = [this.glowFilter, new ZoomBlurFilter({strength: 0.1, radius: 291, innerRadius: 5}), new TiltShiftFilter({ blur: 7, gradientBlur: 0})]
+    }
+}
 
 export class HellPortalObject extends AnimatedTile {
     constructor(app, x_pos, y_pos, texture, label, group, isParticleTile, animationSpeed, scale, alpha, filters, setState, spritesheet, collisionObject) {
@@ -212,16 +142,20 @@ export class HellPortalObject extends AnimatedTile {
             this.play()
     
             this.onComplete = () => {
-                this.off('complete') // Remove listener
-                console.log("TELEPORTING!!!", this)
-                player.setAnimation('teleport') // Trigger player's teleport animation
+                this.off('complete')
+                console.log("TELEPORTING!!!")
+                this.glowFilterSettings = {distance: 20, quality: 1, alpha: .4}
+                this.glowFilter = new ZoomBlurFilter() //add glow filter to portal
+                this.filters = [this.glowFilter]
+                player.setAnimation('teleport') // trigger player's teleport animation
                 player.sprite.onComplete = () => {
-                    player.sprite.off('complete') // Remove listener
-                    player.setAnimation('idle_down') // Return to idle_down after teleport
-                    player.teleporting = false // Allow movement again
+                    player.sprite.off('complete')
+                    player.setAnimation('idle_down') // return to idle_down after teleport
+                    player.teleporting = false // allow movement again
+                    //change state
+                    this.setState("hell_overworld") // state transition
                 }
                 player.teleporting = true
-                this.setState("hell_overworld") // Example state transition
             }
         }
     }

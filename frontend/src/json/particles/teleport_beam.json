@@ -1,0 +1,156 @@
+{ "frames": {
+   "teleport_beam_animation_0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 100
+   },
+   "teleport_beam_animation_1.aseprite": {
+    "frame": { "x": 60, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 100
+   },
+   "teleport_beam_animation_2.aseprite": {
+    "frame": { "x": 120, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 50
+   },
+   "teleport_beam_animation_3.aseprite": {
+    "frame": { "x": 180, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 50
+   },
+   "teleport_beam_animation_4.aseprite": {
+    "frame": { "x": 240, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 75
+   },
+   "teleport_beam_animation_5.aseprite": {
+    "frame": { "x": 300, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 50
+   },
+   "teleport_beam_animation_6.aseprite": {
+    "frame": { "x": 360, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 50
+   },
+   "teleport_beam_animation_7.aseprite": {
+    "frame": { "x": 420, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 50
+   },
+   "teleport_beam_animation_8.aseprite": {
+    "frame": { "x": 480, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 25
+   },
+   "teleport_beam_animation_9.aseprite": {
+    "frame": { "x": 540, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 25
+   },
+   "teleport_beam_animation_10.aseprite": {
+    "frame": { "x": 600, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 25
+   },
+   "teleport_beam_animation_11.aseprite": {
+    "frame": { "x": 660, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 50
+   },
+   "teleport_beam_animation_12.aseprite": {
+    "frame": { "x": 720, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 50
+   },
+   "teleport_beam_animation_13.aseprite": {
+    "frame": { "x": 780, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 100
+   },
+   "teleport_beam_animation_14.aseprite": {
+    "frame": { "x": 840, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 100
+   },
+   "teleport_beam_animation_15.aseprite": {
+    "frame": { "x": 900, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 100
+   },
+   "teleport_beam_animation_16.aseprite": {
+    "frame": { "x": 960, "y": 0, "w": 60, "h": 200 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 60, "h": 200 },
+    "sourceSize": { "w": 60, "h": 200 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.11-x64",
+  "image": "teleport_beam.png",
+  "format": "RGBA8888",
+  "size": { "w": 1020, "h": 200 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "Layer 1", "opacity": 191, "blendMode": "normal" },
+   { "name": "Layer 2", "opacity": 255, "blendMode": "normal" },
+   { "name": "Layer 3", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

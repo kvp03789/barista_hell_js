@@ -246,6 +246,18 @@ export const hellOverworldMapData = {
                 "width":40,
                 "x":1034.5,
                 "y":80
+                },
+                {
+                "height":0,
+                "id":62,
+                "name":"player_spawn",
+                "point":true,
+                "rotation":0,
+                "type":"",
+                "visible":true,
+                "width":0,
+                "x":399,
+                "y":455
                 }
             ]
         }, 
