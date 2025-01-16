@@ -5,6 +5,9 @@ import PlayerSpritesheet from './img/spritesheets/character/player_animations_co
 import NPCSpritesheet_RobertSpritesheet from './img/spritesheets/npc/robert.png'
 import NPCSpritesheet_SarahSpritesheet from './img/spritesheets/npc/sarah.png'
 
+//enemy spritesheets
+import EnemySpritesheet_Slime from './img/spritesheets/enemy/slime_enemy.png'
+
 //ui
 import UI_IpadTurnOnSpritesheet from './img/spritesheets/ipad/ipad_turn_on.png'
 import UI_HUDHealthBar from './img/ui/health_bar.png'
@@ -62,6 +65,7 @@ import Icon_Syrup from './img/materials/syrup.png'
 import Icon_Milk from './img/materials/milk.png'
 import Icon_LargeFang from './img/materials/large_fang.png'
 import Icon_CorruptedBlood from './img/materials/corrupted_blood.png'
+
 //equipment
 
 //consumables
@@ -74,6 +78,7 @@ import Icon_FelCoffee from './img/consumables/demonic_coffee.png'
 import Icon_FelLatte from './img/consumables/demonic_latte.png'
 import Icon_FelIcedCoffee from './img/consumables/demonic_iced_coffee.png'
 import Icon_CraftingSelected from './img/consumables/selected.png'
+
 //empty icons
 import Icon_EmptyItemSlot from './img/ui/empty_item_slot.png'
 import Icon_EmptyCharacterSheetSlot from './img/ui/empty_character_sheet_item.png'
@@ -118,6 +123,15 @@ export const assetsManifest = {
                "src": NPCSpritesheet_SarahSpritesheet
             }
          ]
+      },
+      {
+        "name": "enemy_spritesheets",
+         "assets": [
+            {
+               "alias": "EnemySpritesheet_Slime",
+               "src": EnemySpritesheet_Slime
+            },
+         ] 
       },
       //overworld objects
       {

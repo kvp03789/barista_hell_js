@@ -51,7 +51,6 @@ export class AnimatedTile extends AnimatedSprite{
 export class Torch extends AnimatedTile{
     constructor(app, x_pos, y_pos, texture, label, group, isParticleTile, animationSpeed, scale, alpha, filters, flameSpritesheet){
         super(app, x_pos, y_pos, texture, label, group, isParticleTile, animationSpeed, scale, alpha, filters)
-        console.log('SUMMERS IN CYRODIL', animationSpeed)
         this.flameSpritesheet = flameSpritesheet
         this.torchFlame = new AnimatedSprite(this.flameSpritesheet.animations.main)
         this.torchFlame.label = "torch_flame"
@@ -111,7 +110,6 @@ export class HellPortalObject extends AnimatedTile {
             this.loop = false
         }
         else this.loop = true
-        // console.log(this.currentFrame)
         const polygonX = this.collisionObjectPolygon.x
         const polygonY = this.collisionObjectPolygon.y
 

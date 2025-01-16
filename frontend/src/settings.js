@@ -76,7 +76,7 @@ export const settings = {
                 DIALOGUE_TOTAL: 2,
                 1: {text: `Oh hey PLAYER NAME...didn't see you walk in.`},
                 2: {text: 'Yea looks like a portal to hell opened up right in the cafe earlier. \
-                I\'m looking it up now. Always something, huh?'}
+                I\'m looking it up now. Always something around here, huh?'}
             }
         }
     },

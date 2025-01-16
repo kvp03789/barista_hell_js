@@ -110,7 +110,7 @@ export default class Cafe extends Level{
         this.cafeBaseMap = PIXI.Sprite.from(this.cafeAssets.CafeBaseMap)
         this.visibleSprites.addChild(this.cafeBaseMap)
 
-        this.npcManager = new NPCManager(this.app, this.npcSpritesheets, this.visibleSprites, this.obstacleSprites)
+        this.npcManager = new NPCManager(this.app, this.stateLabel, this.npcSpritesheets, null, this.visibleSprites, this.obstacleSprites)
 
         //add character as property of level and init, adding to visibleSprites and to stage
         this.character = new Character(this.app, this.keysObject, this.spritesheetAssets, this.weaponAssets, this.display_width / 2, this.display_height / 2, this.obstacleSprites, this.bulletManager, this.particleManager, this.iconAssets, this.npcManager.npcList)

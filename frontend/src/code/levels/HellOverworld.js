@@ -48,6 +48,7 @@ export default class HellOverWorld extends Level{
             this.iconAssets = await Assets.loadBundle("icons")
             this.hellObjectsAssets = await Assets.loadBundle("overworld_objects")
             this.npcSpritesheets = await Assets.loadBundle('npc_spritesheets')
+            this.enemySpritesheets = await Assets.loadBundle('enemy_spritesheets')
             this.fonts = await Assets.loadBundle("fonts")
             this.parallaxBackgroundAssets = await Assets.loadBundle("hell_parallax_background_assets")
     
@@ -95,7 +96,7 @@ export default class HellOverWorld extends Level{
             this.hellOverWorldBaseMap.label = "hell_overworld_base_map"
             this.visibleSprites.addChild(this.hellOverWorldBaseMap)
     
-            this.npcManager = new NPCManager(this.app, this.npcSpritesheets, this.visibleSprites, this.obstacleSprites)
+            this.npcManager = new NPCManager(this.app, this.stateLabel, this.npcSpritesheets, this.enemySpritesheets, this.visibleSprites, this.obstacleSprites)
     
             //add character as property of level and init, adding to visibleSprites and to stage
             this.character = new Character(this.app, this.keysObject, this.spritesheetAssets, this.weaponAssets, this.display_width / 2, this.display_height / 2, this.obstacleSprites, this.bulletManager, this.particleManager, this.iconAssets, this.npcManager.npcList)
@@ -106,13 +107,20 @@ export default class HellOverWorld extends Level{
             this.parallaxBackgroundManager = new ParallaxBackgroundManager(this.app, this.character, this.parallaxBackgroundAssets)
 
             //object layer
-            this.parsedMapObject.objects.forEach((object, i) => {
+            this.parsedMapObject.objects.forEach(async (object, i) => {
+                //collision polygon objects
                 if(object.name.startsWith("collision_polygon")){
-                    //collision polygon objects
                     console.log(object)
                     const x = object.x 
                     const y = object.y
                     const polygon = new PolygonCollisionShape(this.app, x, y, object.width, object.height, object.name, this.obstacleSprites, false)
+                }
+                //enemy spawn points
+                else if(object.name === 'enemy_spawn'){
+                    const x = object.x * ZOOM_FACTOR
+                    const y = object.y * ZOOM_FACTOR
+                    const enemyKey = object.properties.find(element => element.name === 'enemy').value
+                    await this.npcManager.initEnemey(enemyKey, x, y)
                 }
                 else{
                     const texture = this.hellOverworldAssets[object.name]
@@ -192,13 +200,6 @@ export default class HellOverWorld extends Level{
             this.particleManager.createAnimatedParticle(this.character.sprite.x + (this.character.sprite.width * 4), this.character.sprite.y + this.character.sprite.height, 'Teleport_Beam', filters)
         }
 
-        // handleMouseDown = () => {
-        //     if(this.character.activeWeapon){
-        //         // this.activeWeapon.fire()
-        //         this.bulletManager.fireWeapon(this.character.activeWeapon, this.angle, this.character.sprite.x, this.character.sprite.y)
-        //     }
-        // }
-
         handleMouseDown = () => {
             if (this.character && this.character.sprite) {
                 if (this.character.activeWeapon) {
@@ -212,7 +213,7 @@ export default class HellOverWorld extends Level{
             } else {
                 console.warn('Character or character sprite is not available during handleMouseDown.');
             }
-        };
+        }
 
         initializeAnimatedTiles = () => {
             //TO DO//
