@@ -8,7 +8,7 @@ export const settings = {
     TILE_WIDTH: 30,
     ZOOM_FACTOR: 1.8,
     UI_CLICK_COOLDOWN: 20,
-    UI_SETTINGS: {PADDING: 12},
+    UI_SETTINGS: {PADDING: 12, ENEMY_HEALTH_BAR: {WIDTH: 50, HEIGHT: 7, BACKGROUND_COLOR: 0x444444, FOREGROUND_COLOR: 0xff0000}},
     PLAYER_SETTINGS: {
         BASE_SPEED: 7,
         INVENTORY_SLOTS_AMOUNT: 40,
@@ -83,11 +83,15 @@ export const settings = {
     PARTICLE_ANIMATION_SETTINGS: {
         Teleport_Beam: {animationSpeed: 0.3, anchor: (1, 1), alpha: 1, scale: 1.8, hasRandomness: 0},
         BulletWallExplodeParticleSmoke: {animationSpeed: 0.166, anchor: (.5), alpha: .6, scale: 1.8, hasRandomness: 1},
-        CharacterWalkingParticle: {animationSpeed: 0.5, anchor: (.5), alpha: .5, scale: 1.8, hasRandomness: 1}
+        CharacterWalkingParticle: {animationSpeed: 0.5, anchor: (.5), alpha: .5, scale: 1.8, hasRandomness: 1},
+        Blood_Splatter: {animationSpeed: 0.3, anchor: (.5), alpha: 1, scale: 1.8, hasRandomness: 1},
+    },
+    ENEMY_SETTINGS: {
+        Slime:{maxHealth: 15, attackDamage: 5, animationSpeed: 0.2, visionRadius: 100}
     }
     
 }
 
-export const { SCREEN_WIDTH, SCREEN_HEIGHT, ANIMATION_SPEED, TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR, UI_CLICK_COOLDOWN, UI_SETTINGS, PLAYER_SETTINGS,  WEAPON_SETTINGS, TESTING_ITEMS, DRINK_RECIPES, ITEM_DESCRIPTIONS, NPC_DIALOGUE_DISTANCE, NPC_DIALOGUE_SECTION_LENGTH, NPC_DIALOGUE, PARTICLE_ANIMATION_SETTINGS } = settings;
+export const { SCREEN_WIDTH, SCREEN_HEIGHT, ANIMATION_SPEED, TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR, UI_CLICK_COOLDOWN, UI_SETTINGS, PLAYER_SETTINGS,  WEAPON_SETTINGS, TESTING_ITEMS, DRINK_RECIPES, ITEM_DESCRIPTIONS, NPC_DIALOGUE_DISTANCE, NPC_DIALOGUE_SECTION_LENGTH, NPC_DIALOGUE, PARTICLE_ANIMATION_SETTINGS, ENEMY_SETTINGS } = settings;
 
 

@@ -27,6 +27,7 @@ import Particle_BulletWallExplodeParticleSmoke from './img/spritesheets/particle
 import Particle_CharacterWalkingParticle from './img/spritesheets/particles/walking_particle_spritesheet.png'
 import Particle_AshParticle from './img/spritesheets/particles/ash_particle_spritesheet.png'
 import Particle_Teleport_Beam from './img/spritesheets/particles/teleport_beam.png'
+import Particle_Blood_Splatter from './img/spritesheets/particles/blood_splatter.png'
 
 //tiles
 import PuddleTile from './img/spritesheets/tiles/puddle_spritesheet.png'
@@ -312,7 +313,11 @@ export const assetsManifest = {
                {
                   "alias": "Particle_Teleport_Beam",
                   "src": Particle_Teleport_Beam
-               }
+               },
+               {
+                  "alias": "Particle_Blood_Splatter",
+                  "src": Particle_Blood_Splatter
+               },
          ],
          
        },

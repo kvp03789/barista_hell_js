@@ -90,7 +90,7 @@ export class NPCManager{
             enemySpriteData[enemyKey])
         await enemySpritesheet.parse()
 
-        const newEnemy = new Enemy(this.app, this.player, this.visibleSprites,  this.obstacleSprites, enemySpritesheet, enemySpritesheet.animations.idle, x, y, `enemy_${enemyKey}`, null, this.stateLabel)
+        const newEnemy = new Enemy(this.app, this.player, this.visibleSprites,  this.obstacleSprites, enemySpritesheet, enemySpritesheet.animations.idle, x, y, `enemy_${enemyKey}`, null, this.stateLabel, enemyKey)
         //add sarah npc to npc list
         this.enemies.push(newEnemy)
         this.npcList.push(newEnemy)

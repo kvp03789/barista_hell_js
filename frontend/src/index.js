@@ -49,7 +49,7 @@ class Application {
         globalThis.__PIXI_APP__ = this.app
 
         // initialize state manager with an empty statesObject for now
-        this.state_manager = new State_Manager('cafe_intro', {}, this.app);
+        this.state_manager = new State_Manager('hell_overworld', {}, this.app);
     }
 
     async init() {

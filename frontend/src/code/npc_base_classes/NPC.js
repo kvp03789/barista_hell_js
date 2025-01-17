@@ -1,4 +1,4 @@
-import { AnimatedSprite } from "pixi.js"
+import { AnimatedSprite, Graphics } from "pixi.js"
 import { ANIMATION_SPEED } from "../../settings"
 
 //base class for all NPC types
@@ -16,10 +16,16 @@ export class NPC extends AnimatedSprite{
         //not stationary npc
         this.patrolTiles = patrolTiles
 
-        this.isInDialogue = false
+        //hitbox used for checking bullet hits, collisions, etc.
+        this.hitbox = new Graphics()
+        this.hitbox.rect(0, 0, this.width / 2, this.height / 2)
+        this.hitbox.fill(0xff0000) 
+        this.hitbox.alpha = .5
+        this.addChild(this.hitbox)
+        this.hitbox.position.set(this.hitbox.width - this.hitbox.width / 2, this.hitbox.width - this.hitbox.width / 2)
         
         //movement vector
-        this.movement = { x: 0, y: 0 };
+        this.movement = { x: 0, y: 0 }
 
         this.currentAnimation = null
 
@@ -43,23 +49,23 @@ export class NPC extends AnimatedSprite{
     handleMovement = () => {
         // Normalize movement vector if moving diagonally
         if (this.movement.x !== 0 && this.movement.y !== 0) {
-            const length = Math.sqrt(this.movement.x ** 2 + this.movement.y ** 2);
+            const length = Math.sqrt(this.movement.x ** 2 + this.movement.y ** 2)
             if(length > 0){
-                this.movement.x /= length;
-                this.movement.y /= length;
+                this.movement.x /= length
+                this.movement.y /= length
             }
             
         }
     
         // Update character position
-        this.x += this.movement.x * this.speed;
-        // this.checkCollision('horizontal');
-        this.y += this.movement.y * this.speed;
-        // this.checkCollision('vertical');
+        this.x += this.movement.x * this.speed
+        // this.checkCollision('horizontal')
+        this.y += this.movement.y * this.speed
+        // this.checkCollision('vertical')
     }
 
     handleAnimationChange = (angle) => {
-        let newTextures = null;
+        let newTextures = null
     
         // determine direction based on angle
         //DOWN
@@ -67,43 +73,43 @@ export class NPC extends AnimatedSprite{
             //check if idle
             if(this.movement.x == 0 && this.movement.y == 0){
                 this.stop()
-                newTextures = this.spritesheet.animations.idle_down;
+                newTextures = this.spritesheet.animations.idle_down
                 this.play()
-            }else newTextures = this.spritesheet.animations.run_down;        
+            }else newTextures = this.spritesheet.animations.run_down        
         } 
         //LEFT
         else if (this.movement.x === -1) {
             //check if idle
             if(this.movement.x == 0 && this.movement.y == 0){
                 this.stop()
-                newTextures = this.spritesheet.animations.idle_left;
+                newTextures = this.spritesheet.animations.idle_left
                 this.play()
-            }else newTextures = this.spritesheet.animations.run_left;
+            }else newTextures = this.spritesheet.animations.run_left
         } 
         //UP
         else if (this.movement.y < 0) {
             //check if idle
             if(this.movement.x == 0 && this.movement.y == 0){
                 this.stop()
-                newTextures = this.spritesheet.animations.idle_up;
+                newTextures = this.spritesheet.animations.idle_up
                 this.play()
-            }else newTextures = this.spritesheet.animations.run_up;
+            }else newTextures = this.spritesheet.animations.run_up
         } 
         //RIGHT
         else {
             //check if idle
             if(this.movement.x == 0 && this.movement.y == 0){
                 this.stop()
-                newTextures = this.spritesheet.animations.idle_right;
+                newTextures = this.spritesheet.animations.idle_right
                 this.play()
-            }else newTextures = this.spritesheet.animations.run_right;
+            }else newTextures = this.spritesheet.animations.run_right
         }
 
         // update animation based on movement
             // play the current movement animation
         if (this.textures !== newTextures) {
-            this.textures = newTextures;
-            this.play();
+            this.textures = newTextures
+            this.play()
         }
     }    
 

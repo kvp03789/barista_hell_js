@@ -5,11 +5,13 @@ import { MotionBlurFilter } from 'pixi-filters'
 import SAT from 'sat'
 
 class Bullet extends Sprite{
-    constructor(texture, angle, speed, playerX, playerY){
+    constructor(texture, angle, speed, playerX, playerY, damage){
         super(texture)
         //angle converted to radians already
         this.angle = angle
         this.speed = speed
+        //damage ccomes from currentWeapon when creating bullet
+        this.damage = damage
 
         this.anchor.set(.5)
         this.rotation = angle
@@ -26,7 +28,7 @@ class Bullet extends Sprite{
 }
 
 class BulletManager extends Container{
-    constructor(app, bulletAssets, obstacleSprites, particleManager){
+    constructor(app, bulletAssets, obstacleSprites, particleManager, enemyList){
         super()
         this.app = app
         this.particleManager = particleManager
@@ -35,7 +37,10 @@ class BulletManager extends Container{
         this.offset = {x: 0, y: 0}
         this.bulletAssets = bulletAssets
         this.bulletDictionary = {}
+        //obstacleSprites container for checking bullet/wall collisions
         this.obstacleSprites = obstacleSprites
+        //enemyList from NPCManager class, for checking collisions with enemies
+        this.enemyList = enemyList
         this.parseBulletAssets()
     }
 
@@ -51,13 +56,14 @@ class BulletManager extends Container{
     }
 
     fireWeapon = (currentWeapon, angle, playerX, playerY) => {
-        let normalizedAngle = (angle + 360) % 360
-        let angleInRads = normalizedAngle * (Math.PI / 180)
+        const normalizedAngle = (angle + 360) % 360
+        const angleInRads = normalizedAngle * (Math.PI / 180)
         
-        let speed = WEAPON_SETTINGS[currentWeapon.itemName].bulletSpeed
-        let randomNum = randomNumber(0, this.bulletDictionary[currentWeapon.itemName].length) - 1
+        const speed = WEAPON_SETTINGS[currentWeapon.itemName].bulletSpeed
+        const randomNum = randomNumber(0, this.bulletDictionary[currentWeapon.itemName].length) - 1
+        const damage = currentWeapon.damage
         
-        let bullet = new Bullet(this.bulletDictionary[currentWeapon.itemName][randomNum], angleInRads, speed, playerX, playerY)
+        const bullet = new Bullet(this.bulletDictionary[currentWeapon.itemName][randomNum], angleInRads, speed, playerX, playerY, damage)
         this.addChild(bullet)
     }
 
@@ -71,7 +77,19 @@ class BulletManager extends Container{
                         this.removeChild(bullet)
                         bullet.destroy()
                     }
-                    
+                }
+            })
+        })
+
+        //check bullet collision on enemies
+        this.enemyList.forEach(enemySprite => {
+            this.children.forEach((bullet, j) => {
+                if(spritesAreColliding(bullet, enemySprite.hitbox.getBounds())){
+                    console.log("HIT AN ENEMY!")
+                    enemySprite.currentHealth -= bullet.damage
+                    this.particleManager.createAnimatedParticle(bullet.x, bullet.y, "Blood_Splatter")
+                    this.removeChild(bullet)
+                    bullet.destroy()
                 }
             })
         })

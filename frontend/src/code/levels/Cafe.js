@@ -57,8 +57,6 @@ export default class Cafe extends Level{
         this.particleManager = new ParticleManager(this.app, this.particleAssets)
         await this.particleManager.init()
 
-        //init bulletManager
-        this.bulletManager = new BulletManager(this.app, this.bulletAssets, this.obstacleSprites, this.particleManager)
         ////ORDER MATTERS HERE/////
 
         const tilesetPngWidth = this.cafeAssets.CafeTilesetPng.width / TILE_WIDTH
@@ -111,7 +109,8 @@ export default class Cafe extends Level{
         this.visibleSprites.addChild(this.cafeBaseMap)
 
         this.npcManager = new NPCManager(this.app, this.stateLabel, this.npcSpritesheets, null, this.visibleSprites, this.obstacleSprites)
-
+//init bulletManager
+this.bulletManager = new BulletManager(this.app, this.bulletAssets, this.obstacleSprites, this.particleManager, this.npcManager.enemies)
         //add character as property of level and init, adding to visibleSprites and to stage
         this.character = new Character(this.app, this.keysObject, this.spritesheetAssets, this.weaponAssets, this.display_width / 2, this.display_height / 2, this.obstacleSprites, this.bulletManager, this.particleManager, this.iconAssets, this.npcManager.npcList)
         await this.character.init(this.visibleSprites, this.particleManager)
@@ -165,7 +164,7 @@ export default class Cafe extends Level{
         await this.npcManager.initRobertNPC()
         await this.npcManager.initSarahNPC(this.sarahNPCTiles)
 
-        this.uiManager = new UIManager(this.app, this.character, this.uiAssets, this.fonts, this.keysObject, this.iconAssets, this.clickEventManager, this.mousePos, this.npcManager.npcList, this.stateLabel)
+        this.uiManager = new UIManager(this.app, this.character, this.uiAssets, this.fonts, this.keysObject, this.iconAssets, this.clickEventManager, this.mousePos, this.npcManager.npcList, this.stateLabel, this.npcManager.enemies)
         await this.uiManager.init()
 
         //add obstacle sprites to stage

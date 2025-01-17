@@ -1,5 +1,85 @@
 import BulletExplodeParticleSmoke from '../../img/spritesheets/particles/bullet_explode_particle_smoke.png'
 
+export const bloodSplatterParticleData = { "frames": {
+  "blood_splatter_0.png": {
+   "frame": { "x": 0, "y": 0, "w": 15, "h": 15 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 15, "h": 15 },
+   "sourceSize": { "w": 15, "h": 15 },
+   "duration": 100
+  },
+  "blood_splatter_1.png": {
+   "frame": { "x": 15, "y": 0, "w": 15, "h": 15 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 15, "h": 15 },
+   "sourceSize": { "w": 15, "h": 15 },
+   "duration": 100
+  },
+  "blood_splatter_2.png": {
+   "frame": { "x": 30, "y": 0, "w": 15, "h": 15 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 15, "h": 15 },
+   "sourceSize": { "w": 15, "h": 15 },
+   "duration": 75
+  },
+  "blood_splatter_3.png": {
+   "frame": { "x": 45, "y": 0, "w": 15, "h": 15 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 15, "h": 15 },
+   "sourceSize": { "w": 15, "h": 15 },
+   "duration": 50
+  },
+  "blood_splatter_4.png": {
+   "frame": { "x": 60, "y": 0, "w": 15, "h": 15 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 15, "h": 15 },
+   "sourceSize": { "w": 15, "h": 15 },
+   "duration": 50
+  },
+  "blood_splatter_5.png": {
+   "frame": { "x": 75, "y": 0, "w": 15, "h": 15 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 15, "h": 15 },
+   "sourceSize": { "w": 15, "h": 15 },
+   "duration": 50
+  },
+  "blood_splatter_6.png": {
+   "frame": { "x": 90, "y": 0, "w": 15, "h": 15 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 15, "h": 15 },
+   "sourceSize": { "w": 15, "h": 15 },
+   "duration": 50
+  }
+},
+"meta": {
+ "app": "https://www.aseprite.org/",
+ "version": "1.3.11-x64",
+ "image": "blood_splatter.png",
+ "format": "RGBA8888",
+ "size": { "w": 105, "h": 15 },
+ "scale": "1",
+ "frameTags": [
+ ],
+ "layers": [
+  { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
+ ],
+ "slices": [
+ ]
+},
+"animations": {
+  "main": ['blood_splatter_0.png', 'blood_splatter_1.png', 
+      'blood_splatter_2.png', 'blood_splatter_3.png', 'blood_splatter_4.png',
+      'blood_splatter_5.png',  'blood_splatter_6.png'
+    ]
+}
+}
 
 export const bulletExplodeParticleData = 
 { "frames": {

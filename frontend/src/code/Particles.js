@@ -1,5 +1,5 @@
 import { AnimatedSprite, Container, Rectangle, Sprite, Spritesheet, Texture } from 'pixi.js'
-import { bulletExplodeParticleData, teleportBeamData, walkingParticleData } from '../json/particles/particleSpriteData.js'
+import { bloodSplatterParticleData, bulletExplodeParticleData, teleportBeamData, walkingParticleData } from '../json/particles/particleSpriteData.js'
 import { SCREEN_HEIGHT, SCREEN_WIDTH, ZOOM_FACTOR, PARTICLE_ANIMATION_SETTINGS } from '../settings.js'
 import { generateSeed, randomNumber } from '../utils.js'
 import { GlowFilter, RGBSplitFilter } from 'pixi-filters'
@@ -117,6 +117,12 @@ class ParticleManager extends Container{
                 //character walking particles
                 else if(key.includes('Walking')){
                     const spritesheet = new Spritesheet(this.particleAssets[key], walkingParticleData)
+                    this.particleDictionary[key] = spritesheet
+                    await this.particleDictionary[key].parse()
+                }
+
+                else if(key.includes("Blood_Splatter")){
+                    const spritesheet = new Spritesheet(this.particleAssets[key], bloodSplatterParticleData)
                     this.particleDictionary[key] = spritesheet
                     await this.particleDictionary[key].parse()
                 }

@@ -6,7 +6,7 @@ import { TooltipManager } from "./TooltipManager";
 import NPCDialogueManager from "./NPCDialogueManager";
 
 export default class UIManager{
-    constructor(app, player, uiAssets, fonts, keysObject, iconAssets, clickEventManager, mousePos, npcList, stateLabel){
+    constructor(app, player, uiAssets, fonts, keysObject, iconAssets, clickEventManager, mousePos, npcList, stateLabel, enemyList){
         this.app = app
         this.player = player
 
@@ -48,6 +48,7 @@ export default class UIManager{
         this.tooltipContainer.label = "tooltip_container"
 
         this.npcList = npcList
+        this.enemyList = enemyList
 
         this.stateLabel = stateLabel
     }
@@ -104,6 +105,9 @@ export default class UIManager{
 
         //npc dialogue manager
         this.npcDialogueManager = new NPCDialogueManager(this.app, this.player, this.UIAssetsObject, this.fonts, this.uiContainer, this.npcList, this.stateLabel)
+
+        //enemy health bars
+        this.enemyHealthBarManager = new EnemyHealthBarManager(this.app, this.enemyList, this.uiContainer, this.UIAssetsObject)
     }     
 
     //returns bool if a non movement key is pressed
@@ -215,6 +219,7 @@ export default class UIManager{
         this.quickBar.run(this.player)
         this.tooltipManager.run(this.mousePos)
         this.npcDialogueManager.run(this.player)
+        this.enemyHealthBarManager.run()
     }
     
 }
@@ -881,3 +886,72 @@ class HealthBar extends Sprite{
     }
 }
 
+class EnemyHealthBar extends Container{
+    constructor(enemy) {
+        super()
+        this.enemy = enemy
+        this.barWidth = 40
+        this.barHeight = 10
+        console.log("DEBUG POSITION HEALTH BAR: ", this.barWidth, this.barHeight)
+
+        this.backgroundColor = UI_SETTINGS.ENEMY_HEALTH_BAR.BACKGROUND_COLOR  
+        this.foregroundColor = UI_SETTINGS.ENEMY_HEALTH_BAR.FOREGROUND_COLOR  
+    
+        // create background rectangle
+        this.backgroundBar = new Graphics()
+        this.backgroundBar.rect(0, 0, this.barWidth, this.barHeight)
+        this.backgroundBar.fill(this.backgroundColor)
+
+        // create the foreground rectangle (actual health)
+        this.foregroundBar = new Graphics()
+        this.foregroundBar.rect(0, 0, this.barWidth, this.barHeight)
+        this.foregroundBar.fill(this.foregroundColor)
+
+        // add both to a container for positioning
+        this.addChild(this.backgroundBar)
+        this.addChild(this.foregroundBar)
+
+        this.backgroundBar.position.set(0,0)
+        this.foregroundBar.position.set(0,0)
+    
+        //position the health bar above enemy sprite
+        this.position.set(enemy.x, enemy.y - 10)
+    }
+  
+    //update the health bar based on enemy current health
+    update = () => {
+      const healthPercentage = this.enemy.currentHealth / this.enemy.maxHealth
+      this.foregroundBar.width = this.width * healthPercentage
+  
+      //keep the health bar positioned above the enemy
+      this.position.set(this.enemy.x + 20, this.enemy.y)
+    }
+  }
+
+class EnemyHealthBarManager extends Container{
+    constructor(app, enemyList, uiContainer, uiAssetsObject){
+        super()
+        this.app = app
+        this.enemyList = enemyList
+        this.uiAssetsObject = uiAssetsObject
+        this.uiContainer = uiContainer
+
+        this.init()
+        this.uiContainer.addChild(this)
+    }
+
+    init = () => {
+        this.enemyList.forEach(enemy => {
+          const healthBar = new EnemyHealthBar(enemy)
+          this.addChild(healthBar)
+        })
+      }
+
+    run = () => {
+        this.children.forEach(healthBar => {
+            if (healthBar.update){
+                healthBar.update()
+            }
+        })
+    }
+}

@@ -21,6 +21,8 @@ export class Sarah extends Employee {
         this.tileToMoveTo = null
         this.tileIndex = 0
 
+        this.isInDialogue = false
+
         //movement
         this.speed = 2
     }
