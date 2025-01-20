@@ -899,8 +899,10 @@ class EnemyHealthBar extends Container{
     
         // create background rectangle
         this.backgroundBar = new Graphics()
+        this.backgroundBar.stroke({ width: 2, color: 0xffffff })
         this.backgroundBar.rect(0, 0, this.barWidth, this.barHeight)
         this.backgroundBar.fill(this.backgroundColor)
+        
 
         // create the foreground rectangle (actual health)
         this.foregroundBar = new Graphics()
@@ -923,8 +925,15 @@ class EnemyHealthBar extends Container{
       const healthPercentage = this.enemy.currentHealth / this.enemy.maxHealth
       this.foregroundBar.width = this.width * healthPercentage
   
-      //keep the health bar positioned above the enemy
-      this.position.set(this.enemy.x + 20, this.enemy.y)
+      //destroy health bar if associated enemy is killed
+      if(this.enemy.currentHealth < 0){
+        this.destroy({ children: true })
+      }
+      else{
+        //keep the health bar positioned above the enemy
+        this.position.set(this.enemy.x + 20, this.enemy.y)
+      }
+      
     }
   }
 

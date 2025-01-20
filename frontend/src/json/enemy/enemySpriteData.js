@@ -549,8 +549,16 @@ export const enemySpriteData =
         "size": { "w": 3216, "h": 48 },
         "scale": "1",
         "frameTags": [
-            { "name": "idle", "from": 0, "to": 11, "direction": "forward", "repeat": "2", "color": "#000000ff" },
-            { "name": "walk", "from": 12, "to": 20, "direction": "forward", "repeat": "3", "color": "#000000ff" },
+            { "name": "idle_down", "from": 0, "to": 11, "direction": "forward", "repeat": "2", "color": "#000000ff" },
+            { "name": "idle_left", "from": 0, "to": 11, "direction": "forward", "repeat": "2", "color": "#000000ff" },
+            { "name": "idle_right", "from": 0, "to": 11, "direction": "forward", "repeat": "2", "color": "#000000ff" },
+            { "name": "idle_up", "from": 0, "to": 11, "direction": "forward", "repeat": "2", "color": "#000000ff" },
+
+            { "name": "run_down", "from": 12, "to": 20, "direction": "forward", "repeat": "3", "color": "#000000ff" },
+            { "name": "run_left", "from": 12, "to": 20, "direction": "forward", "repeat": "3", "color": "#000000ff" },
+            { "name": "run_right", "from": 12, "to": 20, "direction": "forward", "repeat": "3", "color": "#000000ff" },
+            { "name": "run_up", "from": 12, "to": 20, "direction": "forward", "repeat": "3", "color": "#000000ff" },
+
             { "name": "attack", "from": 21, "to": 33, "direction": "forward", "color": "#000000ff" },
             { "name": "damage", "from": 34, "to": 39, "direction": "forward", "repeat": "1", "color": "#000000ff" },
             { "name": "damage_2", "from": 40, "to": 45, "direction": "forward", "repeat": "1", "color": "#000000ff" },

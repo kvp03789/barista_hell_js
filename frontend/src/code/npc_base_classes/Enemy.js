@@ -1,5 +1,5 @@
 import { NPC } from "./NPC"
-import { ENEMY_SETTINGS } from "../../settings"
+import { ENEMY_SETTINGS, ZOOM_FACTOR } from "../../settings"
 import { Graphics } from "pixi.js"
 
 export class Enemy extends NPC {
@@ -13,15 +13,23 @@ export class Enemy extends NPC {
         //init enemy currentHeal to maxHealth
         this.currentHealth = this.maxHealth
         this.attackDamage = ENEMY_SETTINGS[this.enemyKey].attackDamage
+        this.speed = ENEMY_SETTINGS[this.enemyKey].speed
+
+        this.isAggroed = false
+        this.targetPlayeer = false
 
         this.visionRadius = ENEMY_SETTINGS[this.enemyKey].visionRadius
-        //circle for debuggings
+        //circle representation of visionRadius for debugging aggro system
         this.visionRadiusCircle = new Graphics()
         this.visionRadiusCircle.label = "enemy_vision_radius"
-        this.visionRadiusCircle.circle(0 , 0, this.visionRadius) 
+        //dividing by zoom factor so that the debug circle size reflects real visionRadius
+        this.visionRadiusCircle.circle(0 , 0, this.visionRadius / ZOOM_FACTOR) 
         this.visionRadiusCircle.stroke(0x0000ff)
         this.visionRadiusCircle.position.set(this.width / 2, this.height /2)
+        this.visionRadiusCircle.visible = true
         this.addChild(this.visionRadiusCircle)
+
+        
     }
 
     attack = (target) => {
@@ -39,7 +47,24 @@ export class Enemy extends NPC {
         // change textures array to despawn/die animation
         this.textures = this.spritesheet.animations.death
         this.loop = false
-        this.onComplete = this.destroy()
-        console.log("ENEMY DIED!!")
+        this.play()
+        this.onComplete = () => {
+            this.destroy({ children: true })
+            console.log("ENEMY DIED!!")
+        }
     }
+
+    onAggro = () => {
+        console.log("YOU AGGROD AN ENEMY!")
+    }
+
+    onDisengage = () => {
+        console.log("enemy disengaging....")
+    }
+
+    run = () => {
+        this.handleMovement()
+        this.handleAnimationChange()
+    }
+
 }

@@ -85,7 +85,8 @@ class BulletManager extends Container{
         this.enemyList.forEach(enemySprite => {
             this.children.forEach((bullet, j) => {
                 if(spritesAreColliding(bullet, enemySprite.hitbox.getBounds())){
-                    console.log("HIT AN ENEMY!")
+                    //trigger enemy aggro
+                    enemySprite.isAggroed = true
                     enemySprite.currentHealth -= bullet.damage
                     this.particleManager.createAnimatedParticle(bullet.x, bullet.y, "Blood_Splatter")
                     this.removeChild(bullet)

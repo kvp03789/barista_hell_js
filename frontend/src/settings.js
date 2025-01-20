@@ -85,11 +85,14 @@ export const settings = {
         BulletWallExplodeParticleSmoke: {animationSpeed: 0.166, anchor: (.5), alpha: .6, scale: 1.8, hasRandomness: 1},
         CharacterWalkingParticle: {animationSpeed: 0.5, anchor: (.5), alpha: .5, scale: 1.8, hasRandomness: 1},
         Blood_Splatter: {animationSpeed: 0.3, anchor: (.5), alpha: 1, scale: 1.8, hasRandomness: 1},
+        Sparkle: {animationSpeed: 0.3, anchor: (.5), alpha: 1, scale: 1.5, hasRandomness: 1},
+
     },
     ENEMY_SETTINGS: {
-        Slime:{maxHealth: 15, attackDamage: 5, animationSpeed: 0.2, visionRadius: 100}
+        Slime:{maxHealth: 15, speed: 5, attackDamage: 5, animationSpeed: 0.2, visionRadius: 220,
+            items: { drops:[{name: "Beans", Chance: 20}, {name: "Syrup", Chance: 20}, {name: "Milk", Chance: 60}, {name: "WhippedCream", Chance: 20}], min: 4, max: 8}
+        }
     }
-    
 }
 
 export const { SCREEN_WIDTH, SCREEN_HEIGHT, ANIMATION_SPEED, TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR, UI_CLICK_COOLDOWN, UI_SETTINGS, PLAYER_SETTINGS,  WEAPON_SETTINGS, TESTING_ITEMS, DRINK_RECIPES, ITEM_DESCRIPTIONS, NPC_DIALOGUE_DISTANCE, NPC_DIALOGUE_SECTION_LENGTH, NPC_DIALOGUE, PARTICLE_ANIMATION_SETTINGS, ENEMY_SETTINGS } = settings;

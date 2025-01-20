@@ -83,85 +83,154 @@ export const bloodSplatterParticleData = { "frames": {
 
 export const bulletExplodeParticleData = 
 { "frames": {
-  "bullet_explode_particle_smoke_0.png": {
-    "frame": { "x": 0, "y": 0, "w": 10, "h": 10 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
-    "sourceSize": { "w": 10, "h": 10 },
-    "duration": 100
+  "bullet_explode_0.png": {
+   "frame": { "x": 0, "y": 0, "w": 10, "h": 10 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
+   "sourceSize": { "w": 10, "h": 10 },
+   "duration": 100
   },
-  "bullet_explode_particle_smoke_1.png": {
-    "frame": { "x": 10, "y": 0, "w": 10, "h": 10 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
-    "sourceSize": { "w": 10, "h": 10 },
-    "duration": 100
+  "bullet_explode_1.png": {
+   "frame": { "x": 10, "y": 0, "w": 10, "h": 10 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
+   "sourceSize": { "w": 10, "h": 10 },
+   "duration": 100
   },
-  "bullet_explode_particle_smoke_2.png": {
-    "frame": { "x": 20, "y": 0, "w": 10, "h": 10 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
-    "sourceSize": { "w": 10, "h": 10 },
-    "duration": 100
+  "bullet_explode_2.png": {
+   "frame": { "x": 20, "y": 0, "w": 10, "h": 10 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
+   "sourceSize": { "w": 10, "h": 10 },
+   "duration": 100
   },
-  "bullet_explode_particle_smoke_3.png": {
-    "frame": { "x": 30, "y": 0, "w": 10, "h": 10 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
-    "sourceSize": { "w": 10, "h": 10 },
-    "duration": 100
+  "bullet_explode_3.png": {
+   "frame": { "x": 30, "y": 0, "w": 10, "h": 10 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
+   "sourceSize": { "w": 10, "h": 10 },
+   "duration": 100
   },
-  "bullet_explode_particle_smoke_4.png": {
-    "frame": { "x": 40, "y": 0, "w": 10, "h": 10 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
-    "sourceSize": { "w": 10, "h": 10 },
-    "duration": 100
+  "bullet_explode_4.png": {
+   "frame": { "x": 40, "y": 0, "w": 10, "h": 10 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
+   "sourceSize": { "w": 10, "h": 10 },
+   "duration": 100
   },
-  "bullet_explode_particle_smoke_5.png": {
-    "frame": { "x": 50, "y": 0, "w": 10, "h": 10 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
-    "sourceSize": { "w": 10, "h": 10 },
-    "duration": 100
+  "bullet_explode_5.png": {
+   "frame": { "x": 50, "y": 0, "w": 10, "h": 10 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
+   "sourceSize": { "w": 10, "h": 10 },
+   "duration": 100
   },
-  "bullet_explode_particle_smoke_6.png": {
-    "frame": { "x": 60, "y": 0, "w": 10, "h": 10 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
-    "sourceSize": { "w": 10, "h": 10 },
-    "duration": 100
-   }
+  "bullet_explode_6.png": {
+   "frame": { "x": 60, "y": 0, "w": 10, "h": 10 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 10 },
+   "sourceSize": { "w": 10, "h": 10 },
+   "duration": 100
+  }
 },
 "meta": {
-  "app": "https://www.png.org/",
-  "version": "1.3.8.1-x64",
-  "image": BulletExplodeParticleSmoke,
-  "format": "RGBA8888",
-  "size": { "w": 70, "h": 10 },
-  "scale": "1",
-  "frameTags": [
-  ],
-  "layers": [
+ "app": "https://www.aseprite.org/",
+ "version": "1.3.8.1-x64",
+ "image": BulletExplodeParticleSmoke,
+ "format": "RGBA8888",
+ "size": { "w": 70, "h": 10 },
+ "scale": "1",
+ "frameTags": [
+ ],
+ "layers": [
   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
-  ],
-  "slices": [
-  ]
+ ],
+ "slices": [
+ ]
 },
 "animations": {
-    "main": ['bullet_explode_particle_smoke_0.png', 'bullet_explode_particle_smoke_1.png', 
-      'bullet_explode_particle_smoke_2.png', 'bullet_explode_particle_smoke_3.png', 'bullet_explode_particle_smoke_4.png',
-      'bullet_explode_particle_smoke_5.png',  
-    ]
-  }
+  "main":['bullet_explode_0.png', 'bullet_explode_1.png', 
+    'bullet_explode_2.png', 'bullet_explode_3.png', 'bullet_explode_4.png',
+    'bullet_explode_5.png',  'bullet_explode_6.png'
+  ]
 }
+}
+
+export const sparkleParticleData = 
+{ "frames": {
+  "sparkle_0.png": {
+   "frame": { "x": 0, "y": 0, "w": 25, "h": 45 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 45 },
+   "sourceSize": { "w": 25, "h": 45 },
+   "duration": 100
+  },
+  "sparkle_1.png": {
+   "frame": { "x": 25, "y": 0, "w": 25, "h": 45 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 45 },
+   "sourceSize": { "w": 25, "h": 45 },
+   "duration": 100
+  },
+  "sparkle_2.png": {
+   "frame": { "x": 50, "y": 0, "w": 25, "h": 45 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 45 },
+   "sourceSize": { "w": 25, "h": 45 },
+   "duration": 100
+  },
+  "sparkle_3.png": {
+   "frame": { "x": 75, "y": 0, "w": 25, "h": 45 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 45 },
+   "sourceSize": { "w": 25, "h": 45 },
+   "duration": 100
+  },
+  "sparkle_4.png": {
+   "frame": { "x": 100, "y": 0, "w": 25, "h": 45 },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": { "x": 0, "y": 0, "w": 25, "h": 45 },
+   "sourceSize": { "w": 25, "h": 45 },
+   "duration": 100
+  }
+},
+"meta": {
+ "app": "https://www.aseprite.org/",
+ "version": "1.3.11-x64",
+ "image": "sparkle.png",
+ "format": "RGBA8888",
+ "size": { "w": 125, "h": 45 },
+ "scale": "1",
+ "frameTags": [
+ ],
+ "layers": [
+  { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
+ ],
+ "slices": [
+ ]
+},
+"animations": {
+  "main": ["sparkle_0.png", "sparkle_1.png", "sparkle_2.png", "sparkle_3.png", "sparkle_4.png", ]
+}
+
+}
+
+
+
+
+
 
 export const walkingParticleData = 
 { "frames": {

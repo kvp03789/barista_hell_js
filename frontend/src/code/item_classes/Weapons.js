@@ -5,7 +5,8 @@ import Item from "./Item"
 
 class Weapon extends Item{
     constructor(app, texturesObject, player, itemType){
-        super(app, "weapon", player)
+        super(app, "weapon")
+        this.player = player
         //textures object is all textures for this particular weapon
         this.texturesObject = texturesObject
     }

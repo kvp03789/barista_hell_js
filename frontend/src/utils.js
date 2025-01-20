@@ -53,6 +53,11 @@ export function randomNumber(min, max){
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+//generate either -1 or 1
+export function getRandomSign() {
+    return Math.random() < 0.5 ? -1 : 1;
+}
+
 //generate seed for randomness (holds up spork)
 export function generateSeed(min = 0.5, max = 1.5) {
     // Generate a random decimal number between min and max
@@ -79,3 +84,36 @@ export function isPlayerInEllipse(playerX, playerY, ellipseX, ellipseY, ellipseR
     // Check if the normalized distance is less than or equal to 1
     return (normX ** 2 + normY ** 2) <= 1;
 }
+
+/**
+ * Checks if point is in circle. used for enemy vision radius/aggro system
+ * 
+ * @param {number} pointX - X coordinate of point to check
+ * @param {number} pointY - Y coordinate of point to check
+ * @param {number} centerX - X coordinate of circle center
+ * @param {number} centerY - Y coordinate of circle center
+ * @param {number} radius - radius of circle
+ * @returns {boolean} true if point inside circle, false otherwise 
+ */
+export function isPointInCircle (pointX, pointY, centerX, centerY, radius){
+    return (pointX - centerX) ** 2 + (pointY - centerY) ** 2 < (radius * radius)
+}
+
+export function getRandomDrop (enemyDrops){
+    // Calculate total weight
+    const totalChance = enemyDrops.reduce((sum, drop) => sum + drop.Chance, 0);
+
+    // Generate a random number between 0 and totalChance
+    const randomValue = Math.random() * totalChance;
+
+    // Find the corresponding drop
+    let cumulativeChance = 0;
+    for (const drop of enemyDrops) {
+        cumulativeChance += drop.Chance;
+        if (randomValue <= cumulativeChance) {
+            return drop;
+        }
+    }
+
+    return null; // In case something goes wrong
+};

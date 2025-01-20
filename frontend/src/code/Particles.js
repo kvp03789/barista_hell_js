@@ -155,11 +155,6 @@ class ParticleManager extends Container{
 
     createAnimatedParticle = (particleX, particleY, type) => {
         let animationLength = this.particleDictionary[`Particle_${type}`].animations.main.length
-
-        //DEBUG//
-        if(type == 'Teleport_Beam'){
-            console.log('DEBUG: ', animationLength, this.particleDictionary)
-        }
         
         const animationSpeed = PARTICLE_ANIMATION_SETTINGS[type].animationSpeed
         const anchor = PARTICLE_ANIMATION_SETTINGS[type].anchor

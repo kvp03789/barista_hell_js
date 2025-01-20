@@ -1,17 +1,19 @@
 import { AnimatedSprite, Container, Spritesheet } from "pixi.js"
 import { robertSpriteData, sarahSpriteData } from '../json/npc/npcSpriteData'
-import { ANIMATION_SPEED, NPC_DIALOGUE_DISTANCE } from "../settings"
+import { ANIMATION_SPEED, NPC_DIALOGUE_DISTANCE, ZOOM_FACTOR } from "../settings"
 import { SarahNPC, RobertNPC, Sarah } from "./npc_base_classes/Employee"
 import { enemySpriteData } from "../json/enemy/enemySpriteData"
 import { Enemy } from "./npc_base_classes/Enemy"
+import { isPointInCircle } from "../utils"
 
 export class NPCManager{
-    constructor(app, stateLabel, npcSpritesheets, enemySpritesheets, visibleSprites,  obstacleSprites){
+    constructor(app, stateLabel, npcSpritesheets, enemySpritesheets, visibleSprites,  obstacleSprites, dropsManager){
         this.app = app
         this.stateLabel = stateLabel
         // this.player = player
         this.visibleSprites = visibleSprites
         this.obstacleSprites = obstacleSprites
+        this.dropsManager = dropsManager
 
         this.npcSpritesheets = npcSpritesheets
         this.enemySpritesheets = enemySpritesheets
@@ -79,7 +81,7 @@ export class NPCManager{
 
     //the enemyKey should be capitalized so that it lines up with references
     //in enemy json file as well as assetManifest
-    initEnemey = async (enemyKey, x, y) => {
+    initEnemy = async (enemyKey, x, y) => {
          
         //generateAnimations populates parts of characterData json-esque object
         const generateAnimations = enemySpriteData[enemyKey].generateAnimations.bind(enemySpriteData[enemyKey]);
@@ -89,11 +91,10 @@ export class NPCManager{
         const enemySpritesheet = new Spritesheet(this.parsedAssetsObject[enemyKey],
             enemySpriteData[enemyKey])
         await enemySpritesheet.parse()
-
-        const newEnemy = new Enemy(this.app, this.player, this.visibleSprites,  this.obstacleSprites, enemySpritesheet, enemySpritesheet.animations.idle, x, y, `enemy_${enemyKey}`, null, this.stateLabel, enemyKey)
+        console.log('POEKMON!@!', enemySpritesheet)
+        const newEnemy = new Enemy(this.app, this.player, this.visibleSprites,  this.obstacleSprites, enemySpritesheet, enemySpritesheet.animations.idle_down, x, y, `enemy_${enemyKey}`, null, this.stateLabel, enemyKey)
         //add sarah npc to npc list
         this.enemies.push(newEnemy)
-        this.npcList.push(newEnemy)
     }
 
     //this checks to see if player is close enough
@@ -102,9 +103,33 @@ export class NPCManager{
         return Math.abs(npc.x - player.sprite.x) <= tolerance && Math.abs(npc.y - player.sprite.y) <= tolerance
     }
 
+    handleEnemyAggro(player, enemy) {
+        if (isPointInCircle(player.sprite.x, player.sprite.y, enemy.x + enemy.width / 2, enemy.y + enemy.height /2, enemy.visionRadius)) {
+            // If within aggro radius, start targeting the player
+            if (!enemy.isAggroed) {
+                enemy.isAggroed = true
+                enemy.targetPlayer = true
+                enemy.onAggro() // Trigger enemy-specific aggro logic, e.g., animation
+            }
+
+            // Update movement direction towards the player
+            enemy.movement.x = Math.sign(player.sprite.x - enemy.x)
+            enemy.movement.y = Math.sign(player.sprite.y - enemy.y)
+        } else if (enemy.isAggroed) {
+            // if out of range, reset aggro state
+            enemy.isAggroed = false
+            enemy.targetPlayer = false
+            // handle what happens when the enemy disengages
+            enemy.onDisengage() 
+            enemy.movement.x = 0
+            enemy.movement.y = 0
+        }
+    }
+
     run = (player) => {
-        this.npcList.forEach(child => {
-            //execute all the npc's run functions
+
+        //execute all the employees's run functions
+        this.employees.forEach(child => {
             if(child.run){
                 child.run(player)
             }
@@ -116,6 +141,22 @@ export class NPCManager{
             else{
                 child.touchingPlayer = false
             }
+        })
+
+        //execute all the enemy run functions
+        this.enemies.forEach((enemySprite, index) => {
+            //clear dead enemies first
+            if (enemySprite.currentHealth <= 0){
+                //remove sprite from enemies list
+                this.enemies.splice(index, 1)
+                this.dropsManager.generateDrops(enemySprite.enemyKey, enemySprite.x, enemySprite.y)
+                enemySprite.die()
+            }
+            else{
+                enemySprite.run()
+                this.handleEnemyAggro(player, enemySprite)
+            }
+            
         })
     }
 }

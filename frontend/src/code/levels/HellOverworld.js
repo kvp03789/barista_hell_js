@@ -11,8 +11,9 @@ import { hellOverworldMapData } from '../../map_data/hellOverworldMapData'
 import UIManager from '../UI'
 import ParallaxBackgroundManager from '../ParallaxBackgroundManager'
 import { torchPoleData, hellCircleData } from '../../json/tiles/tileSpriteData'
-import { GlowFilter, GodrayFilter, MotionBlurFilter } from 'pixi-filters'
+import { DropShadowFilter, GlowFilter, GodrayFilter, MotionBlurFilter } from 'pixi-filters'
 import ForegroundSprites from '../ForegroundSprites'
+import { DropsManager } from '../DropsManager'
 
 export default class HellOverWorld extends Level{
     constructor(app, keysObject, stateLabel, setState){
@@ -51,6 +52,7 @@ export default class HellOverWorld extends Level{
             this.enemySpritesheets = await Assets.loadBundle('enemy_spritesheets')
             this.fonts = await Assets.loadBundle("fonts")
             this.parallaxBackgroundAssets = await Assets.loadBundle("hell_parallax_background_assets")
+            this.dropsAssets = await Assets.loadBundle("drops")
     
             //parse map data...
             this.parsedMapObject = parseMapData(hellOverworldMapData)
@@ -95,7 +97,9 @@ export default class HellOverWorld extends Level{
             this.hellOverWorldBaseMap.label = "hell_overworld_base_map"
             this.visibleSprites.addChild(this.hellOverWorldBaseMap)
     
-            this.npcManager = new NPCManager(this.app, this.stateLabel, this.npcSpritesheets, this.enemySpritesheets, this.visibleSprites, this.obstacleSprites)
+            this.dropsManager = new DropsManager(this.app, this.visibleSprites, this.dropsAssets, this.iconAssets)
+
+            this.npcManager = new NPCManager(this.app, this.stateLabel, this.npcSpritesheets, this.enemySpritesheets, this.visibleSprites, this.obstacleSprites, this.dropsManager)
 
             //init bulletManager
             this.bulletManager = new BulletManager(this.app, this.bulletAssets, this.obstacleSprites, this.particleManager, this.npcManager.enemies)
@@ -122,7 +126,7 @@ export default class HellOverWorld extends Level{
                     const x = object.x * ZOOM_FACTOR
                     const y = object.y * ZOOM_FACTOR
                     const enemyKey = object.properties.find(element => element.name === 'enemy').value
-                    await this.npcManager.initEnemey(enemyKey, x, y)
+                    await this.npcManager.initEnemy(enemyKey, x, y)
                 }
                 else{
                     const texture = this.hellOverworldAssets[object.name]
@@ -306,6 +310,7 @@ export default class HellOverWorld extends Level{
             this.uiManager.run()
             this.npcManager.run(this.character)
             this.foregroundSpriteGroup.run(this.character)
+            this.dropsManager.run(this.character)
 
             this.stairs.run(this.character)
         }

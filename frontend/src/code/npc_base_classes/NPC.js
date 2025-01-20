@@ -19,8 +19,9 @@ export class NPC extends AnimatedSprite{
         //hitbox used for checking bullet hits, collisions, etc.
         this.hitbox = new Graphics()
         this.hitbox.rect(0, 0, this.width / 2, this.height / 2)
-        this.hitbox.fill(0xff0000) 
-        this.hitbox.alpha = .5
+        this.hitbox.fill(0xff0000)         
+        //toggle visibility for debugging
+        this.hitbox.alpha = 0
         this.addChild(this.hitbox)
         this.hitbox.position.set(this.hitbox.width - this.hitbox.width / 2, this.hitbox.width - this.hitbox.width / 2)
         
@@ -64,7 +65,7 @@ export class NPC extends AnimatedSprite{
         // this.checkCollision('vertical')
     }
 
-    handleAnimationChange = (angle) => {
+    handleAnimationChange = () => {
         let newTextures = null
     
         // determine direction based on angle
@@ -117,12 +118,5 @@ export class NPC extends AnimatedSprite{
         
     }
 
-    handleBeginDialogue = () => {
-        this.isInDialogue = true
-    }
-
-    handleEndDialogue = () => {
-        this.isInDialogue = false
-        this.reset()
-    }
+    
 }

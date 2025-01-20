@@ -103,6 +103,14 @@ export class Sarah extends Employee {
         return Math.abs(a-b) <= tolerance
     }
 
+    handleBeginDialogue = () => {
+        this.isInDialogue = true
+    }
+
+    handleEndDialogue = () => {
+        this.isInDialogue = false
+        this.reset()
+    }
 
     run = (player) => {
         if(!this.isInDialogue){
