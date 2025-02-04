@@ -93,6 +93,8 @@ import BattleRifle3 from './img/weapons/battle_rifle/bullet3.png'
 import EspressoMachineActive from './img/objects/espresso_machine_active.png'
 import EspressoMachineInactive from './img/objects/espresso_machine_inactive.png'
 import HellArch from './img/objects/hell_arch.png'
+import SirenStatue from './img/objects/siren_statue.png'
+import SirenPortal from './img/spritesheets/objects/green_portal.png'
 
 //parallax background
 import HellParallax1 from './img/map_pngs/hell_bg/hell_bg_1.png'
@@ -433,6 +435,14 @@ export const assetsManifest = {
             "alias": "Ruins",
             "src": Ruins
          },
+         {
+            "alias": "SirenStatue",
+            "src": SirenStatue
+         },
+         {
+            "alias": "SirenPortal",
+            "src": SirenPortal
+         }
       ]
       },
       //weapon_assets

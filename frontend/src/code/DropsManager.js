@@ -1,5 +1,5 @@
 import { AnimatedSprite, Sprite, Spritesheet } from "pixi.js"
-import { ENEMY_SETTINGS, ZOOM_FACTOR } from "../settings"
+import { ENEMY_SETTINGS, PLAYER_SETTINGS, ZOOM_FACTOR } from "../settings"
 import { generateSeed, getRandomDrop, getRandomSign, randomNumber, spritesAreColliding } from "../utils"
 import { sparkleParticleData } from "../json/particles/particleSpriteData"
 import { GlowFilter, ShockwaveFilter, ZoomBlurFilter } from "pixi-filters"
@@ -15,7 +15,7 @@ class Drop extends Sprite{
         //the actual item the drop is "holding"
         this.item = item
 
-        this.speed = 5 * this.seed
+        this.speed = 6 * this.seed
         this.x = x + 5 * this.seed
         this.y = y + 5 * this.seed
         this.distanceX = 20 * this.seed
@@ -25,7 +25,7 @@ class Drop extends Sprite{
         this.friction = .95
         //gravity aka constant downward force
         this.gravity = 0.3
-        this.bounceFactor = .6
+        this.bounceFactor = .6 * this.seed
         //simulated ground level
         this.ground = Math.floor(this.y + 20 * this.seed)
 
@@ -34,7 +34,7 @@ class Drop extends Sprite{
         this.sparkleAnimation.loop = true
         this.sparkleAnimation.play()
         this.sparkleAnimation.animationSpeed = .2 - this.seed / 15
-        this.sparkleAnimation.alpha = .8 * this.seed
+        this.sparkleAnimation.alpha = .5 
         this.sparkleAnimation.filters = [new GlowFilter()]
         this.addChild(this.sparkleAnimation)
     }
@@ -129,23 +129,34 @@ export class DropsManager{
                     break;
             }
             const newDrop = new Drop(itemKey, this.parsedDropsAssets[itemKey], enemyX, enemyY, this.parsedDropsAssets.Drops_Sparkle, item)
-            //make sparkle animation
-            
             this.visibleSprites.addChild(newDrop)
             this.dropsList.push(newDrop)
         })   
     }
 
-    handleDropPickup = (player) => {
-
+    handleDropPickup = (drop, player) => {
+        const dropItem = drop.item
+        //the index of the same item as drop that is already in inventory
+        //if not already found in inventory, existingItemIndex will be -1
+        const existingItemIndex = player.inventory.itemSlots.findIndex(itemSlot => itemSlot.item && itemSlot.item.itemName === dropItem.itemName && itemSlot.quantity < PLAYER_SETTINGS.INVENTORY_STACKS[drop.item.itemType])
+        console.log(existingItemIndex)
+        if(existingItemIndex === -1){
+            //item not in inventory
+            const firstEmptySlotIndex = player.inventory.itemSlots.findIndex(itemSlot => itemSlot.item === null)
+            player.inventory.itemSlots[firstEmptySlotIndex].item = drop.item
+            player.inventory.itemSlots[firstEmptySlotIndex].quantity = 1
+        } else{
+            //item in inventory
+            player.inventory.itemSlots[existingItemIndex].quantity += 1
+        }
     }
 
     run = (player) => {
         this.dropsList.forEach((drop, index) => {
             if(spritesAreColliding(player.sprite, drop)){
                 //handle pick up
-                this.handleDropPickup(player)
-                drop.destroy()
+                this.handleDropPickup(drop, player)
+                drop.destroy({ children: true })
                 //remove from drop list
                 this.dropsList.splice(index, 1)
                 return

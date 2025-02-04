@@ -1,7 +1,7 @@
 import parse from "parse-svg-path"
 import SAT from 'sat';
 import { Point } from "pixi.js";
-import { TILE_WIDTH, TILE_HEIGHT, ZOOM_FACTOR, SCREEN_WIDTH, SCREEN_HEIGHT } from "./settings"
+import { TILE_WIDTH, TILE_HEIGHT } from "./settings"
 
 
 //parse map data from 1d array into 2d array 
@@ -9,6 +9,13 @@ export function parseMapData(mapData) {
     const parsedMapObject = {height: mapData.height, width: mapData.width}
     mapData.layers.forEach(layer => {
         if(layer.name != "objects"){
+            parsedMapObject[layer.name] = []
+            for(let i = 0; i < layer.data.length; i += layer.width){
+                parsedMapObject[layer.name].push(layer.data.slice(i, layer.width + i))
+            }
+        }
+
+        else if(layer.name === "npc_tiles"){
             parsedMapObject[layer.name] = []
             for(let i = 0; i < layer.data.length; i += layer.width){
                 parsedMapObject[layer.name].push(layer.data.slice(i, layer.width + i))

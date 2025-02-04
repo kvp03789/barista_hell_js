@@ -35,7 +35,8 @@ export class Inventory{
         this.itemSlots = []
         this.init()
         this.parseAssets()
-        this.testPopulate()
+        // this.testPopulate()
+        this.testPopulateComplete = false
     }
 
     init = () => {
@@ -57,24 +58,26 @@ export class Inventory{
 
     testPopulate = () => {
         //populate some test equipment
-        const someIce = new Ice(this.app, this.player, this.parsedIconsTextures)
+        const someIce = new Ice(this.app, this.parsedIconsTextures)
         this.itemSlots[0].item = someIce
         this.itemSlots[0].quantity = 10
-        const someBeans = new Beans(this.app, this.player, this.parsedIconsTextures)
+        const someBeans = new Beans(this.app, this.parsedIconsTextures)
         this.itemSlots[1].item = someBeans
         this.itemSlots[1].quantity = 25
-        const someMoreBeans = new Beans(this.app, this.player, this.parsedIconsTextures)
+        const someMoreBeans = new Beans(this.app, this.parsedIconsTextures)
         this.itemSlots[2].item = someMoreBeans
         this.itemSlots[2].quantity = 15
-        const someMilk = new Milk(this.app, this.player, this.parsedIconsTextures)
+        const someMilk = new Milk(this.app, this.parsedIconsTextures)
         this.itemSlots[3].item = someMilk
         this.itemSlots[3].quantity = 7
-        const someCorruptedBlood = new CorruptedBlood(this.app, this.player, this.parsedIconsTextures)
+        const someCorruptedBlood = new CorruptedBlood(this.app, this.parsedIconsTextures)
         this.itemSlots[4].item = someCorruptedBlood
         this.itemSlots[4].quantity = 17
-        const someLargeFangs = new LargeFang(this.app, this.player, this.parsedIconsTextures)
+        const someLargeFangs = new LargeFang(this.app, this.parsedIconsTextures)
         this.itemSlots[5].item = someLargeFangs
         this.itemSlots[5].quantity = 4
+
+        this.testPopulateComplete = true
     }
 
     run = () => {
@@ -97,6 +100,8 @@ export class Equipment{
         
         this.parseAssets()
         this.init()
+        this.testPopulateComplete = false
+        // this.testPopulate()
     }
 
     init = () => {
@@ -111,7 +116,6 @@ export class Equipment{
         const primaryWeaponSlot = new ItemSlot(this.app, this.player, "weapon", 0)
         const secondaryWeaponSlot = new ItemSlot(this.app, this.player, "weapon", 1)
         this.weaponSlots = [primaryWeaponSlot, secondaryWeaponSlot]
-        this.testPopulate()
     }
 
     //helper function to parse the assets arrays
@@ -145,6 +149,8 @@ export class Equipment{
 
         this.weaponSlots[0].item = battleRifle
         this.weaponSlots[1].item = shotgun
+
+        this.testPopulateComplete = true
     }
 
     run = () => {

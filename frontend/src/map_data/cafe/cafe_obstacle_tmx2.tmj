@@ -360,15 +360,45 @@
          "objects":[
                 {
                  "ellipse":true,
-                 "height":88,
+                 "height":90,
                  "id":1,
                  "name":"hell_circle_collision",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":90,
-                 "x":617.333333333333,
-                 "y":458.666666666667
+                 "x":578,
+                 "y":458.667
+                }, 
+                {
+                 "height":0,
+                 "id":2,
+                 "name":"npc_robert",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"npcKey",
+                         "type":"string",
+                         "value":"Robert"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":75.3333,
+                 "y":508.667
+                }, 
+                {
+                 "height":0,
+                 "id":3,
+                 "name":"player_spawn",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":621.333333333333,
+                 "y":500.666666666667
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -377,7 +407,7 @@
          "y":0
         }],
  "nextlayerid":13,
- "nextobjectid":2,
+ "nextobjectid":4,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",

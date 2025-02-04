@@ -5,6 +5,7 @@ import Character from './code/Character'
 import Cafe from './code/levels/Cafe'
 import './styles/main.css'
 import HellOverWorld from './code/levels/HellOverworld'
+import { Equipment, Inventory, QuickBar } from './code/ItemsInventoryEquipment'
 
 
 const body = document.querySelector('body')
@@ -47,17 +48,27 @@ class Application {
         this.keysObject = {}
 
         globalThis.__PIXI_APP__ = this.app
-
-        // initialize state manager with an empty statesObject for now
-        this.state_manager = new State_Manager('hell_overworld', {}, this.app);
     }
 
     async init() {
         await this.app.init({ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, preference: 'webgl' });
         body.append(this.app.canvas);
-        await PIXI.Assets.init({ manifest: assetsManifest });
+        await PIXI.Assets.init({ manifest: assetsManifest })
 
-        // instantiate states
+        //these assets have to be loaded before the rest. all other assets
+        //are loaded in each level class as needed
+        this.spritesheetAssets = await PIXI.Assets.loadBundle('character_spritesheets')
+        this.uiAssets = await PIXI.Assets.loadBundle('ui_assets')
+        this.iconAssets = await PIXI.Assets.loadBundle("icons")
+        this.weaponAssets = await PIXI.Assets.loadBundle('weapon_assets')
+
+        //init GameState
+        this.game_state = new GameState(this.app, this.keysObject, this.weaponAssets, this.iconAssets, this.spritesheetAssets)
+        
+        // initialize state manager with an empty statesObject for now
+        this.state_manager = new State_Manager('cafe_intro', {}, this.app, this.game_state)
+
+        // instantiate states for use in statesObject
         const cafe = new Cafe(this.app, this.keysObject, 'cafe_intro', this.state_manager.setState);
         const hellOverworld = new HellOverWorld(this.app, this.keysObject, 'hell_overworld', this.state_manager.setState);
 
@@ -73,11 +84,12 @@ class Application {
 }
 
 class State_Manager{
-    constructor(currentState, statesObject, app) {
-        this.app = app;
-        this.statesObject = statesObject;
-        this.previousState = null;
-        this.currentState = currentState;
+    constructor(currentState, statesObject, app, gameState) {
+        this.app = app
+        this.statesObject = statesObject
+        this.previousState = null
+        this.currentState = currentState
+        this.gameState = gameState
     }
 
     setState = async (newState) => {
@@ -85,23 +97,61 @@ class State_Manager{
 
         // cleanup current state and remove its run method fromticker
         if (this.statesObject[this.currentState].destroy) {
-            this.statesObject[this.currentState].destroy();
+            this.statesObject[this.currentState].destroy()
         }
-        this.app.ticker.remove(this.statesObject[this.currentState].run);
+        this.app.ticker.remove(this.statesObject[this.currentState].run)
 
-        this.previousState = this.currentState;
-        this.currentState = newState;
-        console.log('debug', this.currentState)
-        // Initialize new state
-        const nextState = this.statesObject[this.currentState];
+        this.previousState = this.currentState
+        this.currentState = newState
+        
+        // initialize new state
+        const nextState = this.statesObject[this.currentState]
+
+        // update game state before switching
+        this.gameState.currentLevel = this.currentState;
+        this.gameState.saveProgress();
+
         if (nextState.initMap) {
-            await nextState.initMap();
+            await nextState.initMap(this.gameState)
         }
-        this.app.ticker.add(nextState.run);
+        this.app.ticker.add(nextState.run)
     }
 
     getState = () => {
         return this.currentState
+    }
+}
+
+class GameState {
+    constructor(app, keysObject, weaponAssets, iconAssets, spritesheetAssets) {
+        this.app = app
+        //init the player
+        this.character = new Character(this.app, keysObject, spritesheetAssets, weaponAssets, iconAssets)
+
+        //init player inventory
+        this.inventory = new Inventory(this.app, this.character, weaponAssets, iconAssets)
+        //init player equipment, along with weaponSlots and equipmentSlots
+        this.equipment = new Equipment(this.app, this.character, weaponAssets, iconAssets)
+        //init player quick bar
+        this.quickBar = new QuickBar(this.app, this.character, weaponAssets)
+
+        // any game-wide stats
+        this.stats = {                    
+            playTime: 0,
+            totalEnemiesDefeated: 0,
+        }
+        this.currentLevel = 'cafe_intro'
+        this.flags = {}                  // for tracking game events (e.g., quests, interactions)
+    }
+
+    saveProgress() {
+        // could serialize this data to localStorage or a backend for save/load
+        console.log("Game progress saved.")
+    }
+
+    loadProgress() {
+        // TODO----logic to load game data
+        console.log("Game progress loaded.")
     }
 }
 

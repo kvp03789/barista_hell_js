@@ -6,7 +6,7 @@ import { TooltipManager } from "./TooltipManager";
 import NPCDialogueManager from "./NPCDialogueManager";
 
 export default class UIManager{
-    constructor(app, player, uiAssets, fonts, keysObject, iconAssets, clickEventManager, mousePos, npcList, stateLabel, enemyList){
+    constructor(app, player, uiAssets, fonts, keysObject, iconAssets, clickEventManager, mousePos, employees, stateLabel, enemyList){
         this.app = app
         this.player = player
 
@@ -47,7 +47,8 @@ export default class UIManager{
         this.tooltipContainer = new Container()
         this.tooltipContainer.label = "tooltip_container"
 
-        this.npcList = npcList
+        this.employees = employees
+
         this.enemyList = enemyList
 
         this.stateLabel = stateLabel
@@ -82,6 +83,7 @@ export default class UIManager{
         }
 
         console.log(this.UIAssetsObject)
+        console.log('icon assets', this.iconAssetsObject)
 
         //--init all of the components of the UI--//
         
@@ -104,7 +106,7 @@ export default class UIManager{
         this.craftingWindow = new CraftingWindowUI(this.app, this.player, this.clickCooldown, this.clicking, this.UIAssetsObject, this.uiContainer, SCREEN_WIDTH - (this.UIAssetsObject.UI_InventoryBG.width + 20), 50, this.iconAssetsObject, this.clickEventManager, this, this.tooltipManager)
 
         //npc dialogue manager
-        this.npcDialogueManager = new NPCDialogueManager(this.app, this.player, this.UIAssetsObject, this.fonts, this.uiContainer, this.npcList, this.stateLabel)
+        this.npcDialogueManager = new NPCDialogueManager(this.app, this.player, this.UIAssetsObject, this.fonts, this.uiContainer, this.employees, this.stateLabel)
 
         //enemy health bars
         this.enemyHealthBarManager = new EnemyHealthBarManager(this.app, this.enemyList, this.uiContainer, this.UIAssetsObject)
@@ -172,8 +174,10 @@ export default class UIManager{
             //~~npcDialogueManager.playerCanDialogue is an object with a property called status,  
             //a bool that is set based on player colliding with npc, and an npc property
             //that gets set to the NPC the player is near~~
-            else if(this.npcDialogueManager.playerCanDialogue.status){
-                const npc = this.npcDialogueManager.playerCanDialogue.npc
+
+            else if(this.npcDialogueManager.dialogueStatus.status){
+                const npc = this.npcDialogueManager.dialogueStatus.npc
+                console.log('HEY DONT TOUCH ME', npc)
                 if(!this.npcDialogueManager.dialogueIsDisplaying){
                     //function on the NPCDialogueManager to handle begining dialogue
                     this.npcDialogueManager.handleBeginDialogue(npc)
@@ -206,7 +210,7 @@ export default class UIManager{
         }
 
         //automatically close dialogue if player walks away from npc
-        if(!this.npcDialogueManager.playerCanDialogue.status){
+        if(!this.npcDialogueManager.dialogueStatus.status){
             this.dialogueIsDisplaying = false
             if(this.dialogueIsDisplaying){
                 this.uiContainer.removeChild(this.npcDialogueManager.dialogueContainer)
@@ -220,6 +224,7 @@ export default class UIManager{
         this.tooltipManager.run(this.mousePos)
         this.npcDialogueManager.run(this.player)
         this.enemyHealthBarManager.run()
+        this.healthBar.run()
     }
     
 }
@@ -227,6 +232,7 @@ export default class UIManager{
 class ItemSlot_UI extends Sprite{
     constructor(texture, emptyTexture, player, type, xPos, yPos, slotIndex, item, clickEventManager, uiManager, tooltipManager){
         super(texture)
+
         this.emptyTexture = emptyTexture
         
         this.player = player
@@ -266,7 +272,6 @@ class ItemSlot_UI extends Sprite{
         this.quantityTextContent = `${this.quantity}`
         
         this.init()
-        
     }
 
     init = () => {
@@ -425,7 +430,6 @@ class CraftingWindowUI extends Container{
 
         this.UIAssetsObject = UIAssetsObject
         this.iconAssets = iconsAssetsObject
-        console.log(this.iconAssets, "icon assets")
         this.uiContainer = uiContainer
 
         this.xPos = xPos
@@ -481,19 +485,19 @@ class CraftingWindowUI extends Container{
             let item = null
             switch(DRINK_RECIPES[this.recipeIndex][i]) {
                 case "WhippedCream":
-                    item = new WhippedCream(this.app, this.player, this.iconAssets)
+                    item = new WhippedCream(this.app, this.iconAssets)
                     break;
                 case "Syrup":
-                    item = new Syrup(this.app, this.player, this.iconAssets)
+                    item = new Syrup(this.app, this.iconAssets)
                     break;
                 case "Milk":
-                    item = new Milk(this.app, this.player, this.iconAssets)
+                    item = new Milk(this.app, this.iconAssets)
                     break;
                 case "Beans":
-                    item = new Beans(this.app, this.player, this.iconAssets)
+                    item = new Beans(this.app, this.iconAssets)
                     break;
                 case "Ice":
-                    item = new Ice(this.app, this.player, this.iconAssets)
+                    item = new Ice(this.app, this.iconAssets)
                 default:
                     break;
             }
@@ -537,25 +541,25 @@ class CraftingWindowUI extends Container{
             let item = null
             switch(recipeString) {
                 case "WhippedCream":
-                    item = new WhippedCream(this.app, this.player, this.iconAssets)
+                    item = new WhippedCream(this.app, this.iconAssets)
                     break;
                 case "Syrup":
-                    item = new Syrup(this.app, this.player, this.iconAssets)
+                    item = new Syrup(this.app, this.iconAssets)
                     break;
                 case "Milk":
-                    item = new Milk(this.app, this.player, this.iconAssets)
+                    item = new Milk(this.app, this.iconAssets)
                     break;
                 case "Beans":
-                    item = new Beans(this.app, this.player, this.iconAssets)
+                    item = new Beans(this.app, this.iconAssets)
                     break;
                 case "Ice":
-                    item = new Ice(this.app, this.player, this.iconAssets)
+                    item = new Ice(this.app, this.iconAssets)
                     break;
                 case "LargeFang":
-                    item = new LargeFang(this.app, this.player, this.iconAssets)
+                    item = new LargeFang(this.app, this.iconAssets)
                     break;
                 case "CorruptedBlood":
-                    item = new CorruptedBlood(this.app, this.player, this.iconAssets)
+                    item = new CorruptedBlood(this.app, this.iconAssets)
                     break;
                 default:
                     break;
@@ -882,7 +886,29 @@ class HealthBar extends Sprite{
         this.healthFill = new Graphics().circle( 157, 528, 51).fill('#8a0101')
         this.healthFill.label = "health_fill"
 
-        this.uiContainer.addChild(this.healthFill, this)
+        this.healthTextStyle = new TextStyle({
+            fontFamily: 'roboto',
+            dropShadow: {
+                alpha: 0.5,
+                angle: 2.1,
+                blur: 4,
+                color: '#cae0dd',
+                distance: 10,
+            },
+            fill: '#000000',
+            stroke: { color: '#ffffff', width: 2, join: 'round' },
+            fontSize: 20,
+            fontWeight: 'lighter',
+            alpha: 1
+        })
+        this.healthText = new Text({style: this.healthTextStyle, text: `${this.player.maxHealth} / ${this.player.currentHealth}`})
+        this.healthText.position.set(this.x + 70, this.y + this.height / 2)
+        this.uiContainer.addChild(this.healthFill, this, this.healthText)
+    }
+
+    run = () => {
+        //keep text up to date
+        this.healthText.text = `${this.player.currentHealth} / ${this.player.maxHealth}`
     }
 }
 
@@ -892,7 +918,6 @@ class EnemyHealthBar extends Container{
         this.enemy = enemy
         this.barWidth = 40
         this.barHeight = 10
-        console.log("DEBUG POSITION HEALTH BAR: ", this.barWidth, this.barHeight)
 
         this.backgroundColor = UI_SETTINGS.ENEMY_HEALTH_BAR.BACKGROUND_COLOR  
         this.foregroundColor = UI_SETTINGS.ENEMY_HEALTH_BAR.FOREGROUND_COLOR  

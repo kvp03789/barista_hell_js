@@ -12,8 +12,10 @@ export const settings = {
     PLAYER_SETTINGS: {
         BASE_SPEED: 7,
         INVENTORY_SLOTS_AMOUNT: 40,
+        INVENTORY_STACKS: {"material": 100, "consumable": 10, "weapon": 1},
         EQUIPMENT_SLOTS: ["hands", "feet", "chest", "legs", "head"],
-        QUICK_BAR_SLOTS_AMOUNT: 8
+        QUICK_BAR_SLOTS_AMOUNT: 8,
+        MAX_HEALTH: 50
     },
     WEAPON_SETTINGS: {
         BattleRifle:{
@@ -66,17 +68,17 @@ export const settings = {
         //dialogue that is with a vendor/trainer should have 'isStore' boolean
         //see first sarah_npc example 
         cafe_intro:{
-            sarah_npc:{
+            Sarah_npc:{
                 DIALOGUE_TOTAL: 3,
                 1: {text: 'Yo dude....', hasResponse: false, isStore: false},
                 2: {text:  'Yea this portal to hell is really spiking my anxiety. Did you clock in?'},
                 3: {text: 'This is just a really long dialogue section to test multiple pages of dialogue on an NPC. Just need a bunch of filler here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'}
             },
-            robert_npc:{
+            Robert_npc:{
                 DIALOGUE_TOTAL: 2,
                 1: {text: `Oh hey PLAYER NAME...didn't see you walk in.`},
-                2: {text: 'Yea looks like a portal to hell opened up right in the cafe earlier. \
-                I\'m looking it up now. Always something around here, huh?'}
+                2: {text: 'Yea looks like a portal to hell opened up right in the cafe earlier. ' +
+                'I\'m looking it up now. Always something around here, huh?'}
             }
         }
     },
@@ -89,7 +91,8 @@ export const settings = {
 
     },
     ENEMY_SETTINGS: {
-        Slime:{maxHealth: 15, speed: 5, attackDamage: 5, animationSpeed: 0.2, visionRadius: 220,
+        Slime:{maxHealth: 15, speed: 5, attackSpeed: 20, attackRange: 20,
+            attackDamage: 2, animationSpeed: 0.2, visionRadius: 220,
             items: { drops:[{name: "Beans", Chance: 20}, {name: "Syrup", Chance: 20}, {name: "Milk", Chance: 60}, {name: "WhippedCream", Chance: 20}], min: 4, max: 8}
         }
     }

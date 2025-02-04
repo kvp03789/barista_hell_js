@@ -139,9 +139,9 @@ export const cafeMapData = {
             data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 455, 455, 455, 455, 455, 455, 455, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 455, 455, 455, 455, 455, 455, 455, 455, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 455, 455, 455, 455, 455, 455, 455, 455, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -181,7 +181,71 @@ export const cafeMapData = {
                     "width":80,
                     "x":558,
                     "y":438.666666666667
-                    }],
+                    },
+                    // robert npc
+                    {
+                        "height":0,
+                        "id":2,
+                        "name":"npc_robert",
+                        "point":true,
+                        "properties":[
+                               {
+                                "name":"npcKey",
+                                "type":"string",
+                                "value":"Robert"
+                               },
+                               {
+                                "name":"isPatrolling",
+                                "type":"boolean",
+                                "value":false
+                               }
+                            ],
+                        "rotation":0,
+                        "type":"",
+                        "visible":true,
+                        "width":0,
+                        "x":55.3333333333333,
+                        "y":478.666666666667
+                    },
+                    //sarah npc
+                    {
+                        "height":0,
+                        "id":2,
+                        "name":"npc_sarah",
+                        "point":true,
+                        "properties":[
+                               {
+                                "name":"npcKey",
+                                "type":"string",
+                                "value":"Sarah"
+                               },
+                               {
+                                "name":"isPatrolling",
+                                "type":"boolean",
+                                "value":true
+                               }
+                            ],
+                        "rotation":0,
+                        "type":"",
+                        "visible":true,
+                        "width":0,
+                        "x":95.3333333333333,
+                        "y":178.666666666667
+                       },
+                    //player spawn
+                    {
+                        "height":0,
+                        "id":3,
+                        "name":"player_spawn",
+                        "point":true,
+                        "rotation":0,
+                        "type":"",
+                        "visible":true,
+                        "width":0,
+                        "x":621.333333333333,
+                        "y":500.666666666667
+                       }
+                    ],
             "opacity":1,
             "type":"objectgroup",
             "visible":true,

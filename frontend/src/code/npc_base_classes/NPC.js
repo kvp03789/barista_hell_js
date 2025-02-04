@@ -5,16 +5,14 @@ import { ANIMATION_SPEED } from "../../settings"
 //handles common behavior such as movement, animation changes, 
 //and interaction mechanics like dialogue.
 export class NPC extends AnimatedSprite{
-    constructor(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, patrolTiles, stateLabel){
+    constructor(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, stateLabel){
         super(initialTexture)
         this.app = app
         this.player = player
         this.spritesheet = spritesheet
         this.visibleSprites = visibleSprites
         this.obstacleSprites = obstacleSprites
-        //patrolTiles is an optional array of tiles where the npc will patrol if
-        //not stationary npc
-        this.patrolTiles = patrolTiles
+        
 
         //hitbox used for checking bullet hits, collisions, etc.
         this.hitbox = new Graphics()

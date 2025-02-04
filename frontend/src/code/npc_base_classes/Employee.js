@@ -2,8 +2,32 @@ import { randomNumber } from "../../utils"
 import { NPC } from "./NPC"
 
 export class Employee extends NPC{
-    constructor(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, patrolTiles, stateLabel){
-        super(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, patrolTiles, stateLabel)
+    constructor(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, stateLabel){
+        super(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, stateLabel)
+        this.isInDialogue = false
+        this.touchingPlayer = false
+    }
+
+    handleBeginDialogue = () => {
+        this.isInDialogue = true
+        console.log('debug!!! begin')
+    }
+
+    handleEndDialogue = () => {
+        this.isInDialogue = false
+        if(this.reset)this.reset()
+    }
+
+    run = (player) => {
+        // if(!this.isInDialogue){
+        //     this.patrol()
+        // }
+        
+        // this.handleMovement()
+        // this.handleAnimationChange()
+        if(this.touchingPlayer){
+            // console.log(this.touchingPlayer)
+        }
     }
 }
 
@@ -11,9 +35,9 @@ export class Robert extends Employee{
 
 }
 
-export class Sarah extends Employee {
-    constructor(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, patrolTiles){
-        super(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, patrolTiles)
+export class PatrollingEmployee extends Employee{
+    constructor(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, stateLabel, patrolTiles){
+        super(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, stateLabel)
         this.patrols = true
         this.patrolling = false
         this.patrolTimer = 600
@@ -25,6 +49,9 @@ export class Sarah extends Employee {
 
         //movement
         this.speed = 2
+
+        //patrolTiles is an array of tiles where the npc will patrol
+        this.patrolTiles = patrolTiles
     }
 
     patrol = () => {
@@ -61,21 +88,21 @@ export class Sarah extends Employee {
                 
                 if(!this.isCloseEnough(this.x, adjustedTilePosition.x)){
                     if(this.x < adjustedTilePosition.x){
-                        //if sarah x less than tileX, increase sarah x
+                        //if employee x less than tileX, increase employee x
                         this.movement.x = 1
                     }
                     else if(this.x > adjustedTilePosition.x){
-                        //else decrease sarah x
+                        //else decrease employee x
                         this.movement.x = -1
                     }
                 }
                 else if(!this.isCloseEnough(this.y, adjustedTilePosition.y)){
                     if(this.y < adjustedTilePosition.y){
-                        //if sarah y less than tileY, increase sarah y
+                        //if employee y less than tileY, increase employee y
                         this.movement.y = 1
                     }
                     else if(this.y > adjustedTilePosition.y){
-                        //else decrease sarah x
+                        //else decrease employee x
                         this.movement.y = -1
                     }
                 }
@@ -98,18 +125,9 @@ export class Sarah extends Employee {
         this.tileToMoveTo = null
     }
 
-    //helper function to see if sarah npc is on tile
+    //helper function to see if employee is on tile
     isCloseEnough = (a, b, tolerance = 2) => {
         return Math.abs(a-b) <= tolerance
-    }
-
-    handleBeginDialogue = () => {
-        this.isInDialogue = true
-    }
-
-    handleEndDialogue = () => {
-        this.isInDialogue = false
-        this.reset()
     }
 
     run = (player) => {
@@ -120,4 +138,13 @@ export class Sarah extends Employee {
         this.handleMovement()
         this.handleAnimationChange()
     }
+}
+
+export class Sarah extends PatrollingEmployee {
+    constructor(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, patrolTiles){
+        super(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, patrolTiles)
+        
+    }
+
+    
 }

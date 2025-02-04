@@ -1,6 +1,6 @@
 import Level from './Level'
 import Character from '../Character'
-import Tile, { AnimatedTile, HellPortalObject, PolygonCollisionShape, Stairs, Torch } from '../Tile'
+import Tile, { AnimatedTile, HellPortalObject, PolygonCollisionShape, SirenStatue, Stairs, Torch } from '../Tile'
 import ParticleManager from '../Particles'
 import BulletManager from '../BulletManager'
 import { Assets, Sprite, Rectangle, Texture, Spritesheet, Container, Graphics } from 'pixi.js'
@@ -12,19 +12,19 @@ import UIManager from '../UI'
 import ParallaxBackgroundManager from '../ParallaxBackgroundManager'
 import { torchPoleData, hellCircleData } from '../../json/tiles/tileSpriteData'
 import { DropShadowFilter, GlowFilter, GodrayFilter, MotionBlurFilter } from 'pixi-filters'
-import ForegroundSprites from '../ForegroundSprites'
+// import ForegroundSprites from '../ForegroundSprites'
 import { DropsManager } from '../DropsManager'
 
 export default class HellOverWorld extends Level{
     constructor(app, keysObject, stateLabel, setState){
         super(app, keysObject, stateLabel)
-        this.foregroundSpriteGroup = new ForegroundSprites(app)
+        // this.foregroundSpriteGroup = new ForegroundSprites(app)
 
         //a function from teh state manager to change states
         this.setState = setState
         }
 
-        initMap = async () => {
+        initMap = async (gameState) => {
             //initialized the level's master container. this is the
             //container that holds all other containers and the one
             //that is 'cleaned up' in each level's destroy method
@@ -39,7 +39,6 @@ export default class HellOverWorld extends Level{
 
             //initialize assets used in this level
             this.hellOverworldAssets = await Assets.loadBundle('hell_overworld_assets');
-            console.log("hell overworld assets: ", this.hellOverworldAssets)
             this.spritesheetAssets = await Assets.loadBundle('character_spritesheets');
             this.weaponAssets = await Assets.loadBundle('weapon_assets')
             this.particleAssets = await Assets.loadBundle('particle_spritesheets')
@@ -105,9 +104,9 @@ export default class HellOverWorld extends Level{
             this.bulletManager = new BulletManager(this.app, this.bulletAssets, this.obstacleSprites, this.particleManager, this.npcManager.enemies)
             
             //add character as property of level and init, adding to visibleSprites and to stage
-            this.character = new Character(this.app, this.keysObject, this.spritesheetAssets, this.weaponAssets, this.display_width / 2, this.display_height / 2, this.obstacleSprites, this.bulletManager, this.particleManager, this.iconAssets, this.npcManager.npcList)
-            // await this.character.init(this.visibleSprites, this.particleManager, playerSpawnPoint)
-            // this.mousePos = {x: this.character.sprite.x, y: this.character.sprite.y}
+            // this.character = new Character(this.app, this.keysObject, this.spritesheetAssets, this.weaponAssets, this.display_width / 2, this.display_height / 2, this.obstacleSprites, this.bulletManager, this.particleManager, this.iconAssets, this.npcManager.npcList)
+            this.character = gameState.character
+
             this.mousePos = {x: 0, y: 0}
 
             this.parallaxBackgroundManager = new ParallaxBackgroundManager(this.app, this.character, this.parallaxBackgroundAssets)
@@ -116,7 +115,6 @@ export default class HellOverWorld extends Level{
             this.parsedMapObject.objects.forEach(async (object, i) => {
                 //collision polygon objects
                 if(object.name.startsWith("collision_polygon")){
-                    console.log(object)
                     const x = object.x 
                     const y = object.y
                     const polygon = new PolygonCollisionShape(this.app, x, y, object.width, object.height, object.name, this.obstacleSprites, false)
@@ -135,6 +133,10 @@ export default class HellOverWorld extends Level{
                     if(object.name === "Stairs"){
                         this.stairs = new Stairs(this.app, x, y, texture, `object_${object.name}`, this.visibleSprites)
                     }
+                    else if(object.name === "SirenStatue"){
+                        this.sirenStatue = new SirenStatue(this.app, x, y, texture, `object_${object.name}`, this.visibleSprites, false, this.hellOverworldAssets.SirenPortal, this.setState)
+                        await this.sirenStatue.init()
+                    }
                     else if(object.name === 'player_spawn'){
                         this.playerSpawnPoint = {x: object.x * ZOOM_FACTOR, y: object.y * ZOOM_FACTOR}
                     }
@@ -144,8 +146,9 @@ export default class HellOverWorld extends Level{
                     
                 }
             })
-
-            await this.character.init(this.visibleSprites, this.particleManager, this.playerSpawnPoint)
+            
+            // await this.character.init(this.visibleSprites, this.particleManager, this.playerSpawnPoint)
+            await this.character.init(this.visibleSprites, this.particleManager, this.playerSpawnPoint, this.obstacleSprites, this.bulletManager, gameState.inventory, gameState.equipment, gameState.quickBar)
 
             //animatedTiles
             this.parsedMapObject.animatedTiles.forEach((row, i) => {
@@ -188,7 +191,7 @@ export default class HellOverWorld extends Level{
             this.app.stage.addChild(this.particleManager)
 
             //foreground sprites
-            this.app.stage.addChild(this.foregroundSpriteGroup)
+            // this.app.stage.addChild(this.foregroundSpriteGroup)
     
             //append ui to stage
             this.app.stage.addChild(this.uiManager.uiContainer)
@@ -197,7 +200,7 @@ export default class HellOverWorld extends Level{
             //init and add clickEventManager to stage, for rendering click event icons
             this.clickEventManager.init(this.character, this.uiManager, this.keysObject)
             this.app.stage.addChild(this.clickEventManager)
-            this.initHellArch()
+            // this.initHellArch()
 
             //weapon fire event
             this.app.stage.on('pointerdown', this.handleMouseDown)
@@ -229,11 +232,11 @@ export default class HellOverWorld extends Level{
             this.initHellArch
         }
 
-        initHellArch = () => {
-            const hellArch = new Sprite(this.hellObjectsAssets.HellArch)
-            hellArch.position.set(0, -200)
-            this.foregroundSpriteGroup.addChild(hellArch)
-        }
+        // initHellArch = () => {
+        //     const hellArch = new Sprite(this.hellObjectsAssets.HellArch)
+        //     hellArch.position.set(0, -200)
+        //     this.foregroundSpriteGroup.addChild(hellArch)
+        // }
 
         // initHellCircleTile = async (x, y) => {
         //         //create hell portal
@@ -269,27 +272,32 @@ export default class HellOverWorld extends Level{
         }
 
         //cleanup function
-        // destroy() {
-        //     // Remove all sprites/graphics from the stage
-        //     // while(this.app.stage.children)this.app.stage.removeChild
+        destroy() {
+            // stop animations/tickers
+            this.app.ticker.remove(this.run)
+    
+            //remove weapon fire event
+            this.app.stage.off('pointerdown', this.handleMouseDown)
 
-        //     // Destroy all sprites
-        //     // TO DO //
+            this.visibleSprites.removeChildren()
+            this.obstacleSprites.removeChildren()
 
-        //     // Stop animations/tickers
-        //     this.app.ticker.remove(this.run)
-
-        //     // Remove event listeners
-        //     // this.app.view.removeEventListener('keydown', this.onKeydown)
-        //     // this.app.view.removeEventListener('keyup', this.onKeyup)
-        //     this.app.stage.removeEventListener('mousemove', this.onMouseMove)
-            
-
-        //     // clear any additional references
-        //     // this.levelMasterContainer.destroy({ children: true })
-
-        //     // this.app.stage.removeChild(this.levelMasterContainer)
-        // }
+            //remove keyDown and keyUp events
+            this.removeKeyEvents()
+    
+            if(this.character){
+                this.character.sprite.destroy()
+                this.character = null
+            }
+    
+            // remove all containers 
+            while (this.app.stage.children.length > 0) {
+                const child = this.app.stage.children[0]
+                console.log('DESTORYED A FUUUCKIN THING', child)
+                this.app.stage.removeChild(child)
+                child.destroy({ children: true })
+            }
+        }
 
         run = () => {
             //run the click event manager
@@ -309,9 +317,11 @@ export default class HellOverWorld extends Level{
             this.bulletManager.run(this.character.sprite)
             this.uiManager.run()
             this.npcManager.run(this.character)
-            this.foregroundSpriteGroup.run(this.character)
+            // this.foregroundSpriteGroup.run(this.character)
             this.dropsManager.run(this.character)
 
+            //objects
             this.stairs.run(this.character)
+            this.sirenStatue.run(this.character)
         }
 }

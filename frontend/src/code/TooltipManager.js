@@ -93,6 +93,8 @@ export class TooltipManager{
 
     run = (mousePos) => {
         this.mousePos = mousePos
-        this.currentTooltip.position = this.mousePos
+        // this.currentTooltip.position = this.mousePos
+        this.currentTooltip.position.set(this.mousePos.x + 10, this.mousePos.y+ 10)
+
     }
 }

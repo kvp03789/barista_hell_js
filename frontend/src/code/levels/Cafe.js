@@ -3,7 +3,7 @@ import { TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR }from '../../settings'
 import { parseMapData, getXYSlice, spritesAreColliding } from '../../utils'
 import { cafeMapData } from '../../map_data/cafeMapData'
 import Character from '../Character'
-import Tile from '../Tile'
+import Tile, { PatrolTile } from '../Tile'
 import { AnimatedTile, HellPortalObject } from '../Tile'
 import ParticleManager from '../Particles'
 import BulletManager from '../BulletManager'
@@ -11,6 +11,7 @@ import { tileSpriteData, hellCircleData, trashPileData } from '../../json/tiles/
 import UIManager from '../UI'
 import { NPCManager } from '../NPCManager'
 import Level from './Level'
+import { GodrayFilter, MotionBlurFilter } from 'pixi-filters'
 
 export default class Cafe extends Level{
     constructor(app, keysObject, stateLabel, setState){
@@ -22,7 +23,7 @@ export default class Cafe extends Level{
     }
 
     
-    initMap = async () => {
+    initMap = async (gameState) => {
         //initialized the level's master container. this is the
         //container that holds all other containers and the one
         //that is 'cleaned up' in each level's destroy method
@@ -49,6 +50,7 @@ export default class Cafe extends Level{
 
         //parse map data...
         this.parsedMapObject = parseMapData(cafeMapData)
+        
         //width of entire map in tiles, set in Tiled program and obtained from parsedMapObject
         this.levelRowWidth = this.parsedMapObject.width
         this.levelRowHeight = this.parsedMapObject.height
@@ -109,12 +111,13 @@ export default class Cafe extends Level{
         this.visibleSprites.addChild(this.cafeBaseMap)
 
         this.npcManager = new NPCManager(this.app, this.stateLabel, this.npcSpritesheets, null, this.visibleSprites, this.obstacleSprites)
-//init bulletManager
-this.bulletManager = new BulletManager(this.app, this.bulletAssets, this.obstacleSprites, this.particleManager, this.npcManager.enemies)
-        //add character as property of level and init, adding to visibleSprites and to stage
-        this.character = new Character(this.app, this.keysObject, this.spritesheetAssets, this.weaponAssets, this.display_width / 2, this.display_height / 2, this.obstacleSprites, this.bulletManager, this.particleManager, this.iconAssets, this.npcManager.npcList)
-        await this.character.init(this.visibleSprites, this.particleManager)
-        this.mousePos = {x: this.character.sprite.x, y: this.character.sprite.y}
+        //init bulletManager
+        this.bulletManager = new BulletManager(this.app, this.bulletAssets, this.obstacleSprites, this.particleManager, this.npcManager.enemies)
+        
+        // this.character = new Character(this.app, this.keysObject, this.spritesheetAssets, this.weaponAssets, this.display_width / 2, this.display_height / 2)
+        this.character = gameState.character
+        
+        this.mousePos = {x: 0, y: 0}
         //add foreground blocks to map
         //these are NOT obstacle sprites, just decoration
         this.parsedMapObject.foreground.forEach((row, i) => {
@@ -135,10 +138,11 @@ this.bulletManager = new BulletManager(this.app, this.bulletAssets, this.obstacl
         })
 
         //parse and handle npc_tiles map layer
-        this.sarahNPCTiles = []
+        this.npcPatrolTiles = []
         this.parsedMapObject.npc_tiles.forEach((row, i) => {
             row.forEach((col, j) => {
                 if(col !== 0){
+                    const npcKey = col.npcKey                    
                     const x_pos = ((j) * TILE_WIDTH) * ZOOM_FACTOR
                     const y_pos = ((i) * TILE_HEIGHT) * ZOOM_FACTOR
                     // let x = (Math.floor(col / levelRowWidth) * TILE_WIDTH) + (col % levelRowWidth * TILE_WIDTH)
@@ -148,23 +152,36 @@ this.bulletManager = new BulletManager(this.app, this.bulletAssets, this.obstacl
                     let h = TILE_HEIGHT
                     const sliceRect = new PIXI.Rectangle(x, y, w, h)
                     const texture = new PIXI.Texture({source: this.cafeAssets.CafeTilesetPng, frame: sliceRect})
-                    const tile = new Tile(this.app, x_pos, y_pos, texture, 'tile', this.npcTiles)
-                    this.sarahNPCTiles.push(tile)
+                    const tile = new PatrolTile(this.app, x_pos, y_pos, texture, 'tile', null, false, npcKey)
+                    this.npcPatrolTiles.push(tile)
                 }
             })
         })
-
+        
         //object layer
         this.parsedMapObject.objects.forEach(async (object) => {
+            //hell portal
             if(object.name.startsWith("hell_circle")){
                 await this.createHellCircleTile(object)      
             }
+            //player spawn
+            else if(object.name.startsWith("player_spawn")){
+                this.playerSpawnPoint = {x: object.x * ZOOM_FACTOR, y: object.y * ZOOM_FACTOR}
+            }
+            //npc tiles
+            else if(object.name.startsWith("npc")){
+                const npcKey = object.properties.find(prop => prop.name === 'npcKey').value
+                const isPatrollingNpc = object.properties.find(prop => prop.name === 'isPatrolling').value
+                const position = {x: object.x * ZOOM_FACTOR, y: object.y * ZOOM_FACTOR}
+                const patrolTiles = this.npcPatrolTiles.filter(tile => tile.npcKey === npcKey)
+                await this.npcManager.initEmployee(npcKey, position, isPatrollingNpc, isPatrollingNpc ? patrolTiles : null, this.stateLabel)
+            }
         })
 
-        await this.npcManager.initRobertNPC()
-        await this.npcManager.initSarahNPC(this.sarahNPCTiles)
+        await this.character.init(this.visibleSprites, this.particleManager, this.playerSpawnPoint, this.obstacleSprites, this.bulletManager, gameState.inventory, gameState.equipment, gameState.quickBar)
+        // await this.npcManager.initEmployee(this.npcPatrolTiles, 'Sarah')
 
-        this.uiManager = new UIManager(this.app, this.character, this.uiAssets, this.fonts, this.keysObject, this.iconAssets, this.clickEventManager, this.mousePos, this.npcManager.npcList, this.stateLabel, this.npcManager.enemies)
+        this.uiManager = new UIManager(this.app, this.character, this.uiAssets, this.fonts, this.keysObject, this.iconAssets, this.clickEventManager, this.mousePos, this.npcManager.employees, this.stateLabel, this.npcManager.enemies)
         await this.uiManager.init()
 
         //add obstacle sprites to stage
@@ -195,6 +212,9 @@ this.bulletManager = new BulletManager(this.app, this.bulletAssets, this.obstacl
 
         //weapon fire event
         this.app.stage.on('pointerdown', this.handleMouseDown)
+
+        const filters = [new MotionBlurFilter({velocity: {x: 0, y: 40}}), new GodrayFilter()]
+                    this.particleManager.createAnimatedParticle(this.character.sprite.x + (this.character.sprite.width * 4), this.character.sprite.y + this.character.sprite.height, 'Teleport_Beam', filters)
     }
 
     handleMouseDown = () => {
@@ -276,8 +296,13 @@ this.bulletManager = new BulletManager(this.app, this.bulletAssets, this.obstacl
         //remove weapon fire event
         this.app.stage.off('pointerdown', this.handleMouseDown)
 
+        if(this.hellPortal)this.hellPortal.destroy({children: true})
+
         //remove keyDown and keyUp events
         this.removeKeyEvents()
+
+        this.visibleSprites.removeChildren()
+        this.obstacleSprites.removeChildren()
 
         if(this.character){
             this.character.sprite.destroy()
@@ -287,6 +312,7 @@ this.bulletManager = new BulletManager(this.app, this.bulletAssets, this.obstacl
         // remove all containers 
         while (this.app.stage.children.length > 0) {
             const child = this.app.stage.children[0]
+            console.log('DESTORYED A THING', child)
             this.app.stage.removeChild(child)
             child.destroy({ children: true })
         }
@@ -308,8 +334,9 @@ this.bulletManager = new BulletManager(this.app, this.bulletAssets, this.obstacl
         this.npcTiles.run(this.character.sprite)
         this.visibleSprites.run(this.character.sprite)
         this.bulletManager.run(this.character.sprite)
-        this.uiManager.run()
+        
         this.npcManager.run(this.character)
+        this.uiManager.run()
         this.hellPortal.run(this.character)
 
         if(spritesAreColliding(this.character.sprite, this.craftingTile)){

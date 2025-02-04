@@ -58,6 +58,18 @@ export const hellOverworldMapData = {
         "name":"objects",
         "objects":[
                 {
+                        "gid":541,
+                        "height":128,
+                        "id":2,
+                        "name":"SirenStatue",
+                        "rotation":0,
+                        "type":"",
+                        "visible":true,
+                        "width":128,
+                        "x":98,
+                        "y":134
+                }, 
+                {
                     "gid":541,
                     "height":134,
                     "id":2,

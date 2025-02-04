@@ -1,7 +1,8 @@
-import { Sprite, AnimatedSprite, Graphics, Point, Ellipse, ObservablePoint } from 'pixi.js'
+import { Sprite, AnimatedSprite, Graphics, Point, Ellipse, ObservablePoint, Spritesheet, DisplacementFilter, Rectangle } from 'pixi.js'
 import { ZOOM_FACTOR } from '../settings'
 import { isPlayerInEllipse, spritesAreColliding } from '../utils'
-import { DropShadowFilter, GlowFilter, RadialBlurFilter, SimpleLightmapFilter, TiltShiftFilter, ZoomBlurFilter } from 'pixi-filters'
+import { AdvancedBloomFilter, BulgePinchFilter, GlowFilter, ReflectionFilter, ShockwaveFilter, TiltShiftFilter, TwistFilter, ZoomBlurFilter } from 'pixi-filters'
+import { greenPortalSpriteData } from '../json/objects/objectsSpriteData'
 
 export default class Tile extends Sprite{
     constructor(app, x_pos, y_pos, texture, label, group, bulletsPassThrough){
@@ -17,6 +18,13 @@ export default class Tile extends Sprite{
 
     addSpriteToGroup = (group) => {
         if(group !== null)group.addChild(this)
+    }
+}
+
+export class PatrolTile extends Tile{
+    constructor(app, x_pos, y_pos, texture, label, group, bulletsPassThrough, npcKey){
+        super(app, x_pos, y_pos, texture, label, group, bulletsPassThrough)
+        this.npcKey = npcKey
     }
 }
 
@@ -189,6 +197,71 @@ export class EspressoMachine extends AnimatedTile{
     constructor(app, x_pos, y_pos, texture, label, group, isParticleTile, animationSpeed, scale, alpha, filters){
         super(app, x_pos, y_pos, texture, label, group, isParticleTile, animationSpeed, scale, alpha, filters)
 
+    }
+}
+
+class SirenPortal extends AnimatedSprite{
+    constructor(texture){
+        super(texture)
+        this.animationSpeed = .2
+        this.loop = false
+        this.portalActivated = false
+        this.filters = [new AdvancedBloomFilter(), new TwistFilter({radius: -100, angle: -1.75, offsetX: -50, offsetY: -10}), new GlowFilter({distance: 20, quality: 1, alpha: .3}), new ReflectionFilter()]
+        
+    }
+
+    run = (player) => {
+        //maintain portal scale so that not changed by YSortCameraSpriteGroup
+        this.scale = 3
+        if(spritesAreColliding(player.sprite, this))console.log("FUCK MAN")
+
+    }
+}
+
+export class SirenStatue extends Tile{
+    constructor(app, x_pos, y_pos, texture, label, group, bulletsPassThrough, portalSpritesheet, setState){
+        super(app, x_pos, y_pos, texture, label, group, bulletsPassThrough)
+        this.portalSpritesheet = portalSpritesheet
+        //setState function to change state
+        this.setState = setState
+    }
+
+    init = async () => {
+        //generateAnimations populates parts of sprite data object
+        const generateAnimations = greenPortalSpriteData.generateAnimations.bind(greenPortalSpriteData);
+        generateAnimations(this.portalSpritesheet)
+        //init portal's sprite
+        this.greenPortalSpritesheet = new Spritesheet(this.portalSpritesheet,
+            greenPortalSpriteData)
+        await this.greenPortalSpritesheet.parse()
+
+        this.portal = new SirenPortal(this.greenPortalSpritesheet.animations.activate)
+        this.portal.label = 'siren_portal'
+    }
+
+    run = (player) => {
+        this.portal.run(player)
+
+        if(!this.portal.portalActivated){
+            //activate portal when player touches statue
+            if(spritesAreColliding(player.sprite, this) ){
+                this.addChild(this.portal)
+                this.portal.position.set(0, 100)
+                this.portal.loop = false
+                this.portal.play()
+                this.portal.onComplete = () => {
+                    this.portal.textures = this.greenPortalSpritesheet.animations.on
+                    this.portal.play()
+                    this.portal.loop = true
+                    this.portal.portalActivated = true
+                }  
+            }
+        } else if(this.portal.portalActivated){
+            //teleport functionality
+            if(spritesAreColliding(player.sprite, this.portal.getBounds()) ){
+                this.setState("cafe_intro")
+            }
+        }
     }
 }
 

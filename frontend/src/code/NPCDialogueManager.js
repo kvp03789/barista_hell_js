@@ -1,18 +1,24 @@
 import { Container, Sprite, Text, TextStyle } from "pixi.js"
 import { NPC_DIALOGUE, NPC_DIALOGUE_DISTANCE, NPC_DIALOGUE_SECTION_LENGTH, SCREEN_HEIGHT } from "../settings"
+import { spritesAreColliding } from "../utils"
 
 export default class NPCDialogueManager{
-    constructor(app, player, UIAssetsObject, fonts, uiContainer, npcList, stateLabel){
+    constructor(app, player, UIAssetsObject, fonts, uiContainer, employees, stateLabel){
         this.app = app
         this.player = player
         this.UIAssetsObject = UIAssetsObject
         this.fonts = fonts
 
         this.uiContainer = uiContainer
-        //list of all npc's in current level. passed from NPCManager class
-        this.npcList  = npcList
+        //list of all employees in current level. passed from NPCManager class via UI manager
+        this.employees  = employees
+
         //each level has a stateLabel for getting dialogue from settings
         this.stateLabel = stateLabel
+
+        //set in this classes run function if the player is "colliding" with an npc
+        //used in UIManager to determine when dialogue should display
+        this.dialogueStatus = {status: false, npc: null}
 
         //the current dialogue text being displayed, unparsed. if none, set to null
         this.currentDialogueText = null
@@ -20,8 +26,6 @@ export default class NPCDialogueManager{
         //which array index of parsed Dialogue to display
         //should be reset to 0
         this.currentDialogueCounter = 0
-
-        this.playerCanDialogue = {status: false, npc: null }
 
         //~UI STUFF~
         //the master container for npc dialogue. this is what is appended
@@ -117,9 +121,10 @@ export default class NPCDialogueManager{
                 this.isTyping = false;
             }
         }, 50); // Adjust speed here
-    };
+    }
 
     handleBeginDialogue = (npc) => {
+        console.log(`${npc} this is from npc dialogue manager`)
         this.dialogueIsDisplaying = true
         //this variable being true stops the player from moving
         this.player.isInDialogue = true
@@ -180,16 +185,20 @@ export default class NPCDialogueManager{
         this.currentDialogueCounter = 0
         npc.handleEndDialogue()
         this.uiContainer.removeChild(this.dialogueContainer)
+        //reset player dialogue status
+        // this.player.dialogueStatus = {status: false, npc: null}
     }
 
-    run = () => {
+    run = (player) => {
         //check npc collisions for handling dialogue
-        this.npcList.forEach(npc => {
-            if(this.checkPlayerNPCCollision(npc)){
-                this.playerCanDialogue = {status: true, npc }
+        this.employees.forEach(npc => {
+            if(spritesAreColliding(npc, this.player.sprite)){
+                if(!this.dialogueStatus.status) this.dialogueStatus = {status: true, npc }
+                else return
             }
-            else{
-                this.playerCanDialogue = {status: false, npc: null }
+            else if(this.employees.every(employee => !spritesAreColliding(employee, player.sprite))){
+                if(this.dialogueStatus.status) this.dialogueStatus = {status: false, npc: null }
+                else return
             }
         })
     }

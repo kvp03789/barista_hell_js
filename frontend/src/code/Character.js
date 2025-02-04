@@ -7,18 +7,16 @@ import { DropShadowFilter } from "pixi-filters";
 
 
 export default class Character{
-    constructor(app, keysObject, spritesheetAssets, itemAssets, x_pos, y_pos, obstacleSprites, bulletManager, particleManager, iconAssets, npcList){
+    constructor(app, keysObject, spritesheetAssets, weaponAssets, iconAssets){
         this.app = app
         this.keysObject = keysObject
         this.spritesheetAssets = spritesheetAssets
-        this.itemAssets = itemAssets
+        this.weaponAssets = weaponAssets
         this.iconAssets = iconAssets
 
-        this.bulletManager = bulletManager
-        this.particleManager = particleManager
-        
-        this.x_pos = x_pos
-        this.y_pos = y_pos
+        //stats
+        this.maxHealth = PLAYER_SETTINGS.MAX_HEALTH
+        this.currentHealth = this.maxHealth
 
         //movement
         this.speed = PLAYER_SETTINGS.BASE_SPEED
@@ -29,8 +27,6 @@ export default class Character{
         this.movement = { x: 0, y: 0 };
 
         this.currentAnimation = null
-
-        this.obstacleSprites = obstacleSprites
 
         this.mousePos = {x: 0, y: 0}
 
@@ -56,7 +52,11 @@ export default class Character{
         group.addChild(this.sprite)
     }
 
-    init = async (group, particleManager, playerSpawnPoint) => {
+    init = async (group, particleManager, playerSpawnPoint, obstacleSprites, bulletManager, inventory, equipment, quickBar) => {
+        this.obstacleSprites = obstacleSprites
+        this.bulletManager = bulletManager
+        this.particleManager = particleManager
+        
         //generateAnimations populates parts of characterData json-esque object
         const generateAnimations = playerSpritesheetData.generateAnimations.bind(playerSpritesheetData);
         generateAnimations(this.spritesheetAssets.PlayerSpritesheet);
@@ -82,12 +82,22 @@ export default class Character{
         this.rect = this.sprite.getBounds()
         //initialize mousePos to prevent error
         this.mousePos = {x: this.sprite.x, y: this.sprite.y}
-        //initialize player inventory
-        this.inventory = new Inventory(this.app, this, this.itemAssets, this.iconAssets)
-        //initialize player equipment, along with weaponSlots and equipmentSlots
-        this.equipment = new Equipment(this.app, this, this.itemAssets, this.iconAssets)
-        //initialize player quick bar
-        this.quickBar = new QuickBar(this.app, this, this.itemAssets)
+
+        // //initialize player inventory
+        // this.inventory = new Inventory(this.app, this, this.weaponAssets, this.iconAssets)
+        // //initialize player equipment, along with weaponSlots and equipmentSlots
+        // this.equipment = new Equipment(this.app, this, this.weaponAssets, this.iconAssets)
+        // //initialize player quick bar
+        // this.quickBar = new QuickBar(this.app, this, this.weaponAssets)
+
+        this.inventory = inventory
+        console.log('ITS IN MY HAAAEEEAD', this.inventory)
+        this.equipment = equipment
+        this.quickBar = quickBar
+        //test populates called here because they rely on char sprite position
+        if(!this.inventory.testPopulateComplete)this.inventory.testPopulate()
+        if(!this.equipment.testPopulateComplete)this.equipment.testPopulate()
+
         this.weaponSlots = this.equipment.weaponSlots
         this.equipmentSlots = this.equipment.equipmentSlots
         //set active weapon index
@@ -104,8 +114,6 @@ export default class Character{
         //
         // this.app.stage.on('pointerdown', this.mouseDown)
         this.sprite.play()
-
-        console.log("heres the player inventory", this.inventory)
     }
 
     mouseDown = () => {
@@ -304,6 +312,12 @@ export default class Character{
         }
     }
 
+    takeDamage = (enemy) => {
+        this.currentHealth -= enemy.attackDamage
+        console.log("took damage!")
+    }
+
+
     run = (angle) => {
         //angle passed in from level class
         this.angle = angle
@@ -336,7 +350,5 @@ export default class Character{
         //run the inventory, equipment, and quickBar
         //this keeps them up to date
         this.inventory.run()
-
-        
     }
 }
