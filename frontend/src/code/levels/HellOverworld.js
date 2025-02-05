@@ -134,7 +134,7 @@ export default class HellOverWorld extends Level{
                         this.stairs = new Stairs(this.app, x, y, texture, `object_${object.name}`, this.visibleSprites)
                     }
                     else if(object.name === "SirenStatue"){
-                        this.sirenStatue = new SirenStatue(this.app, x, y, texture, `object_${object.name}`, this.visibleSprites, false, this.hellOverworldAssets.SirenPortal, this.setState)
+                        this.sirenStatue = new SirenStatue(this.app, x, y, texture, `object_${object.name}`, this.visibleSprites, false, this.hellOverworldAssets.SirenPortal, this.setState, this.keysObject)
                         await this.sirenStatue.init()
                     }
                     else if(object.name === 'player_spawn'){

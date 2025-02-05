@@ -88,7 +88,7 @@ export default class UIManager{
         //--init all of the components of the UI--//
         
         //tooltip manager
-        this.tooltipManager = new TooltipManager(this.app, this.UIAssetsObject.UI_Tooltip_BG_Texture, this.uiContainer, this.tooltipContainer, this.mousePos)
+        this.tooltipManager = new TooltipManager(this.app, this.UIAssetsObject.UI_Tooltip_BG_Texture, this.uiContainer, this.tooltipContainer, this.mousePos, this.UIAssetsObject)
 
         //health bar
         this.healthBar = new HealthBar(this.app, this.UIAssetsObject.UI_HUDFullBG, this.player,  55, SCREEN_HEIGHT - this.UIAssetsObject.UI_HUDHealthBar.height, this.uiContainer, this.tooltipManager)
@@ -221,7 +221,7 @@ export default class UIManager{
         this.characterSheet.run(this.player)
         this.inventory.run(this.player)
         this.quickBar.run(this.player)
-        this.tooltipManager.run(this.mousePos)
+        this.tooltipManager.run(this.mousePos, this.player)
         this.npcDialogueManager.run(this.player)
         this.enemyHealthBarManager.run()
         this.healthBar.run()

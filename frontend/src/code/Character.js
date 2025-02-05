@@ -32,11 +32,22 @@ export default class Character{
 
         this.keyboardCooldown = 0
 
-        //character is in position to craft or not
-        this.inCraftingPosition = false
         //if inCraftingPosition and player presses E, set to true and open
         //crafting window
         this.crafting = false
+
+        //whether character is in position to craft or not
+        this.inCraftingPosition = false
+
+        //whether or not player is next to NPC
+        this.inDialoguePosition = false
+
+        //whether or not player is next to an "activatable" item
+        this.inActivatePosition = false
+
+        //inTooltipPosition gets set to true in handler function if
+        //player is in crafting, dialogue, or activate positions
+        this.inTooltipPosition = false
 
         //bool used for checking if player is already in dialogue, crafting, etc.
         this.busy = false  
@@ -136,13 +147,7 @@ export default class Character{
     }
 
     handleActionKeyPress = () => {
-        // if(this.keysObject[69]){
-        //     console.log("E key pressed!")
-        //     if(this.inCraftingPosition){
-        //         this.crafting = true
-        //         console.log("opening crafting window...")
-        //     }
-        // }
+        
         if(this.keysObject[16]){
             console.log("LSHIFT key pressed!")
         }
@@ -294,14 +299,12 @@ export default class Character{
         }
     }
 
-    // handleTeleport = () => {
-    //     //change animation and play
-    //     this.sprite.textures = this.mainSpritesheet.animations.teleport
-    //     this.sprite.play()
-    //     this.teleporting = false
-    //     this.sprite.onLoop = () => this.sprite.textures = this.mainSpritesheet.animations.idle_down
-    //     this.sprite.off('loop')
-    // }
+    //function to check whether or not player is in crafting, dialogue, or activate 
+    //positions. used for key press tooltips in UIManager.tooltipManager class
+    handleSetInTooltipPosition = () => {
+        if(this.inCraftingPosition || this.inDialoguePosition || this.inActivatePosition)this.inTooltipPosition = true
+        else this.inTooltipPosition = false 
+    }
 
     setAnimation(animationKey) {
         console.log('setting animation......')
@@ -322,6 +325,9 @@ export default class Character{
         //angle passed in from level class
         this.angle = angle
         this.activeWeapon.run(angle)
+
+        //check for in tooltip position
+        this.handleSetInTooltipPosition()
 
         //stairs check to slow movement
         if(this.isOnStairs)this.speed = this.stairSpeed

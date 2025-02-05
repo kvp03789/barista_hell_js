@@ -219,11 +219,13 @@ class SirenPortal extends AnimatedSprite{
 }
 
 export class SirenStatue extends Tile{
-    constructor(app, x_pos, y_pos, texture, label, group, bulletsPassThrough, portalSpritesheet, setState){
+    constructor(app, x_pos, y_pos, texture, label, group, bulletsPassThrough, portalSpritesheet, setState, keysObject){
         super(app, x_pos, y_pos, texture, label, group, bulletsPassThrough)
         this.portalSpritesheet = portalSpritesheet
         //setState function to change state
         this.setState = setState
+        //keysObject for activating portal with keypress
+        this.keysObject = keysObject
     }
 
     init = async () => {
@@ -243,20 +245,27 @@ export class SirenStatue extends Tile{
         this.portal.run(player)
 
         if(!this.portal.portalActivated){
-            //activate portal when player touches statue
-            if(spritesAreColliding(player.sprite, this) ){
-                this.addChild(this.portal)
-                this.portal.position.set(0, 100)
-                this.portal.loop = false
-                this.portal.play()
-                this.portal.onComplete = () => {
-                    this.portal.textures = this.greenPortalSpritesheet.animations.on
+            //set player activatable position for key tooltip
+            if(spritesAreColliding(player.sprite, this)) player.inActivatePosition = true
+            else player.inActivatePosition = false
+            if(this.keysObject[69]){
+                //activate portal when player touches statue
+                if(spritesAreColliding(player.sprite, this) ){
+                    this.addChild(this.portal)
+                    this.portal.position.set(0, 100)
+                    this.portal.loop = false
                     this.portal.play()
-                    this.portal.loop = true
-                    this.portal.portalActivated = true
-                }  
+                    this.portal.onComplete = () => {
+                        this.portal.textures = this.greenPortalSpritesheet.animations.on
+                        this.portal.play()
+                        this.portal.loop = true
+                        this.portal.portalActivated = true
+                    }  
+                }
+                
             }
         } else if(this.portal.portalActivated){
+            player.inActivatePosition = false
             //teleport functionality
             if(spritesAreColliding(player.sprite, this.portal.getBounds()) ){
                 this.setState("cafe_intro")

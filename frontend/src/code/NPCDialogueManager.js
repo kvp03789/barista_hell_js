@@ -193,11 +193,18 @@ export default class NPCDialogueManager{
         //check npc collisions for handling dialogue
         this.employees.forEach(npc => {
             if(spritesAreColliding(npc, this.player.sprite)){
-                if(!this.dialogueStatus.status) this.dialogueStatus = {status: true, npc }
+                if(!this.dialogueStatus.status) {
+                    this.dialogueStatus = {status: true, npc }
+                    player.inDialoguePosition = true
+                }
+                
                 else return
             }
             else if(this.employees.every(employee => !spritesAreColliding(employee, player.sprite))){
-                if(this.dialogueStatus.status) this.dialogueStatus = {status: false, npc: null }
+                if(this.dialogueStatus.status) {
+                    this.dialogueStatus = {status: false, npc: null }
+                    player.inDialoguePosition = false
+                }
                 else return
             }
         })

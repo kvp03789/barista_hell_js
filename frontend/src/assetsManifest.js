@@ -21,6 +21,7 @@ import UI_InventoryBG from './img/ui/inventory_bg.png'
 import UI_CraftingBG from './img/ui/crafting_bg.png'
 import UI_Tooltip_BG_Texture from './img/ui/tooltip_bg_texture.png'
 import UI_Dialogue_BG from './img/ui/dialogue_bg.png'
+import UI_KeyPressTooltip from './img/ui/key_press_tooltip.png'
 
 //particles
 import Particle_BulletWallExplodeParticleSmoke from './img/spritesheets/particles/bullet_explode_particle_smoke.png'
@@ -331,6 +332,10 @@ export const assetsManifest = {
          {
             "alias": "UI_Dialogue_BG",
             "src": UI_Dialogue_BG
+         },
+         {
+            "alias" :"UI_KeyPressTooltip",
+            "src": UI_KeyPressTooltip
          }
       ]
       },

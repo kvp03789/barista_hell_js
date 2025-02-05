@@ -2,12 +2,13 @@ import { Container, Sprite, TextStyle, Rectangle, Texture, Text } from "pixi.js"
 import { ITEM_DESCRIPTIONS, ZOOM_FACTOR } from "../settings"
 
 export class TooltipManager{
-    constructor(app, tooltipBackgroundTexture, uiContainer, tooltipContainer, mousePos){
+    constructor(app, tooltipBackgroundTexture, uiContainer, tooltipContainer, mousePos, UIAssetsObject){
         this.app = app
         this.tooltipBackgroundTexture = tooltipBackgroundTexture
         this.uiContainer = uiContainer
         this.tooltipContainer = tooltipContainer
         this.mousePos = mousePos
+        this.UIAssetsObject = UIAssetsObject
 
         this.currentTooltip = new Container()
         this.currentTooltip.interactive = false
@@ -48,6 +49,12 @@ export class TooltipManager{
         this.itemNameText = new Text({text: '', style: this.itemTextStyle})
         this.itemTypeText = new Text({text: '', style: this.itemTypeTextStyle})
         this.descriptionText = new Text({text: '', style: this.descriptionTextStyle})
+
+        //key tooltip
+        this.keyTooltip = new Sprite(this.UIAssetsObject.UI_KeyPressTooltip)
+        this.keyTooltip.label = "key_tooltip"
+        this.keyTooltip.scale.set(ZOOM_FACTOR)
+        this.keyTooltip.alpha = 1
     }
 
     displayTooltip = (itemName, iconTexture) => {
@@ -91,10 +98,17 @@ export class TooltipManager{
         this.currentTooltip.removeChildren()
     }
 
-    run = (mousePos) => {
+    run = (mousePos, player) => {
         this.mousePos = mousePos
         // this.currentTooltip.position = this.mousePos
         this.currentTooltip.position.set(this.mousePos.x + 10, this.mousePos.y+ 10)
 
+        //if player in tooltip position display key tooltip
+        if(player.inTooltipPosition){
+            this.keyTooltip.x = player.sprite.x
+            this.keyTooltip.y = player.sprite.y - 40
+            this.uiContainer.addChild(this.keyTooltip)
+        }
+        else this.uiContainer.removeChild(this.keyTooltip)
     }
 }
