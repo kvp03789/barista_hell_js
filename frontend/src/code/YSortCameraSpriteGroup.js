@@ -8,8 +8,6 @@ export default class YSortCameraSpriteGroup extends Container{
         this.half_width = this.app.view.width / 2
         this.half_height = this.app.view.height / 2
         this.label = "Camera_Sprite_Group"
-        // this.container = new Container()
-        // this.container.label = "Camera_Sprite_Group"
 
         this.offset = {x: 0, y: 0}
     }
@@ -19,7 +17,7 @@ export default class YSortCameraSpriteGroup extends Container{
         // in the center of the player and the center of the screen
         this.offset.x = player.x + (player.width / 2) - this.half_width
         this.offset.y = player.y + (player.height / 2) - this.half_height
-        
+
         // update position of each child sprite based oncalculated offset
         let sortedSprites = this.children.sort((a, b) => a.y - b.y)
         sortedSprites.forEach(sprite => {

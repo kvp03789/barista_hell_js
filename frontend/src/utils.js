@@ -8,7 +8,7 @@ import { TILE_WIDTH, TILE_HEIGHT } from "./settings"
 export function parseMapData(mapData) {
     const parsedMapObject = {height: mapData.height, width: mapData.width}
     mapData.layers.forEach(layer => {
-        if(layer.name != "objects"){
+        if(!layer.name.startsWith("object")){
             parsedMapObject[layer.name] = []
             for(let i = 0; i < layer.data.length; i += layer.width){
                 parsedMapObject[layer.name].push(layer.data.slice(i, layer.width + i))
@@ -23,9 +23,9 @@ export function parseMapData(mapData) {
         }
         //every layer should have objects in an object layer called "objects"
         else{
-            parsedMapObject.objects = []
+            parsedMapObject[layer.name] = []
             layer.objects.forEach(obj => {
-                parsedMapObject.objects.push(obj)
+                parsedMapObject[layer.name].push(obj)
             })
         }
     })

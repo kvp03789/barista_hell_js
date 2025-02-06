@@ -1,3 +1,4 @@
+import { ZOOM_FACTOR } from "../../settings"
 import { randomNumber } from "../../utils"
 import { NPC } from "./NPC"
 
@@ -36,22 +37,30 @@ export class Robert extends Employee{
 }
 
 export class PatrollingEmployee extends Employee{
-    constructor(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, stateLabel, patrolTiles){
+    constructor(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, stateLabel, patrolPointsArray){
         super(app, player, visibleSprites, obstacleSprites, spritesheet, initialTexture, xPos, yPos, label, stateLabel)
         this.patrols = true
         this.patrolling = false
         this.patrolTimer = 600
         this.randomAmountOfFrames = null
-        this.tileToMoveTo = null
-        this.tileIndex = 0
+        this.pointToMoveTo = null
+
+        //this is the index of the current point the npc is moving
+        //towards
+        this.pointIndex = null
+
+        //dx is what the pointIndex is incremented by when deermining 
+        // next poin. when npc reaches last point this.dx becomes -1
+        //to make the npc move backwards through the points
+        this.dx = 1
 
         this.isInDialogue = false
 
         //movement
         this.speed = 2
 
-        //patrolTiles is an array of tiles where the npc will patrol
-        this.patrolTiles = patrolTiles
+        //patrolPointsArray is an array of tiles where the npc will patrol
+        this.patrolPointsArray = patrolPointsArray
     }
 
     patrol = () => {
@@ -71,20 +80,43 @@ export class PatrollingEmployee extends Employee{
         }
 
         else{
-            if(!this.tileToMoveTo){
-                //pick a tile to move to
-                let randomTileIndex;
-                do {
-                    randomTileIndex = randomNumber(0, this.patrolTiles.length - 1);
-                } while (randomTileIndex === this.tileIndex);
-                this.tileIndex = randomTileIndex;
-                this.tileToMoveTo = this.patrolTiles[this.tileIndex];
+            if(!this.pointToMoveTo){
+                console.log("ipcking point to move to.....")
+                //pick a point to move to
+                //on very first move npc moves from its spawn
+                //to first point
+                if(this.pointIndex === null){
+                    this.pointIndex = 0
+                    this.pointToMoveTo = this.patrolPointsArray[this.pointIndex]
+                }
+                //first check if npc is at last point in patrolPointsArray
+                else if(this.pointIndex >= this.patrolPointsArray.length - 1 && this.dx === 1){
+                    this.dx = -1
+                    //update pointIndex
+                    this.pointIndex += this.dx
+                    this.pointToMoveTo = this.patrolPointsArray[this.pointIndex]
+                }
+                else if(this.pointIndex === 0 && this.dx === -1){
+                    this.dx = 1
+                    //update pointIndex
+                    this.pointIndex += this.dx
+                    this.pointToMoveTo = this.patrolPointsArray[this.pointIndex]
+                }
+                else{
+                    this.pointIndex += this.dx
+                    this.pointToMoveTo = this.patrolPointsArray[this.pointIndex]
+                }
+                console.log("point picked!", this.pointToMoveTo)
             }
-            else if(this.tileToMoveTo){ 
+            //once a point is picked, begin patrol
+            else if(this.pointToMoveTo){ 
+                console.log("MOVING!")
+
+                //adjust point  position to account for zoom
                 const adjustedTilePosition = { 
-                    x: this.tileToMoveTo.x, 
-                    y: this.tileToMoveTo.y 
-                };
+                    x: this.patrolPointsArray[this.pointIndex].x, 
+                    y: this.patrolPointsArray[this.pointIndex].y 
+                }
                 
                 if(!this.isCloseEnough(this.x, adjustedTilePosition.x)){
                     if(this.x < adjustedTilePosition.x){
@@ -115,14 +147,14 @@ export class PatrollingEmployee extends Employee{
             
         }
     }
-
+    
     reset = () => {
         this.movement.x = 0
         this.movement.y = 0
         this.patrolling = false
         this.patrolTimer = 600
         this.randomAmountOfFrames = null
-        this.tileToMoveTo = null
+        this.pointToMoveTo = null
     }
 
     //helper function to see if employee is on tile
@@ -133,10 +165,10 @@ export class PatrollingEmployee extends Employee{
     run = (player) => {
         if(!this.isInDialogue){
             this.patrol()
+            this.handleMovement()
+            this.handleAnimationChange()
         }
         
-        this.handleMovement()
-        this.handleAnimationChange()
     }
 }
 

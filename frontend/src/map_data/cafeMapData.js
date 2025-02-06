@@ -15,7 +15,7 @@ export const cafeMapData = {
     type:"map",
     version:1.10,
     layers:[
-     
+        //foreground
         {
             name: "foreground",
             zIndex: 1,
@@ -54,6 +54,7 @@ export const cafeMapData = {
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                
         },
+        //collision
         {
             name: "collision",
             zIndex: 0,
@@ -91,6 +92,7 @@ export const cafeMapData = {
                 483, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 483,
                 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483, 483],
         },
+        //event
         {
             name: "event",
             zIndex: 0,
@@ -128,129 +130,207 @@ export const cafeMapData = {
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         },
-        {
-            name: "npc_tiles",
-            zIndex: 0,
-            height: 28,
-            width: 28,
-            x: 0,
-            y: 0,
-            opacity: 1,
-            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, {id: 455, npcKey: "Sarah"}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        },
+        //npc patrol points
         {
             "draworder":"topdown",
-            "id":12,
-            "name":"objects",
+            "id":13,
+            "name":"object_npc_patrol_points",
             "objects":[
                     {
-                    "ellipse":true,
-                    "height":60,
-                    "id":1,
-                    "name":"hell_circle_collision",
+                    "height":0,
+                    "id":4,
+                    "name":"patrol_point_1",
+                    "point":true,
+                    "properties":[
+                            {
+                            "name":"npcKey",
+                            "type":"string",
+                            "value":"Sarah"
+                            }],
                     "rotation":0,
                     "type":"",
                     "visible":true,
-                    "width":80,
-                    "x":558,
-                    "y":438.666666666667
-                    },
-                    // robert npc
+                    "width":0,
+                    "x":292.666666666667,
+                    "y":128.666666666667
+                    }, 
                     {
-                        "height":0,
-                        "id":2,
-                        "name":"npc_robert",
-                        "point":true,
-                        "properties":[
-                               {
-                                "name":"npcKey",
-                                "type":"string",
-                                "value":"Robert"
-                               },
-                               {
-                                "name":"isPatrolling",
-                                "type":"boolean",
-                                "value":false
-                               }
-                            ],
-                        "rotation":0,
-                        "type":"",
-                        "visible":true,
-                        "width":0,
-                        "x":55.3333333333333,
-                        "y":478.666666666667
-                    },
-                    //sarah npc
+                    "height":0,
+                    "id":6,
+                    "name":"patrol_point_2",
+                    "point":true,
+                    "properties":[
+                            {
+                            "name":"npcKey",
+                            "type":"string",
+                            "value":"Sarah"
+                            }],
+                    "rotation":0,
+                    "type":"",
+                    "visible":true,
+                    "width":0,
+                    "x":83.3333333333333,
+                    "y":126
+                    }, 
                     {
-                        "height":0,
-                        "id":2,
-                        "name":"npc_sarah",
-                        "point":true,
-                        "properties":[
-                               {
-                                "name":"npcKey",
-                                "type":"string",
-                                "value":"Sarah"
-                               },
-                               {
-                                "name":"isPatrolling",
-                                "type":"boolean",
-                                "value":true
-                               }
-                            ],
-                        "rotation":0,
-                        "type":"",
-                        "visible":true,
-                        "width":0,
-                        "x":95.3333333333333,
-                        "y":178.666666666667
-                       },
-                    //player spawn
+                    "height":0,
+                    "id":7,
+                    "name":"patrol_point_3",
+                    "point":true,
+                    "properties":[
+                            {
+                            "name":"npcKey",
+                            "type":"string",
+                            "value":"Sarah"
+                            }],
+                    "rotation":0,
+                    "type":"",
+                    "visible":true,
+                    "width":0,
+                    "x":77.3333333333333,
+                    "y":316.666666666667
+                    }, 
                     {
-                        "height":0,
-                        "id":3,
-                        "name":"player_spawn",
-                        "point":true,
-                        "rotation":0,
-                        "type":"",
-                        "visible":true,
-                        "width":0,
-                        "x":621.333333333333,
-                        "y":500.666666666667
-                       }
-                    ],
+                    "height":0,
+                    "id":8,
+                    "name":"patrol_point_4",
+                    "point":true,
+                    "properties":[
+                            {
+                            "name":"npcKey",
+                            "type":"string",
+                            "value":"Sarah"
+                            }],
+                    "rotation":0,
+                    "type":"",
+                    "visible":true,
+                    "width":0,
+                    "x":80.6666666666667,
+                    "y":227.333333333333
+                    }, 
+                    {
+                    "height":0,
+                    "id":9,
+                    "name":"patrol_point_5",
+                    "point":true,
+                    "properties":[
+                            {
+                            "name":"npcKey",
+                            "type":"string",
+                            "value":"Sarah"
+                            }],
+                    "rotation":0,
+                    "type":"",
+                    "visible":true,
+                    "width":0,
+                    "x":189.333333333333,
+                    "y":224
+                    }, 
+                    {
+                    "height":0,
+                    "id":10,
+                    "name":"patrol_point_6",
+                    "point":true,
+                    "properties":[
+                            {
+                            "name":"npcKey",
+                            "type":"string",
+                            "value":"Sarah"
+                            }],
+                    "rotation":0,
+                    "type":"",
+                    "visible":true,
+                    "width":0,
+                    "x":190,
+                    "y":282.666666666667
+                    }],
             "opacity":1,
             "type":"objectgroup",
             "visible":true,
             "x":0,
             "y":0
-        }
+            },
+        //spawn points
+        {
+            "draworder":"topdown",
+            "id":12,
+            "name":"object_spawn_points",
+            "objects":[
+                   {
+                    "ellipse":true,
+                    "height":90,
+                    "id":1,
+                    "name":"hell_circle_collision",
+                    "rotation":0,
+                    "type":"",
+                    "visible":true,
+                    "width":90,
+                    "x":578,
+                    "y":458.667
+                   }, 
+                   {
+                    "height":0,
+                    "id":2,
+                    "name":"npc_robert",
+                    "point":true,
+                    "properties":[
+                           {
+                            "name":"npcKey",
+                            "type":"string",
+                            "value":"Robert"
+                           },
+                           {
+                            "name":"isPatrolling",
+                            "type":"boolean",
+                            "value":false
+                           }],
+                    "rotation":0,
+                    "type":"",
+                    "visible":true,
+                    "width":0,
+                    "x":75.3333,
+                    "y":508.667
+                   }, 
+                   {
+                    "height":0,
+                    "id":3,
+                    "name":"player_spawn",
+                    "point":true,
+                    "rotation":0,
+                    "type":"",
+                    "visible":true,
+                    "width":0,
+                    "x":621.333,
+                    "y":500.667
+                   }, 
+                   {
+                    "height":0,
+                    "id":5,
+                    "name":"npc_sarah",
+                    "point":true,
+                    "properties":[
+                           {
+                            "name":"npcKey",
+                            "type":"string",
+                            "value":"Sarah"
+                           },
+                           {
+                            "name":"isPatrolling",
+                            "type":"boolean",
+                            "value":true
+                           }],
+                    "rotation":0,
+                    "type":"",
+                    "visible":true,
+                    "width":0,
+                    "x":294.666666666667,
+                    "y":182
+                   }],
+            "opacity":1,
+            "type":"objectgroup",
+            "visible":true,
+            "x":0,
+            "y":0
+           }, 
     ]
 }

@@ -82,7 +82,7 @@ export default class Cafe extends Level{
             })
         })
 
-        //event tile
+        //event tile. this is for crafting area
         this.parsedMapObject.event.forEach((row, i) => {
             row.forEach((col, j) =>{
                 if(col !== 0){
@@ -137,29 +137,32 @@ export default class Cafe extends Level{
             })
         })
 
-        //parse and handle npc_tiles map layer
-        this.npcPatrolTiles = []
-        this.parsedMapObject.npc_tiles.forEach((row, i) => {
-            row.forEach((col, j) => {
-                if(col !== 0){
-                    const npcKey = col.npcKey                    
-                    const x_pos = ((j) * TILE_WIDTH) * ZOOM_FACTOR
-                    const y_pos = ((i) * TILE_HEIGHT) * ZOOM_FACTOR
-                    // let x = (Math.floor(col / levelRowWidth) * TILE_WIDTH) + (col % levelRowWidth * TILE_WIDTH)
-                    // let y = (Math.floor(col / levelRowWidth) * TILE_HEIGHT)
-                    let { x, y } = getXYSlice(col - 1, tilesetPngWidth)
-                    let w = TILE_WIDTH
-                    let h = TILE_HEIGHT
-                    const sliceRect = new PIXI.Rectangle(x, y, w, h)
-                    const texture = new PIXI.Texture({source: this.cafeAssets.CafeTilesetPng, frame: sliceRect})
-                    const tile = new PatrolTile(this.app, x_pos, y_pos, texture, 'tile', null, false, npcKey)
-                    this.npcPatrolTiles.push(tile)
-                }
-            })
+        //parse and handle npc patrol points object layer
+        this.npcPatrolPoints = {}
+        this.parsedMapObject.object_npc_patrol_points.forEach((point, i) => {
+            const pointNpcKey = point.properties.find(prop => prop.name === "npcKey").value
+            const xPos = point.x * ZOOM_FACTOR
+            const yPos = point.y * ZOOM_FACTOR
+            let x = 690
+            let y = 510
+            let w = TILE_WIDTH
+            let h = TILE_HEIGHT
+            const sliceRect = new PIXI.Rectangle(x, y, w, h)
+            const texture = new PIXI.Texture({source: this.cafeAssets.CafeTilesetPng, frame: sliceRect})
+            const newPatrolPointTile = new PatrolTile(this.app, xPos, yPos, texture, 'patrol_tile', this.npcTiles, true, pointNpcKey)
+            if(!this.npcPatrolPoints[pointNpcKey]){
+                this.npcPatrolPoints[pointNpcKey] = []
+                this.npcPatrolPoints[pointNpcKey].push(newPatrolPointTile)
+            }
+            else{
+                this.npcPatrolPoints[pointNpcKey].push(newPatrolPointTile)
+            }
         })
-        
-        //object layer
-        this.parsedMapObject.objects.forEach(async (object) => {
+        console.log("just checking...", this.npcPatrolPoints)
+           
+        //parse and handle object spawn points layer. these are spawn
+        //points for any npc's or complex objects
+        this.parsedMapObject.object_spawn_points.forEach(async (object) => {
             //hell portal
             if(object.name.startsWith("hell_circle")){
                 await this.createHellCircleTile(object)      
@@ -168,18 +171,18 @@ export default class Cafe extends Level{
             else if(object.name.startsWith("player_spawn")){
                 this.playerSpawnPoint = {x: object.x * ZOOM_FACTOR, y: object.y * ZOOM_FACTOR}
             }
-            //npc tiles
+            //npc spawn points
             else if(object.name.startsWith("npc")){
                 const npcKey = object.properties.find(prop => prop.name === 'npcKey').value
                 const isPatrollingNpc = object.properties.find(prop => prop.name === 'isPatrolling').value
-                const position = {x: object.x * ZOOM_FACTOR, y: object.y * ZOOM_FACTOR}
-                const patrolTiles = this.npcPatrolTiles.filter(tile => tile.npcKey === npcKey)
-                await this.npcManager.initEmployee(npcKey, position, isPatrollingNpc, isPatrollingNpc ? patrolTiles : null, this.stateLabel)
+                const spawnPosition = {x: object.x * ZOOM_FACTOR, y: object.y * ZOOM_FACTOR}
+                const patrolPointsArray = this.npcPatrolPoints[npcKey]
+
+                await this.npcManager.initEmployee(npcKey, spawnPosition, isPatrollingNpc, isPatrollingNpc ? patrolPointsArray : null, this.stateLabel)
             }
         })
 
         await this.character.init(this.visibleSprites, this.particleManager, this.playerSpawnPoint, this.obstacleSprites, this.bulletManager, gameState.inventory, gameState.equipment, gameState.quickBar)
-        // await this.npcManager.initEmployee(this.npcPatrolTiles, 'Sarah')
 
         this.uiManager = new UIManager(this.app, this.character, this.uiAssets, this.fonts, this.keysObject, this.iconAssets, this.clickEventManager, this.mousePos, this.npcManager.employees, this.stateLabel, this.npcManager.enemies)
         await this.uiManager.init()
@@ -214,7 +217,7 @@ export default class Cafe extends Level{
         this.app.stage.on('pointerdown', this.handleMouseDown)
 
         const filters = [new MotionBlurFilter({velocity: {x: 0, y: 40}}), new GodrayFilter()]
-                    this.particleManager.createAnimatedParticle(this.character.sprite.x + (this.character.sprite.width * 4), this.character.sprite.y + this.character.sprite.height, 'Teleport_Beam', filters)
+        this.particleManager.createAnimatedParticle(this.character.sprite.x + (this.character.sprite.width * 4), this.character.sprite.y + this.character.sprite.height, 'Teleport_Beam', filters)
     }
 
     handleMouseDown = () => {
@@ -261,7 +264,6 @@ export default class Cafe extends Level{
         const spritesheet = new PIXI.Spritesheet(this.animatedTileAssets.HellCircle,
             hellCircleData)
         await spritesheet.parse()
-        console.log("HELL CIRCLE SPRITESHEET", spritesheet)
         const label = "animated_tile_hell_circle"
         const isParticleTile = false
         const animationSpeed = .3
@@ -328,14 +330,14 @@ export default class Cafe extends Level{
         //ORDER MATTERS HERE
         this.angle = this.getPlayerAngle(this.mousePos)
         this.character.run(this.angle)
-        
+        this.npcManager.run(this.character)
         this.particleManager.run(this.character.sprite)
         this.obstacleSprites.run(this.character.sprite)
         this.npcTiles.run(this.character.sprite)
         this.visibleSprites.run(this.character.sprite)
         this.bulletManager.run(this.character.sprite)
         
-        this.npcManager.run(this.character)
+        
         this.uiManager.run()
         this.hellPortal.run(this.character)
 

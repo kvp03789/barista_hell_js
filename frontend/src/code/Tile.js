@@ -24,7 +24,9 @@ export default class Tile extends Sprite{
 export class PatrolTile extends Tile{
     constructor(app, x_pos, y_pos, texture, label, group, bulletsPassThrough, npcKey){
         super(app, x_pos, y_pos, texture, label, group, bulletsPassThrough)
+        this.worldPosition = {x: x_pos, y: y_pos}
         this.npcKey = npcKey
+        this.anchor.set(.5)
     }
 }
 

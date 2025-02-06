@@ -79,7 +79,7 @@ export class NPCManager{
     //     this.npcList.push(this.sarahNPC)
     // }
 
-    initEmployee = async (npcKey, position, isPatrollingNpc, patrolTiles, stateLabel) => {
+    initEmployee = async (npcKey, position, isPatrollingNpc, patrolPointsArray, stateLabel) => {
         //generateAnimations populates parts of characterData json-esque object
         const generateAnimations = npcSpriteData[npcKey].generateAnimations.bind(npcSpriteData[npcKey]);
         generateAnimations(this.npcSpritesheets[`${npcKey}Spritesheet`]);
@@ -88,19 +88,12 @@ export class NPCManager{
         const npcSpritesheet = new Spritesheet(this.parsedAssetsObject[`${npcKey}Spritesheet`],
             npcSpriteData[npcKey])
         await npcSpritesheet.parse()
-        let xPos
-        let yPos
-        if(patrolTiles){
-            xPos = patrolTiles[2].x_pos
-            yPos = patrolTiles[2].y_pos
-        }
-        else{
-            xPos = position.x
-            yPos = position.y
-        }
+        const xPos = position.x
+        const yPos = position.y
+
         //init a patrolling npc if the npc is a patrolling one
         if(isPatrollingNpc){
-            this[`${npcKey}_npc`] = new PatrollingEmployee(this.app, this.player, this.visibleSprites,  this.obstacleSprites, npcSpritesheet, npcSpritesheet.animations.idle_down, xPos, yPos, `${npcKey}_npc`, stateLabel, patrolTiles)
+            this[`${npcKey}_npc`] = new PatrollingEmployee(this.app, this.player, this.visibleSprites,  this.obstacleSprites, npcSpritesheet, npcSpritesheet.animations.idle_down, xPos, yPos, `${npcKey}_npc`, stateLabel, patrolPointsArray)
 
         }
         else this[`${npcKey}_npc`] = new Employee(this.app, this.player, this.visibleSprites,  this.obstacleSprites, npcSpritesheet, npcSpritesheet.animations.idle_down, xPos, yPos, `${npcKey}_npc`, stateLabel)
