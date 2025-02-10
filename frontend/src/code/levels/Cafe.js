@@ -210,7 +210,7 @@ export default class Cafe extends Level{
         this.app.stage.addChild(this.uiManager.tooltipContainer)
 
         //init and add clickEventManager to stage, for rendering click event icons
-        this.clickEventManager.init(this.character, this.uiManager, this.keysObject)
+        this.clickEventManager.init(this.character, this.uiManager, this.uiManager.craftingWindow, this.keysObject)
         this.app.stage.addChild(this.clickEventManager)
 
         //weapon fire event

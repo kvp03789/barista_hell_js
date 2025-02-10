@@ -43,9 +43,11 @@ export class ClickEventManager extends Container{
         this.currentEvent = null
     }
 
-    init = (player, uiManager, keysObject) => {
+    init = (player, uiManager, craftingManager, keysObject) => {
         this.player = player
         this.uiManager = uiManager
+        this.craftingManager = craftingManager
+        console.log("crafting window from clickeven manager: ", this.craftingManager)
         this.keysObject = keysObject
         
         this.playerInventory = this.player.inventory
@@ -55,7 +57,7 @@ export class ClickEventManager extends Container{
 
     handleSlotClick = (itemSlot, e) => {
         const slotIsOccupied = this.player[itemSlot.slotType].itemSlots[itemSlot.slotIndex].item !== null
-        console.log("DEBUG: slot clicked: ", "inventory: ", this.player.inventory.itemSlots, "quickBar: ", this.player.quickBar.itemSlots, "event: ", e)
+
         //is there already a currentEvent
         if(!this.currentEvent){
             
@@ -119,8 +121,86 @@ export class ClickEventManager extends Container{
         }
     }
 
-    handleMaterialSlotClick = (itemSlot, e) => {
-        console.log("clicked a material slot")
+    handleMaterialSlotClick = (itemSlot, schemaItem, e) => {
+        console.log("ITEM SLOT", itemSlot)
+        const slotIsOccupied = this.craftingManager.itemSlots[itemSlot.slotIndex].item !== null
+        
+        //is there already a currentEvent
+        if(!this.currentEvent){
+            if(!slotIsOccupied){
+                return
+            }
+
+            else{
+                if(this.isShiftPressed()){
+                    //pick up individuals
+                    this.currentEvent = new ClickEvent(this, itemSlot, 1)
+                    //update player
+                    this.craftingManager.itemSlots[itemSlot.slotIndex].quantity -= 1
+                }
+                else{
+                    //pick up full stacks
+                    this.currentEvent = new ClickEvent(this, itemSlot, itemSlot.quantity)
+                    //corresponding player itemSlot item and quantity should be null and 0
+                    this.craftingManager.itemSlots[this.currentEvent.slotIndex].item = null
+                    this.craftingManager.itemSlots[this.currentEvent.slotIndex].quantity = 0
+                } 
+            }
+        }
+        else if(this.currentEvent){
+            if(slotIsOccupied){
+                //stack items if itemSlot.item same as currentEvent.item
+                if(itemSlot.item.itemName === this.currentEvent.item.itemName){
+                    if(this.isShiftPressed()){
+                        this.currentEvent.quantity--
+                        this.craftingManager.itemSlots[itemSlot.slotIndex].quantity++
+                    }
+                    else {
+                        //by whole stack otherwise
+                        this.craftingManager.itemSlots[itemSlot.slotIndex].quantity += this.currentEvent.quantity
+                        this.cleanUp()
+                    }
+                }
+                //swap items places if items not same
+                else{
+                    return
+                }
+            }
+            else if(!slotIsOccupied){
+                if(this.currentEvent.item.itemName === schemaItem.itemName){    
+                    //drop items in empty slots 
+                    if(this.isShiftPressed()){
+                        //by ones if shift is held
+                        this.craftingManager.itemSlots[itemSlot.slotIndex].item = this.currentEvent.item
+                        this.craftingManager.itemSlots[itemSlot.slotIndex].quantity = 1
+                        
+                        this.currentEvent.quantity--
+
+                        console.log("dropped one in material slot", this.craftingManager)
+                    }
+                    else{
+                        //else by full stacks
+                        const item = this.currentEvent.item
+                        const quantity = this.currentEvent.quantity  
+                        this.craftingManager.itemSlots[itemSlot.slotIndex].item = item
+                        this.craftingManager.itemSlots[itemSlot.slotIndex].quantity = quantity
+                        this.cleanUp()
+                    }}
+                else{
+                    console.log("items have to match here!")
+                }
+            } 
+        }
+    }
+
+    handleResultsBoxClick = (itemSlot) => {
+        
+        if(this.currentEvent)return
+        else{
+            this.currentEvent = new ClickEvent(this, itemSlot, itemSlot.quantity)
+            itemSlot.quantity -= itemSlot.quantity
+        }
+        console.log("clicked results box", itemSlot)
     }
 
     handleOffClick = () => {

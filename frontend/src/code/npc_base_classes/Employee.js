@@ -11,7 +11,6 @@ export class Employee extends NPC{
 
     handleBeginDialogue = () => {
         this.isInDialogue = true
-        console.log('debug!!! begin')
     }
 
     handleEndDialogue = () => {
@@ -81,7 +80,6 @@ export class PatrollingEmployee extends Employee{
 
         else{
             if(!this.pointToMoveTo){
-                console.log("ipcking point to move to.....")
                 //pick a point to move to
                 //on very first move npc moves from its spawn
                 //to first point
@@ -106,11 +104,9 @@ export class PatrollingEmployee extends Employee{
                     this.pointIndex += this.dx
                     this.pointToMoveTo = this.patrolPointsArray[this.pointIndex]
                 }
-                console.log("point picked!", this.pointToMoveTo)
             }
             //once a point is picked, begin patrol
             else if(this.pointToMoveTo){ 
-                console.log("MOVING!")
 
                 //adjust point  position to account for zoom
                 const adjustedTilePosition = { 

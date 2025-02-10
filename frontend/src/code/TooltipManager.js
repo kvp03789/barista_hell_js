@@ -58,7 +58,6 @@ export class TooltipManager{
     }
 
     displayTooltip = (itemName, iconTexture) => {
-        console.log("tooltip text: ", itemName)
         const parsedItemName = itemName.split(/(?=[A-Z])/).join(" ")
 
         //determine the fill color of the itemTypeText based on the item type
@@ -69,6 +68,9 @@ export class TooltipManager{
                 break;
             case "Equipment":
                 itemTypeFillColor = '#152eeb'
+                break;
+            case "Consumable":
+                itemTypeFillColor = '#39eb15'
                 break;
             default:
                 break;
@@ -104,11 +106,17 @@ export class TooltipManager{
         this.currentTooltip.position.set(this.mousePos.x + 10, this.mousePos.y+ 10)
 
         //if player in tooltip position display key tooltip
-        if(player.inTooltipPosition){
+        if(player.inTooltipPosition ){
             this.keyTooltip.x = player.sprite.x
             this.keyTooltip.y = player.sprite.y - 40
             this.uiContainer.addChild(this.keyTooltip)
         }
         else this.uiContainer.removeChild(this.keyTooltip)
+
+        //remove key tooltip if player opens crafting window
+        if(this.uiContainer.children.some(child => child.label === 'crafting_ui')
+        && this.uiContainer.children.includes(this.keyTooltip)){
+            this.uiContainer.removeChild(this.keyTooltip)
+        }
     }
 }

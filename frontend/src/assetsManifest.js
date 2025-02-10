@@ -67,6 +67,7 @@ import Icon_Syrup from './img/materials/syrup.png'
 import Icon_Milk from './img/materials/milk.png'
 import Icon_LargeFang from './img/materials/large_fang.png'
 import Icon_CorruptedBlood from './img/materials/corrupted_blood.png'
+import Icon_CraftButton from './img/ui/craft_icon.png'
 
 //equipment
 
@@ -238,6 +239,10 @@ export const assetsManifest = {
             {
                "alias" :"Icon_EmptyItemSlot",
                "src": Icon_EmptyItemSlot
+            },
+            {
+               "alias" :"Icon_CraftButton",
+               "src": Icon_CraftButton
             },
             {
                "alias": "Icon_EmptyCharacterSheetSlot",

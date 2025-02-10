@@ -58,7 +58,15 @@ export const settings = {
         Beans: {type: "Material", description: "A description of the item."},
         WhippedCream: {type: "Material", description: "A description of the item."},
         LargeFang: {type: "Material", description: "A description of the item."},
-        CorruptedBlood: {type: "Material", description: "A description of the item."}
+        CorruptedBlood: {type: "Material", description: "A description of the item."},
+        Frappe: {type: "Consumable", description: "A description of the item."},
+        Latte: {type: "Consumable", description: "A description of the item."},
+        Coffee: {type: "Consumable", description: "A description of the item."},
+        IcedCoffee: {type: "Consumable", description: "A description of the item."},
+        FelFrappe: {type: "Consumable", description: "A description of the item."},
+        FelLatte: {type: "Consumable", description: "A description of the item."},
+        FelCoffee: {type: "Consumable", description: "A description of the item."},
+        FelIcedCoffee: {type: "Consumable", description: "A description of the item."},
 
     },
     NPC_DIALOGUE_DISTANCE: 50,

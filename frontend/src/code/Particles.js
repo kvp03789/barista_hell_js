@@ -129,7 +129,6 @@ class ParticleManager extends Container{
             }
         }
 
-        console.log("Particleeeeeee ", this.particleDictionary)
     }
 
     init = async () => {
@@ -179,7 +178,6 @@ class ParticleManager extends Container{
             // check if the particles animation is complete and destroy it if so
             if (particle.shouldDestroy) {
                 particle.destroy();
-                console.log("DESTROYED  A PARTICLE ")
                 this.removeChild(particle);
                 return
             }
