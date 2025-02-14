@@ -122,8 +122,72 @@ import Drops_Sparkle from './img/spritesheets/drops/sparkle.png'
 //fonts
 import Font_AdvancedPixel7 from './fonts/advanced_pixel-7.ttf'
 
+//title screen
+import TitleTextVideo from './video/title_text.webm'
+import CharacterVideo from './video/character.webm'
+import Background1 from './img/title_screen/background_layer_1.png'
+import Background2 from './img/title_screen/background_layer_2.png'
+import FoliageVideo from './video/foliage3.webm'
+import FireVideo from './video/fire.webm'
+import SnowVideo from './video/snow.webm'
+//title screen menu
+import NewMenu from './img/title_screen/new.png'
+import LoadMenu from './img/title_screen/load.png'
+import OptionsMenu from './img/title_screen/options.png'
+import ExitMenu from './img/title_screen/exit.png'
+
 export const assetsManifest = {
     "bundles":[
+      //title screen
+      {
+         "name": "title_screen",
+         "assets": [
+            {
+               "alias": "TitleTextVideo",
+               "src": TitleTextVideo
+            },
+            {
+               "alias": "CharacterVideo",
+               "src": CharacterVideo
+            },
+            {
+               "alias": "FoliageVideo",
+               "src": FoliageVideo
+            },
+            {
+               "alias": "Background1",
+               "src": Background1
+            },
+            {
+               "alias": "Background2",
+               "src": Background2
+            },
+            {
+               "alias": "FireVideo",
+               "src" : FireVideo
+            },
+            {
+               "alias": "SnowVideo",
+               "src" : SnowVideo
+            },
+            {
+               "alias": "NewMenu",
+               "src" : NewMenu
+            },
+            {
+               "alias": "OptionsMenu",
+               "src" : OptionsMenu
+            },
+            {
+               "alias": "LoadMenu",
+               "src" : LoadMenu
+            },
+            {
+               "alias": "ExitMenu",
+               "src" : ExitMenu
+            }
+         ]
+      },
       //drops
       {
          "name": "drops",
