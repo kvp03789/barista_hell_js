@@ -75,9 +75,10 @@ class Drop extends Sprite{
 }
 
 export class DropsManager{
-    constructor(app, visibleSprites, dropsAssets, iconAssets){
+    constructor(app, visibleSprites, dropsAssets, iconAssets, player){
         this.app = app
         this.iconAssets = iconAssets
+        this.player = player
 
         this.half_width = this.app.view.width / 2
         this.half_height = this.app.view.height / 2
@@ -116,16 +117,16 @@ export class DropsManager{
             let item
             switch(itemKey){
                 case "Milk":
-                    item = new Milk(this.app, this.iconAssets)
+                    item = new Milk(this.app, this.iconAssets, this.player)
                     break;
                 case "Beans":
-                    item = new Beans(this.app, this.iconAssets)
+                    item = new Beans(this.app, this.iconAssets, this.player)
                     break;
                 case "Syrup":
-                    item = new Syrup(this.app, this.iconAssets)
+                    item = new Syrup(this.app, this.iconAssets, this.player)
                     break;
                 case "WhippedCream":
-                    item = new WhippedCream(this.app, this.iconAssets)
+                    item = new WhippedCream(this.app, this.iconAssets, this.player)
                     break;
             }
             const newDrop = new Drop(itemKey, this.parsedDropsAssets[itemKey], enemyX, enemyY, this.parsedDropsAssets.Drops_Sparkle, item)

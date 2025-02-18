@@ -10,8 +10,8 @@ import { parseMapData, getXYSlice, spritesAreColliding, randomNumber, createSATP
 import { hellOverworldMapData } from '../../map_data/hellOverworldMapData'
 import UIManager from '../UI'
 import ParallaxBackgroundManager from '../ParallaxBackgroundManager'
-import { torchPoleData, hellCircleData } from '../../json/tiles/tileSpriteData'
-import { DropShadowFilter, GlowFilter, GodrayFilter, MotionBlurFilter } from 'pixi-filters'
+import { torchPoleData } from '../../json/tiles/tileSpriteData'
+import { GodrayFilter, MotionBlurFilter } from 'pixi-filters'
 // import ForegroundSprites from '../ForegroundSprites'
 import { DropsManager } from '../DropsManager'
 
@@ -96,17 +96,16 @@ export default class HellOverWorld extends Level{
             this.hellOverWorldBaseMap.label = "hell_overworld_base_map"
             this.visibleSprites.addChild(this.hellOverWorldBaseMap)
     
-            this.dropsManager = new DropsManager(this.app, this.visibleSprites, this.dropsAssets, this.iconAssets)
+            //add character as property of level and init, adding to visibleSprites and to stage
+            this.character = gameState.character
+
+            this.dropsManager = new DropsManager(this.app, this.visibleSprites, this.dropsAssets, this.iconAssets, this.character)
 
             this.npcManager = new NPCManager(this.app, this.stateLabel, this.npcSpritesheets, this.enemySpritesheets, this.visibleSprites, this.obstacleSprites, this.dropsManager)
 
             //init bulletManager
             this.bulletManager = new BulletManager(this.app, this.bulletAssets, this.obstacleSprites, this.particleManager, this.npcManager.enemies)
             
-            //add character as property of level and init, adding to visibleSprites and to stage
-            // this.character = new Character(this.app, this.keysObject, this.spritesheetAssets, this.weaponAssets, this.display_width / 2, this.display_height / 2, this.obstacleSprites, this.bulletManager, this.particleManager, this.iconAssets, this.npcManager.npcList)
-            this.character = gameState.character
-
             this.mousePos = {x: 0, y: 0}
 
             this.parallaxBackgroundManager = new ParallaxBackgroundManager(this.app, this.character, this.parallaxBackgroundAssets)
@@ -272,7 +271,7 @@ export default class HellOverWorld extends Level{
         }
 
         //cleanup function
-        destroy() {
+        destroy = () => {
             // stop animations/tickers
             this.app.ticker.remove(this.run)
     

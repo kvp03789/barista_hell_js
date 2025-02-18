@@ -255,7 +255,7 @@ class ItemSlot_UI extends Sprite{
         this.on("click", this.onClick)
         this.on("mouseenter", this.handleMouseEnter)
         this.on("mouseleave", this.handleMouseLeave)
-    
+        this.on("rightclick", this.handleRightClick)
 
         this.quantityTextStyle = new TextStyle({
             fontFamily: 'roboto',
@@ -311,10 +311,6 @@ class ItemSlot_UI extends Sprite{
     }
 
     handleMouseEnter = () => {
-        // if(this.item && this.clickEventManager.itemInfoTimer){
-        //     this.clickEventManager.itemInfoTimer--
-        // }
-        // else if(this.item && !this.clickEventManager)
         if(this.item){
             this.tooltipManager.displayTooltip(this.item.itemName, this.item.texture)
         }
@@ -322,6 +318,17 @@ class ItemSlot_UI extends Sprite{
 
     handleMouseLeave = () => {
         this.tooltipManager.removeTooltip()
+    }
+
+    handleRightClick = () =>  {
+        //find non-ui version of item and itemSlot 
+        const correspondingRealItemSlot = this.player[this.slotType].itemSlots[this.slotIndex]
+        const correspondingRealItem = this.player[this.slotType].itemSlots[this.slotIndex].item
+        //if item and if item is a consumable use item's handleConsumeItem func
+        if(correspondingRealItem && correspondingRealItem.handleConsumeItem){
+            correspondingRealItem.handleConsumeItem()
+            correspondingRealItemSlot.quantity--
+        }
     }
 
     onClick = (e) => {
@@ -704,15 +711,15 @@ class CraftingWindowUI extends Container{
         const interval = this.background.width / 4
         const margin = (interval - buttonWidth) / 2
         const firstRowY = 15
-        const frappeIcon = new CraftingSelectionButton(this.iconAssets.Icon_Frappe, this.iconAssets.Icon_CraftingSelected, margin, firstRowY, this, "frappe_button", 0, this.tooltipManager, new Frappe(this.app, this.iconAssets))
-        const latteIcon = new CraftingSelectionButton(this.iconAssets.Icon_Latte, this.iconAssets.Icon_CraftingSelected, interval + margin, firstRowY, this, "latte_button", 1, this.tooltipManager, new Latte(this.app, this.iconAssets))
-        const icedCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_IcedCoffee, this.iconAssets.Icon_CraftingSelected, interval * 2 + margin, firstRowY, this, "iced_coffee_button", 2, this.tooltipManager, new IcedCoffee(this.app, this.iconAssets))
-        const coffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_Coffee, this.iconAssets.Icon_CraftingSelected, interval * 3 + margin, firstRowY, this, "coffee_button", 3, this.tooltipManager, new Coffee(this.app, this.iconAssets))
+        const frappeIcon = new CraftingSelectionButton(this.iconAssets.Icon_Frappe, this.iconAssets.Icon_CraftingSelected, margin, firstRowY, this, "frappe_button", 0, this.tooltipManager, new Frappe(this.app, this.iconAssets, this.player))
+        const latteIcon = new CraftingSelectionButton(this.iconAssets.Icon_Latte, this.iconAssets.Icon_CraftingSelected, interval + margin, firstRowY, this, "latte_button", 1, this.tooltipManager, new Latte(this.app, this.iconAssets, this.player))
+        const icedCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_IcedCoffee, this.iconAssets.Icon_CraftingSelected, interval * 2 + margin, firstRowY, this, "iced_coffee_button", 2, this.tooltipManager, new IcedCoffee(this.app, this.iconAssets, this.player))
+        const coffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_Coffee, this.iconAssets.Icon_CraftingSelected, interval * 3 + margin, firstRowY, this, "coffee_button", 3, this.tooltipManager, new Coffee(this.app, this.iconAssets, this.player))
 
-        const felFrappeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelFrappe, this.iconAssets.Icon_CraftingSelected, margin, firstRowY*5, this, "frappe_button", 4, this.tooltipManager, new FelFrappe(this.app, this.iconAssets))
-        const felLatteIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelLatte, this.iconAssets.Icon_CraftingSelected, interval + margin, firstRowY*5, this, "latte_button", 5, this.tooltipManager, new FelLatte(this.app, this.iconAssets))
-        const felIcedCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelIcedCoffee, this.iconAssets.Icon_CraftingSelected, interval * 2 + margin, firstRowY*5, this, "iced_coffee_button", 6, this.tooltipManager, new FelIcedCoffee(this.app, this.iconAssets))
-        const felCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelCoffee, this.iconAssets.Icon_CraftingSelected, interval * 3 + margin, firstRowY*5, this, "coffee_button", 7, this.tooltipManager, new FelCoffee(this.app, this.iconAssets))
+        const felFrappeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelFrappe, this.iconAssets.Icon_CraftingSelected, margin, firstRowY*5, this, "frappe_button", 4, this.tooltipManager, new FelFrappe(this.app, this.iconAssets, this.player))
+        const felLatteIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelLatte, this.iconAssets.Icon_CraftingSelected, interval + margin, firstRowY*5, this, "latte_button", 5, this.tooltipManager, new FelLatte(this.app, this.iconAssets, this.player))
+        const felIcedCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelIcedCoffee, this.iconAssets.Icon_CraftingSelected, interval * 2 + margin, firstRowY*5, this, "iced_coffee_button", 6, this.tooltipManager, new FelIcedCoffee(this.app, this.iconAssets, this.player))
+        const felCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelCoffee, this.iconAssets.Icon_CraftingSelected, interval * 3 + margin, firstRowY*5, this, "coffee_button", 7, this.tooltipManager, new FelCoffee(this.app, this.iconAssets, this.player))
         this.addChild(frappeIcon, latteIcon, icedCoffeeIcon, coffeeIcon, felFrappeIcon, felLatteIcon, felIcedCoffeeIcon, felCoffeeIcon)
 
         this.currentItemToBeCrafted = frappeIcon.item

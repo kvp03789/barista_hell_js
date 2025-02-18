@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js'
 import { TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR }from '../../settings'
-import { parseMapData, getXYSlice, spritesAreColliding } from '../../utils'
+import { parseMapData, getXYSlice, spritesAreColliding, showDebugFPS } from '../../utils'
 import { cafeMapData } from '../../map_data/cafeMapData'
 import Character from '../Character'
 import Tile, { PatrolTile } from '../Tile'
@@ -345,5 +345,8 @@ export default class Cafe extends Level{
             this.character.inCraftingPosition = true
             
         }else this.character.inCraftingPosition = false
+
+        ///debug for showing fps
+        // showDebugFPS(this.app)
     }
 }

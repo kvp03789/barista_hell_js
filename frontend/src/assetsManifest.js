@@ -135,6 +135,7 @@ import NewMenu from './img/title_screen/new.png'
 import LoadMenu from './img/title_screen/load.png'
 import OptionsMenu from './img/title_screen/options.png'
 import ExitMenu from './img/title_screen/exit.png'
+import Selector from './img/title_screen/selector.png'
 
 export const assetsManifest = {
     "bundles":[
@@ -185,6 +186,10 @@ export const assetsManifest = {
             {
                "alias": "ExitMenu",
                "src" : ExitMenu
+            },
+            {
+               "alias": "Selector",
+               "src" : Selector
             }
          ]
       },

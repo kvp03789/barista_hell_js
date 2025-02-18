@@ -123,4 +123,14 @@ export function getRandomDrop (enemyDrops){
     }
 
     return null; // In case something goes wrong
-};
+}
+
+export function showDebugFPS (app) {
+    let lastLoggedTime = 0;
+    const now = performance.now();
+    if (now - lastLoggedTime >= 1000) { 
+        // Log once per second
+        console.log(`FPS: ${app.ticker.FPS.toFixed(2)}`);
+        lastLoggedTime = now;
+    }
+}

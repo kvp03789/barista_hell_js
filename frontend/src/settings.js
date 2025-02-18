@@ -10,7 +10,7 @@ export const settings = {
     UI_CLICK_COOLDOWN: 20,
     UI_SETTINGS: {PADDING: 12, ENEMY_HEALTH_BAR: {WIDTH: 50, HEIGHT: 7, BACKGROUND_COLOR: 0x444444, FOREGROUND_COLOR: 0xff0000}},
     PLAYER_SETTINGS: {
-        BASE_SPEED: 7,
+        BASE_SPEED: 10,
         INVENTORY_SLOTS_AMOUNT: 40,
         INVENTORY_STACKS: {"material": 100, "consumable": 10, "weapon": 1},
         EQUIPMENT_SLOTS: ["hands", "feet", "chest", "legs", "head"],

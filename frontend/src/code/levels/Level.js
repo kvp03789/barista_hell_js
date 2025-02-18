@@ -40,8 +40,9 @@ export default class Level{
         handleKeyDown = (e) => {
             this.keysObject[e.keyCode] = true
             //create walking particle
-            if(this.character){if(this.character.movement.x !== 0 || this.character.movement.y !== 0){
-                this.particleManager.createAnimatedParticle(this.character.sprite.x, this.character.sprite.y, "CharacterWalkingParticle")
+            if(this.character){
+                if(this.character.movement.x !== 0 || this.character.movement.y !== 0){
+                    this.particleManager.createAnimatedParticle(this.character.sprite.x, this.character.sprite.y, "CharacterWalkingParticle")
             }}
         }
     
@@ -56,11 +57,14 @@ export default class Level{
         setUpKeyEvents = () => {
             window.addEventListener("keydown", e => this.handleKeyDown(e))
             window.addEventListener("keyup", e => this.handleKeyUp(e))
+            console.log(`key events set up: ${this.stateLabel}`)
+
         }
 
         removeKeyEvents = () => {
             window.removeEventListener("keydown", this.handleKeyDown);
             window.removeEventListener("keyup", this.handleKeyUp);
+            console.log(`key events removed: ${this.stateLabel}`)
         }
 
         getPlayerAngle = (mousePos) => {

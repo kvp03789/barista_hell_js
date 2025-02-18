@@ -53,6 +53,7 @@ class Application {
 
     async init() {
         await this.app.init({ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, preference: 'webgl' });
+        this.app.ticker.maxFPS = 60
         body.append(this.app.canvas);
         await PIXI.Assets.init({ manifest: assetsManifest })
 
@@ -96,13 +97,14 @@ class State_Manager{
     }
 
     setState = async (newState) => {
-        // if (this.currentState === newState) return;
-
         // cleanup current state and remove its run method fromticker
-        if (this.statesObject[this.currentState]) {
+        //but only if there is a previousState. this is to prevent
+        //dstroy being called the very first time
+        if (this.previousState && this.statesObject[this.currentState]) {
             this.statesObject[this.currentState].destroy()
+            this.app.ticker.remove(this.statesObject[this.currentState].run)
+
         }
-        this.app.ticker.remove(this.statesObject[this.currentState].run)
 
         this.previousState = this.currentState
         this.currentState = newState
@@ -143,6 +145,7 @@ class GameState {
             playTime: 0,
             totalEnemiesDefeated: 0,
         }
+        //currentLevel  is used for saving loading
         this.currentLevel = 'cafe_intro'
         this.flags = {}                  // for tracking game events (e.g., quests, interactions)
     }
