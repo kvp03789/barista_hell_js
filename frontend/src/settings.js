@@ -7,10 +7,11 @@ export const settings = {
     TILE_HEIGHT: 30,
     TILE_WIDTH: 30,
     ZOOM_FACTOR: 1.8,
+    ICON_SCALING: 1.5, 
     UI_CLICK_COOLDOWN: 20,
     UI_SETTINGS: {PADDING: 12, ENEMY_HEALTH_BAR: {WIDTH: 50, HEIGHT: 7, BACKGROUND_COLOR: 0x444444, FOREGROUND_COLOR: 0xff0000}},
     PLAYER_SETTINGS: {
-        BASE_SPEED: 10,
+        BASE_SPEED: 8,
         INVENTORY_SLOTS_AMOUNT: 40,
         INVENTORY_STACKS: {"material": 100, "consumable": 10, "weapon": 1},
         EQUIPMENT_SLOTS: ["hands", "feet", "chest", "legs", "head"],
@@ -51,24 +52,55 @@ export const settings = {
         [null, null, "LargeFang" ,"Beans" ,"Beans" ,"Beans"],   //fel coffee
     ],
     ITEM_DESCRIPTIONS: {
-        Beans: {type: "Material", description: "A description of the item."},
-        Syrup: {type: "Material", description: "A description of the item."},
-        Milk: {type: "Material", description: "A description of the item."},
-        Ice: {type: "Material", description: "A description of the item."},
-        Beans: {type: "Material", description: "A description of the item."},
-        WhippedCream: {type: "Material", description: "A description of the item."},
-        LargeFang: {type: "Material", description: "A description of the item."},
-        CorruptedBlood: {type: "Material", description: "A description of the item."},
-        Frappe: {type: "Consumable", description: "A description of the item."},
-        Latte: {type: "Consumable", description: "A description of the item."},
-        Coffee: {type: "Consumable", description: "A description of the item."},
-        IcedCoffee: {type: "Consumable", description: "A description of the item."},
-        FelFrappe: {type: "Consumable", description: "A description of the item."},
-        FelLatte: {type: "Consumable", description: "A description of the item."},
-        FelCoffee: {type: "Consumable", description: "A description of the item."},
-        FelIcedCoffee: {type: "Consumable", description: "A description of the item."},
+        //materials
+        Beans: {name: "Beans", type: "Material", description: "A description of the item."},
+        Syrup: {name: "Syrup", type: "Material", description: "A description of the item."},
+        Milk: {name: "Milk", type: "Material", description: "A description of the item."},
+        Ice: {name: "Ice", type: "Material", description: "A description of the item."},
+        Beans: {name: "Beans", type: "Material", description: "A description of the item."},
+        WhippedCream: {name: "Whipped Cream", type: "Material", description: "A description of the item."},
+        LargeFang: {name: "Large Fang", type: "Material", description: "A description of the item."},
+        CorruptedBlood: {name: "Corrupted Blood", type: "Material", description: "A description of the item."},
+        //consumables
+        Frappe: {name: "Frappe", type: "Consumable", description: "A description of the item.",
+            effects: {buff: "CaffeineRush"}
+        },
+        Latte: {name: "Latte", type: "Consumable", description: "A description of the item.",
+            effects: {buff: "CaffeineRush"}
+        },
+        Coffee: {name: "Coffee", type: "Consumable", description: "A description of the item.",
+            effects: {buff: "CaffeineRush"}
+        },
+        IcedCoffee: {name: "Iced Coffee", type: "Consumable", description: "A description of the item.",
+            effects: {buff: "CaffeineRush"}
+        },
+        FelFrappe: {name: "Fel Frappe", type: "Consumable", description: "A description of the item.",
+            effects: {buff: "CaffeineRush"}
+        },
+        FelLatte: {name: "Fel Latte", type: "Consumable", description: "A description of the item.",
+            effects: {buff: "CaffeineRush"}
+        },
+        FelCoffee: {name: "Fel Coffee", type: "Consumable", description: "A description of the item.",
+            effects: {buff: "CaffeineRush"}
+        },
+        FelIcedCoffee: {name: "Fel Iced Coffee", type: "Consumable", description: "A description of the item.",
+            effects: {buff: "CaffeineRush"}
+        },
 
     },
+    BUFF_DATA: {
+        "CaffeineRush": {
+            "name": "Caffeine Rush",
+            //atm type is buff or debuff 
+            "type": "Buff",
+            "duration": 5000, // miliseconds
+            "applyEffect": (target) => target.speed *= 1.5,
+            "removeEffect": (target) => target.speed /= 1.5,
+            "description": "A description of the buff goes here"
+        }
+    },
+    //boons given by npcs, buffs from items
+    BOON_DATA:{},
     NPC_DIALOGUE_DISTANCE: 50,
     NPC_DIALOGUE_SECTION_LENGTH: 100,
     NPC_DIALOGUE: {
@@ -106,6 +138,6 @@ export const settings = {
     }
 }
 
-export const { SCREEN_WIDTH, SCREEN_HEIGHT, ANIMATION_SPEED, TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR, UI_CLICK_COOLDOWN, UI_SETTINGS, PLAYER_SETTINGS,  WEAPON_SETTINGS, TESTING_ITEMS, DRINK_RECIPES, ITEM_DESCRIPTIONS, NPC_DIALOGUE_DISTANCE, NPC_DIALOGUE_SECTION_LENGTH, NPC_DIALOGUE, PARTICLE_ANIMATION_SETTINGS, ENEMY_SETTINGS } = settings;
+export const { SCREEN_WIDTH, SCREEN_HEIGHT, ANIMATION_SPEED, TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR, ICON_SCALING, UI_CLICK_COOLDOWN, UI_SETTINGS, PLAYER_SETTINGS,  WEAPON_SETTINGS, TESTING_ITEMS, DRINK_RECIPES, ITEM_DESCRIPTIONS, BUFF_DATA, BOON_DATA, NPC_DIALOGUE_DISTANCE, NPC_DIALOGUE_SECTION_LENGTH, NPC_DIALOGUE, PARTICLE_ANIMATION_SETTINGS, ENEMY_SETTINGS } = settings;
 
 

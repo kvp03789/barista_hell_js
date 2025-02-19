@@ -7,6 +7,7 @@ import './styles/main.css'
 import HellOverWorld from './code/levels/HellOverworld'
 import { Equipment, Inventory, QuickBar } from './code/ItemsInventoryEquipment'
 import { TitleScreen } from './code/levels/TitleScreen'
+import { BuffManager } from './code/BuffManager'
 
 
 const body = document.querySelector('body')
@@ -53,7 +54,7 @@ class Application {
 
     async init() {
         await this.app.init({ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, preference: 'webgl' });
-        this.app.ticker.maxFPS = 60
+        // this.app.ticker.maxFPS = 60
         body.append(this.app.canvas);
         await PIXI.Assets.init({ manifest: assetsManifest })
 
@@ -132,9 +133,11 @@ class GameState {
         this.app = app
         //init the player
         this.character = new Character(this.app, keysObject, spritesheetAssets, weaponAssets, iconAssets)
-
+        //init the buff manager
+        this.buffManager = new BuffManager(this.app, this.character, this.iconAssets)
+        
         //init player inventory
-        this.inventory = new Inventory(this.app, this.character, weaponAssets, iconAssets)
+        this.inventory = new Inventory(this.app, this.character, weaponAssets, iconAssets, this.buffManager)
         //init player equipment, along with weaponSlots and equipmentSlots
         this.equipment = new Equipment(this.app, this.character, weaponAssets, iconAssets)
         //init player quick bar

@@ -57,6 +57,12 @@ export default class Character{
 
         //bool to use for stairs to adjust speed
         this.isOnStairs = false
+
+        //list of all buffs on player
+        this.activeBuffs = []
+
+        //list of active boons
+        this.activeBoons = []
     }
 
     addSpriteToGroups = (group) => {
@@ -102,7 +108,6 @@ export default class Character{
         // this.quickBar = new QuickBar(this.app, this, this.weaponAssets)
 
         this.inventory = inventory
-        console.log('ITS IN MY HAAAEEEAD', this.inventory)
         this.equipment = equipment
         this.quickBar = quickBar
         //test populates called here because they rely on char sprite position
@@ -307,7 +312,6 @@ export default class Character{
     }
 
     setAnimation(animationKey) {
-        console.log('setting animation......')
         const newTextures = this.mainSpritesheet.animations[animationKey];
         if (newTextures && this.sprite.textures !== newTextures) {
             this.sprite.textures = newTextures;

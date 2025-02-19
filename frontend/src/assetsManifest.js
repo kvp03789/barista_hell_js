@@ -69,6 +69,9 @@ import Icon_LargeFang from './img/materials/large_fang.png'
 import Icon_CorruptedBlood from './img/materials/corrupted_blood.png'
 import Icon_CraftButton from './img/ui/craft_icon.png'
 
+//buffs
+import Buff_Icon_CaffeineRush from './img/buffs/caffeine_rush.png'
+
 //equipment
 
 //consumables
@@ -277,6 +280,7 @@ export const assetsManifest = {
       {
          "name": "icons",
          "assets":[
+            //materials
             {
                "alias": "Icon_Beans", 
                "src": Icon_Beans
@@ -305,6 +309,7 @@ export const assetsManifest = {
                "alias": "Icon_CorruptedBlood", 
                "src": Icon_CorruptedBlood
             },
+            //crafting icons
             {
                "alias" :"Icon_EmptyItemSlot",
                "src": Icon_EmptyItemSlot
@@ -317,6 +322,11 @@ export const assetsManifest = {
                "alias": "Icon_EmptyCharacterSheetSlot",
                "src": Icon_EmptyCharacterSheetSlot
             },
+            {
+               "alias": "Icon_CraftingSelected",
+               "src": Icon_CraftingSelected
+            },
+            //consumables
             {
                "alias": "Icon_Coffee",
                "src": Icon_Coffee
@@ -349,9 +359,10 @@ export const assetsManifest = {
                "alias": "Icon_FelIcedCoffee",
                "src": Icon_FelIcedCoffee
             },
+            //buff icons
             {
-               "alias": "Icon_CraftingSelected",
-               "src": Icon_CraftingSelected
+               "alias": "Buff_Icon_CaffeineRush",
+               "src": Buff_Icon_CaffeineRush
             }
          ]
       },

@@ -1,5 +1,5 @@
 import { Container, Sprite, TextStyle, Rectangle, Texture, Text } from "pixi.js"
-import { ITEM_DESCRIPTIONS, ZOOM_FACTOR } from "../settings"
+import { BUFF_DATA, ITEM_DESCRIPTIONS, ZOOM_FACTOR } from "../settings"
 
 export class TooltipManager{
     constructor(app, tooltipBackgroundTexture, uiContainer, tooltipContainer, mousePos, UIAssetsObject){
@@ -91,9 +91,40 @@ export class TooltipManager{
         this.tooltipItemIcon.scale.set(ZOOM_FACTOR)
 
         this.currentTooltip.addChild(this.tooltipBG, this.itemNameText, this.itemTypeText, this.descriptionText, this.tooltipItemIcon)
-        this.tooltipContainer.addChild(this.currentTooltip)
+        this.tooltipContainer.addChild(this.currentTooltip)   
+    }
 
-       
+    displayTooltipBuff = (buff, iconTexture) => {
+        console.log(buff)
+        //determine the fill color of the itemTypeText based on the item type
+        let buffTypeFillColor
+        switch (BUFF_DATA[buff.buffKey].type) {
+            case "Buff":
+                buffTypeFillColor = '#f54242'
+                break;
+            case "Debuff":
+                buffTypeFillColor = '#152eeb'
+                break;
+            default:
+                break;
+        }
+        this.itemTypeTextStyle.fill = buffTypeFillColor
+        //name of the item
+        this.itemNameText.text = buff.name
+        this.itemNameText.position.set(20, 15)
+        //the item type ie material, equipemtn, etc
+        this.itemTypeText.text = buff.type
+        this.itemTypeText.position.set(20, 45)
+        //a brief item description that comes from te settings file
+        this.descriptionText.text = buff.description
+        this.descriptionText.position.set(20, 75)
+        //the items icon
+        this.tooltipItemIcon = new Sprite(iconTexture)
+        this.tooltipItemIcon.position.set(170, 15)
+        this.tooltipItemIcon.scale.set(ZOOM_FACTOR)
+
+        this.currentTooltip.addChild(this.tooltipBG, this.itemNameText, this.itemTypeText, this.descriptionText, this.tooltipItemIcon)
+        this.tooltipContainer.addChild(this.currentTooltip)   
     }
 
     removeTooltip = () => {

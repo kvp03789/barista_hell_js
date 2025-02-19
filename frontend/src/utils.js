@@ -125,6 +125,7 @@ export function getRandomDrop (enemyDrops){
     return null; // In case something goes wrong
 }
 
+//logs fps for debugging purposes
 export function showDebugFPS (app) {
     let lastLoggedTime = 0;
     const now = performance.now();
@@ -133,4 +134,22 @@ export function showDebugFPS (app) {
         console.log(`FPS: ${app.ticker.FPS.toFixed(2)}`);
         lastLoggedTime = now;
     }
+}
+
+/**
+ * Returns object containing seconds and minutes
+ * 
+ * @param {number} timeInMilliseconds - time in milliseconds to convert
+ * @returns {object} object containing seconds property and minutes property if needed 
+ */
+export function getMillisecondsToSeconds(timeInMilliseconds){
+    //convert seconds to ms
+    const timeInSeconds = timeInMilliseconds / 1000
+    //get minutes from seconds
+    if(timeInSeconds >= 60){
+        const minutes = Math.floor(timeInSeconds / 60)
+        const leftOverSeconds = timeInSeconds % 60
+        return {minutes, seconds: leftOverSeconds}
+    }
+    else return { seconds: timeInSeconds }
 }

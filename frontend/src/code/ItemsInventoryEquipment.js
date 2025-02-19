@@ -27,11 +27,13 @@ export class ItemSlot{
 }
 
 export class Inventory{
-    constructor(app, player, weaponAssets, iconAssets){
+    constructor(app, player, weaponAssets, iconAssets, buffManager){
         this.app = app
         this.player = player
         this.weaponAssets = weaponAssets
         this.iconAssets = iconAssets
+        //buff manager needed here for initing consumables
+        this.buffManager = buffManager
         //this array is populated with ItemSlot instances during init call
         this.itemSlots = []
         this.init()
@@ -51,14 +53,14 @@ export class Inventory{
         //parse the icons assets
         this.parsedIconsTextures = {}
         for(let key in this.iconAssets){
-            if(key.startsWith("Icon")){
+            if(key.startsWith("Icon") || key.startsWith("Buff")){
                 this.parsedIconsTextures[key] = this.iconAssets[key]
             }
         }
     }
 
     testPopulate = () => {
-        //populate some test equipment
+        //populate some test materials
         const someIce = new Ice(this.app, this.parsedIconsTextures, this.player)
         this.itemSlots[0].item = someIce
         this.itemSlots[0].quantity = 10
@@ -77,7 +79,9 @@ export class Inventory{
         const someLargeFangs = new LargeFang(this.app, this.parsedIconsTextures, this.player)
         this.itemSlots[5].item = someLargeFangs
         this.itemSlots[5].quantity = 4
-        const aConsumableItem = new Coffee(this.app, this.parsedIconsTextures, this.player)
+
+        //aaaand test consumables
+        const aConsumableItem = new Coffee(this.app, this.parsedIconsTextures, this.player, this.buffManager)
         this.itemSlots[6].item = aConsumableItem
         this.itemSlots[6].quantity = 2
         this.testPopulateComplete = true

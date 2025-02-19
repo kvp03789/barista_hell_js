@@ -1,21 +1,24 @@
 import { Container, Graphics, Sprite, Text, TextStyle } from "pixi.js";
-import { SCREEN_HEIGHT, SCREEN_WIDTH, UI_CLICK_COOLDOWN, UI_SETTINGS, DRINK_RECIPES } from "../settings";
-import { AdjustmentFilter, BevelFilter, CRTFilter, GlitchFilter, GlowFilter } from "pixi-filters";
+import { SCREEN_HEIGHT, SCREEN_WIDTH, UI_CLICK_COOLDOWN, UI_SETTINGS, DRINK_RECIPES, ICON_SCALING } from "../settings";
+import { AdjustmentFilter, CRTFilter, GlitchFilter, GlowFilter } from "pixi-filters";
 import { Beans, CorruptedBlood, Ice, LargeFang, Milk, Syrup, WhippedCream } from "./item_classes/Materials";
 import { TooltipManager } from "./TooltipManager";
 import NPCDialogueManager from "./NPCDialogueManager";
 import { ItemSlot } from "./ItemsInventoryEquipment";
-import Item from "./item_classes/Item";
 import { Coffee, FelCoffee, FelFrappe, FelIcedCoffee, FelLatte, Frappe, IcedCoffee, Latte } from "./item_classes/Consumables";
+import { getMillisecondsToSeconds } from "../utils";
 
 export default class UIManager{
-    constructor(app, player, uiAssets, fonts, keysObject, iconAssets, clickEventManager, mousePos, employees, stateLabel, enemyList){
+    constructor(app, player, uiAssets, fonts, keysObject, iconAssets, clickEventManager, mousePos, employees, stateLabel, enemyList, buffManager){
         this.app = app
         this.player = player
 
         this.app.stage.on('mousemove', this.onMouseMove)
 
         this.clickEventManager = clickEventManager
+
+        //buff manager needed here for consumables that are inited in crafting
+        this.buffManager = buffManager
 
         //raw assets that are loaded in assetsManifest 
         this.uiAssets = uiAssets
@@ -80,13 +83,10 @@ export default class UIManager{
             }
         }
         for(let key in this.iconAssets){
-            if(key.startsWith("Icon")){
+            if(key.includes("Icon_")){
                 this.iconAssetsObject[key] = this.iconAssets[key]
             }
         }
-
-        console.log(this.UIAssetsObject)
-        console.log('icon assets', this.iconAssetsObject)
 
         //--init all of the components of the UI--//
         
@@ -106,13 +106,16 @@ export default class UIManager{
         this.inventory = new InventoryUI(this.app, this.player, this.player.inventory.itemSlots, this.clickCooldown, this.clicking, this.UIAssetsObject, this.uiContainer, SCREEN_WIDTH - (this.UIAssetsObject.UI_InventoryBG.width + 20), 50, this.iconAssetsObject, this.clickEventManager, this.uiManager, this.tooltipManager)
         
         //crafting window
-        this.craftingWindow = new CraftingWindowUI(this.app, this.player, this.clickCooldown, this.clicking, this.UIAssetsObject, this.uiContainer, SCREEN_WIDTH - (this.UIAssetsObject.UI_InventoryBG.width + 20), 50, this.iconAssetsObject, this.clickEventManager, this, this.tooltipManager)
+        this.craftingWindow = new CraftingWindowUI(this.app, this.player, this.clickCooldown, this.clicking, this.UIAssetsObject, this.uiContainer, SCREEN_WIDTH - (this.UIAssetsObject.UI_InventoryBG.width + 20), 50, this.iconAssetsObject, this.clickEventManager, this, this.tooltipManager, this.buffManager)
 
         //npc dialogue manager
         this.npcDialogueManager = new NPCDialogueManager(this.app, this.player, this.UIAssetsObject, this.fonts, this.uiContainer, this.employees, this.stateLabel)
 
         //enemy health bars
         this.enemyHealthBarManager = new EnemyHealthBarManager(this.app, this.enemyList, this.uiContainer, this.UIAssetsObject)
+
+        //buff ui
+        this.buffUIContainer = new Buff_UI_Container(this.app, this.player, 500, 0 + UI_SETTINGS.PADDING, this.uiContainer, this.tooltipManager)
     }     
 
     //returns bool if a non movement key is pressed
@@ -228,10 +231,13 @@ export default class UIManager{
         this.npcDialogueManager.run(this.player)
         this.enemyHealthBarManager.run()
         this.healthBar.run()
+        this.buffUIContainer.run()
     }
     
 }
 
+//item slot classes here represent the ui element only -
+//each one corresponds to its "real" version on the player 
 class ItemSlot_UI extends Sprite{
     constructor(texture, emptyTexture, player, type, xPos, yPos, slotIndex, item, clickEventManager, uiManager, tooltipManager){
         super(texture)
@@ -320,13 +326,14 @@ class ItemSlot_UI extends Sprite{
         this.tooltipManager.removeTooltip()
     }
 
+    //right clicking items to use or "consume" them
     handleRightClick = () =>  {
         //find non-ui version of item and itemSlot 
         const correspondingRealItemSlot = this.player[this.slotType].itemSlots[this.slotIndex]
         const correspondingRealItem = this.player[this.slotType].itemSlots[this.slotIndex].item
         //if item and if item is a consumable use item's handleConsumeItem func
         if(correspondingRealItem && correspondingRealItem.handleConsumeItem){
-            correspondingRealItem.handleConsumeItem()
+            correspondingRealItem.handleConsumeItem(this.player)
             correspondingRealItemSlot.quantity--
         }
     }
@@ -335,6 +342,9 @@ class ItemSlot_UI extends Sprite{
         if(this.slotType === 'crafting_material'){
             this.clickEventManager.handleMaterialSlotClick(this, this.schemaItem, e)
         }
+        //clicks get handled by click event manager because clicking an 
+        //item slot picks up or puts down items. all of this kind of logic 
+        // handle there
         else this.clickEventManager.handleSlotClick(this, e)
         
     }
@@ -398,7 +408,6 @@ class Material_ItemSlot_UI extends ItemSlot_UI{
         this.quantityText.position.set(20, 15)
         this.addChild(this.quantityText)
 
-        console.log("MATERIALLLLS", this.item)
         this.alpha = .5
         
     }
@@ -623,13 +632,16 @@ class CraftButton extends Sprite{
 }
 
 class CraftingWindowUI extends Container{
-    constructor(app, player, clickCooldown, clicking, UIAssetsObject, uiContainer, xPos, yPos, iconsAssetsObject, clickEventManager, uiManager, tooltipManager){
+    constructor(app, player, clickCooldown, clicking, UIAssetsObject, uiContainer, xPos, yPos, iconsAssetsObject, clickEventManager, uiManager, tooltipManager, buffManager){
         super()
         this.app = app
         this.player = player
         this.uiManager = uiManager
         this.clickEventManager = clickEventManager
         this.tooltipManager = tooltipManager
+        //this class needs access to the buff manager because consumable 
+        // items are inited here and THEY need access to it
+        this.buffManager = buffManager 
 
         this.UIAssetsObject = UIAssetsObject
         this.iconAssets = iconsAssetsObject
@@ -711,15 +723,15 @@ class CraftingWindowUI extends Container{
         const interval = this.background.width / 4
         const margin = (interval - buttonWidth) / 2
         const firstRowY = 15
-        const frappeIcon = new CraftingSelectionButton(this.iconAssets.Icon_Frappe, this.iconAssets.Icon_CraftingSelected, margin, firstRowY, this, "frappe_button", 0, this.tooltipManager, new Frappe(this.app, this.iconAssets, this.player))
-        const latteIcon = new CraftingSelectionButton(this.iconAssets.Icon_Latte, this.iconAssets.Icon_CraftingSelected, interval + margin, firstRowY, this, "latte_button", 1, this.tooltipManager, new Latte(this.app, this.iconAssets, this.player))
-        const icedCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_IcedCoffee, this.iconAssets.Icon_CraftingSelected, interval * 2 + margin, firstRowY, this, "iced_coffee_button", 2, this.tooltipManager, new IcedCoffee(this.app, this.iconAssets, this.player))
-        const coffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_Coffee, this.iconAssets.Icon_CraftingSelected, interval * 3 + margin, firstRowY, this, "coffee_button", 3, this.tooltipManager, new Coffee(this.app, this.iconAssets, this.player))
+        const frappeIcon = new CraftingSelectionButton(this.iconAssets.Icon_Frappe, this.iconAssets.Icon_CraftingSelected, margin, firstRowY, this, "frappe_button", 0, this.tooltipManager, new Frappe(this.app, this.iconAssets, this.player, this.buffManager))
+        const latteIcon = new CraftingSelectionButton(this.iconAssets.Icon_Latte, this.iconAssets.Icon_CraftingSelected, interval + margin, firstRowY, this, "latte_button", 1, this.tooltipManager, new Latte(this.app, this.iconAssets, this.player, this.buffManager))
+        const icedCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_IcedCoffee, this.iconAssets.Icon_CraftingSelected, interval * 2 + margin, firstRowY, this, "iced_coffee_button", 2, this.tooltipManager, new IcedCoffee(this.app, this.iconAssets, this.player, this.buffManager))
+        const coffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_Coffee, this.iconAssets.Icon_CraftingSelected, interval * 3 + margin, firstRowY, this, "coffee_button", 3, this.tooltipManager, new Coffee(this.app, this.iconAssets, this.player, this.buffManager))
 
-        const felFrappeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelFrappe, this.iconAssets.Icon_CraftingSelected, margin, firstRowY*5, this, "frappe_button", 4, this.tooltipManager, new FelFrappe(this.app, this.iconAssets, this.player))
-        const felLatteIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelLatte, this.iconAssets.Icon_CraftingSelected, interval + margin, firstRowY*5, this, "latte_button", 5, this.tooltipManager, new FelLatte(this.app, this.iconAssets, this.player))
-        const felIcedCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelIcedCoffee, this.iconAssets.Icon_CraftingSelected, interval * 2 + margin, firstRowY*5, this, "iced_coffee_button", 6, this.tooltipManager, new FelIcedCoffee(this.app, this.iconAssets, this.player))
-        const felCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelCoffee, this.iconAssets.Icon_CraftingSelected, interval * 3 + margin, firstRowY*5, this, "coffee_button", 7, this.tooltipManager, new FelCoffee(this.app, this.iconAssets, this.player))
+        const felFrappeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelFrappe, this.iconAssets.Icon_CraftingSelected, margin, firstRowY*5, this, "frappe_button", 4, this.tooltipManager, new FelFrappe(this.app, this.iconAssets, this.player, this.buffManager))
+        const felLatteIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelLatte, this.iconAssets.Icon_CraftingSelected, interval + margin, firstRowY*5, this, "latte_button", 5, this.tooltipManager, new FelLatte(this.app, this.iconAssets, this.player, this.buffManager))
+        const felIcedCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelIcedCoffee, this.iconAssets.Icon_CraftingSelected, interval * 2 + margin, firstRowY*5, this, "iced_coffee_button", 6, this.tooltipManager, new FelIcedCoffee(this.app, this.iconAssets, this.player, this.buffManager))
+        const felCoffeeIcon = new CraftingSelectionButton(this.iconAssets.Icon_FelCoffee, this.iconAssets.Icon_CraftingSelected, interval * 3 + margin, firstRowY*5, this, "coffee_button", 7, this.tooltipManager, new FelCoffee(this.app, this.iconAssets, this.player, this.buffManager))
         this.addChild(frappeIcon, latteIcon, icedCoffeeIcon, coffeeIcon, felFrappeIcon, felLatteIcon, felIcedCoffeeIcon, felCoffeeIcon)
 
         this.currentItemToBeCrafted = frappeIcon.item
@@ -1237,6 +1249,91 @@ class EnemyHealthBarManager extends Container{
         this.children.forEach(healthBar => {
             if (healthBar.update){
                 healthBar.update()
+            }
+        })
+    }
+}
+
+class UI_Buff extends Sprite{
+    constructor(buff, texture, xPos, yPos, buffUIContainer){
+        super(texture)
+        this.buff = buff
+
+        this.buffUIContainer = buffUIContainer
+
+        this.parsedDuration = getMillisecondsToSeconds(this.buff.duration)
+
+        this.x = xPos
+        this.y = yPos
+        this.label = this.buff.name.replace(" ", "_")
+        this.scale.set(ICON_SCALING)
+
+        this.interactive = true
+        this.on("mouseovercapture", this.handleMouseOver)
+        this.on("mouseoutcapture", this.handleMouseOut)
+
+        this.timerTextOptions = new TextStyle({
+            fontFamily: 'roboto',
+            fill: '#ffffff',
+            stroke: { color: '#1d1f1e', width: 3, join: 'round' },
+            fontSize: 10,
+            fontWeight: 'lighter',
+            alpha: .5
+        })
+        this.timerText = new Text({text: `${this.parsedDuration.seconds}`, style: this.timerTextOptions})
+        this.timerText.position.set(0, 30)
+        this.addChild(this.timerText)
+    }
+
+    handleMouseOver = () => {
+        this.buffUIContainer.handleMouseOver(this.buff, this.texture)
+    }
+
+    handleMouseOut = () => {
+        this.buffUIContainer.handleMouseOut()
+    }
+}
+
+class Buff_UI_Container extends Container{
+    constructor(app, player, xPos, yPos, uiContainer, tooltipManager){
+        super()
+        this.app = app
+        this.player = player
+        this.x = xPos
+        this.y = yPos
+        this.uiContainer = uiContainer
+        this.tooltipManager = tooltipManager
+
+        this.label = "buffs_container"
+
+        this.uiContainer.addChild(this)
+    }
+
+    //mouse in and out display tooltips
+    handleMouseOver = (buff, texture) => {
+        console.log("buff mouse over: ", buff, texture)
+        this.tooltipManager.displayTooltipBuff(buff, texture)
+    }
+
+    handleMouseOut = () => {
+        this.tooltipManager.removeTooltip()
+    }
+
+    run = () => {
+        // remove buffs that are no longer active if not removed already
+        this.children.forEach(child => {
+            //check if buff has been removed
+            if (!this.player.activeBuffs.includes(child.buff)) {
+                this.removeChild(child)
+            }
+        })
+
+        // display active buffs if not displayed already
+        this.player.activeBuffs.forEach((buff, index) => {
+            // check if the bufff is already displayed
+            if (!this.children.some(child => child.buff === buff)) {
+                const buffSprite = new UI_Buff(buff, buff.texture, index * 40, 0, this);
+                this.addChild(buffSprite)
             }
         })
     }

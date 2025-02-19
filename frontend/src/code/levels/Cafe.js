@@ -2,7 +2,6 @@ import * as PIXI from 'pixi.js'
 import { TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR }from '../../settings'
 import { parseMapData, getXYSlice, spritesAreColliding, showDebugFPS } from '../../utils'
 import { cafeMapData } from '../../map_data/cafeMapData'
-import Character from '../Character'
 import Tile, { PatrolTile } from '../Tile'
 import { AnimatedTile, HellPortalObject } from '../Tile'
 import ParticleManager from '../Particles'
@@ -12,6 +11,7 @@ import UIManager from '../UI'
 import { NPCManager } from '../NPCManager'
 import Level from './Level'
 import { GodrayFilter, MotionBlurFilter } from 'pixi-filters'
+import { BuffManager } from '../BuffManager'
 
 export default class Cafe extends Level{
     constructor(app, keysObject, stateLabel, setState){
@@ -111,13 +111,15 @@ export default class Cafe extends Level{
         this.visibleSprites.addChild(this.cafeBaseMap)
 
         this.npcManager = new NPCManager(this.app, this.stateLabel, this.npcSpritesheets, null, this.visibleSprites, this.obstacleSprites)
+
         //init bulletManager
         this.bulletManager = new BulletManager(this.app, this.bulletAssets, this.obstacleSprites, this.particleManager, this.npcManager.enemies)
         
-        // this.character = new Character(this.app, this.keysObject, this.spritesheetAssets, this.weaponAssets, this.display_width / 2, this.display_height / 2)
+        //character is passed in with gameState
         this.character = gameState.character
         
         this.mousePos = {x: 0, y: 0}
+
         //add foreground blocks to map
         //these are NOT obstacle sprites, just decoration
         this.parsedMapObject.foreground.forEach((row, i) => {
@@ -184,8 +186,14 @@ export default class Cafe extends Level{
 
         await this.character.init(this.visibleSprites, this.particleManager, this.playerSpawnPoint, this.obstacleSprites, this.bulletManager, gameState.inventory, gameState.equipment, gameState.quickBar)
 
-        this.uiManager = new UIManager(this.app, this.character, this.uiAssets, this.fonts, this.keysObject, this.iconAssets, this.clickEventManager, this.mousePos, this.npcManager.employees, this.stateLabel, this.npcManager.enemies)
+        //init the buff manager which is born in top level (index.js)
+        this.buffManager = gameState.buffManager
+
+        this.uiManager = new UIManager(this.app, this.character, this.uiAssets, this.fonts, this.keysObject, this.iconAssets, this.clickEventManager, this.mousePos, this.npcManager.employees, this.stateLabel, this.npcManager.enemies, this.buffManager)
         await this.uiManager.init()
+
+        //then give buff manager access to uiManager
+        this.buffManager.init(this.uiManager)
 
         //add obstacle sprites to stage
         this.app.stage.addChild(this.obstacleSprites)

@@ -246,7 +246,6 @@ export class TitleScreen extends Level{
         // remove all containers 
         while (this.app.stage.children.length > 0) {
             const child = this.app.stage.children[0]
-            console.log('DESTORYED A FUUUCKIN THING', child)
             this.app.stage.removeChild(child)
             child.destroy({ children: true })
         }
@@ -269,7 +268,6 @@ class TitleMenuOption extends Sprite{
 
         //the actual TitleMenu class
         this.titleMenu = titleMenu
-        console.log(this.titleMenu, "debugging title menu")
 
         //which state is called when option is selected
         this.stateLabel = stateLabel
@@ -280,23 +278,16 @@ class TitleMenuOption extends Sprite{
         this.on("mouseleave", this.handleMouseLeave)
     }
 
-    handleClick = () => {
-        console.log(`clicked ${this.label}`)
-    }
-
     handleMouseIn = () => {
-        console.log(`mouse in debug`)
         //set selected for this individual menu option
         if(!this.selected)this.selected = true
 
         //set selected in the title menu class
         if(!this.titleMenu.optionSelected){
             this.titleMenu.optionSelected = this
-            console.log(`option selected changed: ${this.titleMenu.optionSelected.label}`)
         }
         if(this.titleMenu.optionSelected && this.titleMenu.optionSelected.label != this.label){
             this.titleMenu.optionSelected = this
-            console.log(`option selected changed: ${this.titleMenu.optionSelected.label}`)
         }
     }
 
@@ -307,6 +298,12 @@ class TitleMenuOption extends Sprite{
         //set selected in the title menu class
         if(this.titleMenu.optionSelected.label == this.label){
             this.titleMenu.optionSelected = null
+        }
+    }
+
+    handleClick = () => {
+        if(this.titleMenu.optionSelected){
+            this.titleMenu.optionSelected.setState(this.titleMenu.optionSelected.stateLabel)
         }
     }
 
