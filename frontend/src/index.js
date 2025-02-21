@@ -12,41 +12,12 @@ import { BuffManager } from './code/BuffManager'
 
 const body = document.querySelector('body')
 
-// class Application{
-//     constructor(){
-//         this.app = new PIXI.Application()
-//         this.ticker = new PIXI.Ticker()
-        
-//         // this.app.stage.scale.set(1.5)
-//         //object for storing keys currently being pressed
-//         this.keysObject = {}
-
-//         //this is for te pixij debugger
-//         globalThis.__PIXI_APP__ = this.app;
-
-//         this.state_manager = new State_Manager('cafe_intro', this.app)
-//     }
-
-//     async init(){
-//         await this.app.init({width: SCREEN_WIDTH, height: SCREEN_HEIGHT, preference: 'webgl'})
-//         body.append(this.app.canvas)
-//         await PIXI.Assets.init({manifest: assetsManifest})
-//         this.cafe = new Cafe(this.app, this.keysObject, 'cafe_intro', this.state_manager.setState)
-//         this.hellOverworld = new HellOverWorld(this.app, this.keysObject, 'hell_overworld', this.state_manager.setState)
-
-//         this.statesObject = {
-//             'cafe_intro': this.cafe,
-//             'hell_overworld': this.hellOverworld
-//         }
-//         await this.statesObject[this.state_manager.currentState].initMap()
-//         this.app.ticker.add(this.statesObject[this.state_manager.currentState].run)
-//     }
-// }
 
 class Application {
     constructor() {
         this.app = new PIXI.Application()
         this.ticker = new PIXI.Ticker()
+        this.app.stage.label = "main_stage"
         this.keysObject = {}
 
         globalThis.__PIXI_APP__ = this.app
@@ -102,9 +73,9 @@ class State_Manager{
         //but only if there is a previousState. this is to prevent
         //dstroy being called the very first time
         if (this.previousState && this.statesObject[this.currentState]) {
+            console.log(`Removing run from: ${this.currentState}`);
             this.statesObject[this.currentState].destroy()
-            this.app.ticker.remove(this.statesObject[this.currentState].run)
-
+            // this.app.ticker.remove(this.statesObject[this.currentState].run)
         }
 
         this.previousState = this.currentState
@@ -120,6 +91,8 @@ class State_Manager{
         if (nextState.initMap) {
             await nextState.initMap(this.gameState)
         }
+
+        //add run function to ticker 
         this.app.ticker.add(nextState.run)
     }
 

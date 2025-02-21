@@ -2,7 +2,7 @@ import { Sprite } from "pixi.js"
 import { PLAYER_SETTINGS, WEAPON_SETTINGS } from "../settings"
 import { BattleRifle, Shotgun } from "./item_classes/Weapons"
 import { Beans, CorruptedBlood, Ice, LargeFang, Milk } from "./item_classes/Materials"
-import { Coffee } from "./item_classes/Consumables"
+import { Coffee, Latte } from "./item_classes/Consumables"
 
 export class ItemSlot{
     constructor(app, player, slotType, slotIndex){
@@ -81,9 +81,14 @@ export class Inventory{
         this.itemSlots[5].quantity = 4
 
         //aaaand test consumables
-        const aConsumableItem = new Coffee(this.app, this.parsedIconsTextures, this.player, this.buffManager)
-        this.itemSlots[6].item = aConsumableItem
-        this.itemSlots[6].quantity = 2
+        const aCoffee = new Coffee(this.app, this.parsedIconsTextures, this.player, this.buffManager)
+        this.itemSlots[6].item = aCoffee
+        this.itemSlots[6].quantity = 22
+        this.testPopulateComplete = true
+
+        const aLatte = new Latte(this.app, this.parsedIconsTextures, this.player, this.buffManager)
+        this.itemSlots[7].item = aLatte
+        this.itemSlots[7].quantity = 22
         this.testPopulateComplete = true
     }
 

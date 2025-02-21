@@ -31,6 +31,7 @@ class BulletManager extends Container{
     constructor(app, bulletAssets, obstacleSprites, particleManager, enemyList){
         super()
         this.app = app
+        this.deltaTime = 0
         this.particleManager = particleManager
         this.half_width = this.app.view.width / 2
         this.half_height = this.app.view.height / 2
@@ -102,7 +103,10 @@ class BulletManager extends Container{
         })
     }
 
-    run = (player) => {
+    run = (player, deltaTime) => {
+        //update deltaTime
+        this.deltaTime = deltaTime
+
         // calculate offsets based on player's position. its basically the difference
         // in the center of the player and the center of the screen
         
@@ -116,8 +120,8 @@ class BulletManager extends Container{
             bullet.vx = Math.cos(bullet.rotation) * bullet.speed;
             bullet.vy = Math.sin(bullet.rotation) * bullet.speed;
 
-            bullet.x += bullet.vx;
-            bullet.y += bullet.vy;      
+            bullet.x += bullet.vx * this.deltaTime;
+            bullet.y += bullet.vy * this.deltaTime;      
 
             bullet.scale.set(ZOOM_FACTOR)
 

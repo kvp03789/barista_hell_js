@@ -158,7 +158,8 @@ export class PatrollingEmployee extends Employee{
         return Math.abs(a-b) <= tolerance
     }
 
-    run = (player) => {
+    run = (player, deltaTime) => {
+        this.deltaTime = deltaTime
         if(!this.isInDialogue){
             this.patrol()
             this.handleMovement()

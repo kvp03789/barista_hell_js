@@ -6,7 +6,7 @@ import { TooltipManager } from "./TooltipManager";
 import NPCDialogueManager from "./NPCDialogueManager";
 import { ItemSlot } from "./ItemsInventoryEquipment";
 import { Coffee, FelCoffee, FelFrappe, FelIcedCoffee, FelLatte, Frappe, IcedCoffee, Latte } from "./item_classes/Consumables";
-import { getMillisecondsToSeconds } from "../utils";
+import { getMillisecondsToSeconds, parseDurationToString } from "../utils";
 
 export default class UIManager{
     constructor(app, player, uiAssets, fonts, keysObject, iconAssets, clickEventManager, mousePos, employees, stateLabel, enemyList, buffManager){
@@ -183,7 +183,6 @@ export default class UIManager{
 
             else if(this.npcDialogueManager.dialogueStatus.status){
                 const npc = this.npcDialogueManager.dialogueStatus.npc
-                console.log('HEY DONT TOUCH ME', npc)
                 if(!this.npcDialogueManager.dialogueIsDisplaying){
                     //function on the NPCDialogueManager to handle begining dialogue
                     this.npcDialogueManager.handleBeginDialogue(npc)
@@ -682,10 +681,7 @@ class CraftingWindowUI extends Container{
     }
 
     handleCraftButtonClick = (quantity) => {
-        console.log("clicked craft button")
-        console.log(this.currentRecipe)
         //set quantity and item of results box
-        console.log(this.currentItemToBeCrafted, "CURRENT ITEM TO BE CRAFTED")
         this.resultSlot.item = this.currentItemToBeCrafted
         this.resultSlot.quantity = quantity
 
@@ -735,7 +731,6 @@ class CraftingWindowUI extends Container{
         this.addChild(frappeIcon, latteIcon, icedCoffeeIcon, coffeeIcon, felFrappeIcon, felLatteIcon, felIcedCoffeeIcon, felCoffeeIcon)
 
         this.currentItemToBeCrafted = frappeIcon.item
-        console.log('DEBUG FIRST ITEM TO BE CRAFTED: ', this.currentItemToBeCrafted)
     }
 
     initMaterialsSlots = () => {
@@ -794,7 +789,6 @@ class CraftingWindowUI extends Container{
         this.craftingSlotsContainer.removeChildren()
         const slotSize = 30 * 1.5
         //repopulate with new recipe
-        console.log("RECIPE INDEX: ", this.recipeIndex)
         DRINK_RECIPES[this.recipeIndex].forEach((recipeString, index) => {
             let item = null
             switch(recipeString) {
@@ -1292,6 +1286,11 @@ class UI_Buff extends Sprite{
     handleMouseOut = () => {
         this.buffUIContainer.handleMouseOut()
     }
+
+    run = () => {
+        this.parsedDuration = getMillisecondsToSeconds(this.buff.timer)
+        this.timerText.text = parseDurationToString(this.parsedDuration)
+    }
 }
 
 class Buff_UI_Container extends Container{
@@ -1311,7 +1310,6 @@ class Buff_UI_Container extends Container{
 
     //mouse in and out display tooltips
     handleMouseOver = (buff, texture) => {
-        console.log("buff mouse over: ", buff, texture)
         this.tooltipManager.displayTooltipBuff(buff, texture)
     }
 
@@ -1336,5 +1334,7 @@ class Buff_UI_Container extends Container{
                 this.addChild(buffSprite)
             }
         })
+
+        this.children.forEach(child => {if(child.run)child.run()})
     }
 }

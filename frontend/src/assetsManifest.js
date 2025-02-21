@@ -71,6 +71,7 @@ import Icon_CraftButton from './img/ui/craft_icon.png'
 
 //buffs
 import Buff_Icon_CaffeineRush from './img/buffs/caffeine_rush.png'
+import Buff_Icon_EspressoAegis from './img/buffs/espresso_aegis.png'
 
 //equipment
 
@@ -363,6 +364,10 @@ export const assetsManifest = {
             {
                "alias": "Buff_Icon_CaffeineRush",
                "src": Buff_Icon_CaffeineRush
+            },
+            {
+               "alias": "Buff_Icon_EspressoAegis",
+               "src": Buff_Icon_EspressoAegis
             }
          ]
       },

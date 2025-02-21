@@ -99,10 +99,10 @@ export class TooltipManager{
         //determine the fill color of the itemTypeText based on the item type
         let buffTypeFillColor
         switch (BUFF_DATA[buff.buffKey].type) {
-            case "Buff":
+            case "buff":
                 buffTypeFillColor = '#f54242'
                 break;
-            case "Debuff":
+            case "debuff":
                 buffTypeFillColor = '#152eeb'
                 break;
             default:

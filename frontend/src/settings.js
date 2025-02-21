@@ -66,7 +66,7 @@ export const settings = {
             effects: {buff: "CaffeineRush"}
         },
         Latte: {name: "Latte", type: "Consumable", description: "A description of the item.",
-            effects: {buff: "CaffeineRush"}
+            effects: {buff: "EspressoAegis"}
         },
         Coffee: {name: "Coffee", type: "Consumable", description: "A description of the item.",
             effects: {buff: "CaffeineRush"}
@@ -92,11 +92,37 @@ export const settings = {
         "CaffeineRush": {
             "name": "Caffeine Rush",
             //atm type is buff or debuff 
-            "type": "Buff",
+            "type": "buff",
+            //buff type is only if type is Buff. buffTypes can be:
+            //damage, shield, speed, stat, or other
+            "buffType": "speed",
+            "duration": 15000, // miliseconds
+            "applyEffect": (target) => {
+                console.log("speed buff being applied...", target.speed)
+                target.speed *= 1.5
+                console.log("speed buff applied!", target.speed)
+            },
+            "removeEffect": (target) => {
+                target.speed /= 1.5
+                console.log("speed buff being removed...", target.speed)
+            },
+            "description": "A description of the buff goes here",
+            //particleKey is which geometry particle associated with this buff
+            "particleKey": "speedLines"
+        },
+        "EspressoAegis": {
+            "name": "Espresso Aegis",
+            //atm type is buff or debuff 
+            "type": "buff",
+            //buff type is only if type is Buff. buffTypes can be:
+            //damage, shield, speed, stat, or other
+            "buffType": "shield",
             "duration": 5000, // miliseconds
             "applyEffect": (target) => target.speed *= 1.5,
             "removeEffect": (target) => target.speed /= 1.5,
-            "description": "A description of the buff goes here"
+            "description": "A description of the buff goes here",
+            //particleKey is which geometry particle associated with this buff
+            "particleKey": "shield"
         }
     },
     //boons given by npcs, buffs from items
@@ -130,6 +156,50 @@ export const settings = {
         Sparkle: {animationSpeed: 0.3, anchor: (.5), alpha: 1, scale: 1.5, hasRandomness: 1},
 
     },
+    GEOMETRY_PARTICLE_SETTINGS: {
+        speedLines: {
+            alpha: .6,
+            fillColor: 0xFFFFFF, 
+            alpha: 0.6, 
+            speed: 15, // speed of the particle movement
+            length: 50, // how long the lines last
+            life: 70,
+            hasMovement: true
+        },
+        shield: {
+            alpha: .01,
+            fillColor: 0x34C9EB, 
+            radius: 75,
+            speed: 15, // speed of the particle movement
+            length: 50, // how long the lines last
+            life: 70,
+            hasMovement: false
+        },
+        explosionRing: {
+            lineWidth: 5,
+            lineColor: 0xFF4500, // orange color for explosion
+            opacity: 1,
+            radius: 100, // radius of the explosion ring
+            expansionSpeed: 30, // how fast the ring expands
+            lifeSpan: 500, // time in ms before the ring fades out
+        },
+        trailEffect: {
+            trailLength: 20, // how long the trail is
+            trailColor: 0x00FFFF, // cyan color
+            fadeRate: 0.1, // rate at which the trail fades out
+            startSize: 5, // initial size of the trail particles
+            endSize: 0.5, // final size of the trail particles
+            speed: 10, // how fast the trail moves
+        },
+        burst: {
+            particleCount: 30, // how many particles in the burst
+            size: 10, // size of the burst particles
+            color: 0xFF6347, // tomato red
+            speed: 20, // speed of the particles in the burst
+            randomness: 0.5, // how much randomness there is to the particle movement
+            lifetime: 300, // how long each particle lasts
+        }
+    },
     ENEMY_SETTINGS: {
         Slime:{maxHealth: 15, speed: 5, attackSpeed: 20, attackRange: 20,
             attackDamage: 2, animationSpeed: 0.2, visionRadius: 220,
@@ -138,6 +208,6 @@ export const settings = {
     }
 }
 
-export const { SCREEN_WIDTH, SCREEN_HEIGHT, ANIMATION_SPEED, TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR, ICON_SCALING, UI_CLICK_COOLDOWN, UI_SETTINGS, PLAYER_SETTINGS,  WEAPON_SETTINGS, TESTING_ITEMS, DRINK_RECIPES, ITEM_DESCRIPTIONS, BUFF_DATA, BOON_DATA, NPC_DIALOGUE_DISTANCE, NPC_DIALOGUE_SECTION_LENGTH, NPC_DIALOGUE, PARTICLE_ANIMATION_SETTINGS, ENEMY_SETTINGS } = settings;
+export const { SCREEN_WIDTH, SCREEN_HEIGHT, ANIMATION_SPEED, TILE_HEIGHT, TILE_WIDTH, ZOOM_FACTOR, ICON_SCALING, UI_CLICK_COOLDOWN, UI_SETTINGS, PLAYER_SETTINGS,  WEAPON_SETTINGS, TESTING_ITEMS, DRINK_RECIPES, ITEM_DESCRIPTIONS, BUFF_DATA, BOON_DATA, NPC_DIALOGUE_DISTANCE, NPC_DIALOGUE_SECTION_LENGTH, NPC_DIALOGUE, PARTICLE_ANIMATION_SETTINGS, GEOMETRY_PARTICLE_SETTINGS, ENEMY_SETTINGS } = settings;
 
 

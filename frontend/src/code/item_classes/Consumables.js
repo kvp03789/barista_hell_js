@@ -15,8 +15,8 @@ class Consumable extends Item{
 
     handleConsumeItem = (player) => {
         const buffData = BUFF_DATA[this.buffKey]
-        const { name, description, duration, type, applyEffect, removeEffect } = buffData
-        const buff = new Buff(this.buffKey, name, description, duration, type,  applyEffect, removeEffect, this.iconAssets[`Buff_Icon_${this.buffKey}`])
+        const { name, description, duration, type, applyEffect, removeEffect, particleKey } = buffData
+        const buff = new Buff(this.buffKey, name, description, duration, type,  applyEffect, removeEffect, particleKey, this.iconAssets[`Buff_Icon_${this.buffKey}`])
         //add buff to buff manager (where it also gets added to player activeBuffs)
         this.buffManager.addBuff(buff)
     }

@@ -11,6 +11,9 @@ export default class Level{
             this.app = app
             this.app.stage.interactive = true
 
+            //delta time updated in run function
+            this.deltaTime = 0
+
             //used for npc dialogue and other settings that must
             //change depending on game state
             this.stateLabel = stateLabel            
@@ -21,11 +24,9 @@ export default class Level{
             //"controller" object that manages keydown and up events
             this.keysObject = keysObject
             //sprite group/container
-            this.visibleSprites = new YSortCameraSpriteGroup(this.app)
-            this.obstacleSprites = new ObstacleSpriteGroup(this.app)
-            this.npcTiles = new NPCTilesGroup(this.app)
             
-            this.clickEventManager = new ClickEventManager(this.app, this.visibleSprites)
+            
+            
     
             //used when calculating angle of player
             this.offset = {x: 0, y:0}

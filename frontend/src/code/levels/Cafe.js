@@ -11,7 +11,10 @@ import UIManager from '../UI'
 import { NPCManager } from '../NPCManager'
 import Level from './Level'
 import { GodrayFilter, MotionBlurFilter } from 'pixi-filters'
-import { BuffManager } from '../BuffManager'
+import YSortCameraSpriteGroup from '../YSortCameraSpriteGroup'
+import ObstacleSpriteGroup from '../ObstacleSpriteGroup'
+import NPCTilesGroup from '../NPCTilesGroup'
+import { ClickEventManager } from '../ClickEventManager'
 
 export default class Cafe extends Level{
     constructor(app, keysObject, stateLabel, setState){
@@ -24,6 +27,10 @@ export default class Cafe extends Level{
 
     
     initMap = async (gameState) => {
+        this.visibleSprites = new YSortCameraSpriteGroup(this.app)
+        this.obstacleSprites = new ObstacleSpriteGroup(this.app)
+        this.npcTiles = new NPCTilesGroup(this.app)
+        this.clickEventManager = new ClickEventManager(this.app, this.visibleSprites)
         //initialized the level's master container. this is the
         //container that holds all other containers and the one
         //that is 'cleaned up' in each level's destroy method
@@ -193,7 +200,7 @@ export default class Cafe extends Level{
         await this.uiManager.init()
 
         //then give buff manager access to uiManager
-        this.buffManager.init(this.uiManager)
+        if(!this.buffManager.hasBeenInited)this.buffManager.init(this.uiManager)
 
         //add obstacle sprites to stage
         this.app.stage.addChild(this.obstacleSprites)
@@ -226,6 +233,8 @@ export default class Cafe extends Level{
 
         const filters = [new MotionBlurFilter({velocity: {x: 0, y: 40}}), new GodrayFilter()]
         this.particleManager.createAnimatedParticle(this.character.sprite.x + (this.character.sprite.width * 4), this.character.sprite.y + this.character.sprite.height, 'Teleport_Beam', filters)
+
+        console.log('HERES THE BUFF MANAGER JUST IN CASE', this.buffManager)
     }
 
     handleMouseDown = () => {
@@ -306,13 +315,24 @@ export default class Cafe extends Level{
         //remove weapon fire event
         this.app.stage.off('pointerdown', this.handleMouseDown)
 
-        if(this.hellPortal)this.hellPortal.destroy({children: true})
-
         //remove keyDown and keyUp events
         this.removeKeyEvents()
 
-        this.visibleSprites.removeChildren()
-        this.obstacleSprites.removeChildren()
+        //destroy animated tiles
+        if(this.hellPortal)this.hellPortal.destroy({children: true})
+
+        this.cafeBaseMap.destroy()
+
+        this.visibleSprites.destroy({ children: true })
+        this.obstacleSprites.destroy({ children: true })
+        this.visibleSprites = null
+        this.obstacleSprites = null
+
+        // this.bulletManager.destroy({ children: true })
+        // this.buffManager.destroy({ children: true })
+        // this.uiManager.uiContainer.destroy({ children: true })
+        // this.npcTiles.destroy({ children: true })
+        this.npcManager.destroy()
 
         if(this.character){
             this.character.sprite.destroy()
@@ -326,10 +346,14 @@ export default class Cafe extends Level{
             this.app.stage.removeChild(child)
             child.destroy({ children: true })
         }
+        
     }
 
+
     //the level's run method is added to the stage by the Application class
-    run = () => {
+    run = (ticker) => {
+        //update levels delta time
+        this.deltaTime = ticker.deltaTime
         //run the click event manager
         this.clickEventManager.run()
         //this.character.sprite is passed to run methods of sprite groups
@@ -337,15 +361,15 @@ export default class Cafe extends Level{
 
         //ORDER MATTERS HERE
         this.angle = this.getPlayerAngle(this.mousePos)
-        this.character.run(this.angle)
-        this.npcManager.run(this.character)
+        this.character.run(this.deltaTime, this.angle)
+        this.npcManager.run(this.character, this.deltaTime)
         this.particleManager.run(this.character.sprite)
         this.obstacleSprites.run(this.character.sprite)
         this.npcTiles.run(this.character.sprite)
         this.visibleSprites.run(this.character.sprite)
-        this.bulletManager.run(this.character.sprite)
+        this.bulletManager.run(this.character.sprite, this.deltaTime)
         
-        
+        this.buffManager.run(ticker)
         this.uiManager.run()
         this.hellPortal.run(this.character)
 

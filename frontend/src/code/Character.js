@@ -14,6 +14,8 @@ export default class Character{
         this.weaponAssets = weaponAssets
         this.iconAssets = iconAssets
 
+        this.deltaTime = 0
+
         //stats
         this.maxHealth = PLAYER_SETTINGS.MAX_HEALTH
         this.currentHealth = this.maxHealth
@@ -82,7 +84,7 @@ export default class Character{
         await this.mainSpritesheet.parse()
         
         this.sprite = new AnimatedSprite(this.mainSpritesheet.animations.run_down)
-        this.sprite.animationSpeed = ANIMATION_SPEED
+        this.sprite.animationSpeed = ANIMATION_SPEED * this.deltaTime
 
         if(playerSpawnPoint){
             this.sprite.x = playerSpawnPoint.x 
@@ -222,22 +224,22 @@ export default class Character{
     }    
 
     handleMovement = (angle) => {
-        this.movement.x = 0;
-        this.movement.y = 0;
+        this.movement.x = 0
+        this.movement.y = 0
         
     
         // If keys are pressed, update movement
         if (this.keysObject[87]) { // W key
-            this.movement.y = -1;
+            this.movement.y = -1
         }
         if (this.keysObject[65]) { // A key
-            this.movement.x = -1;
+            this.movement.x = -1
         }
         if (this.keysObject[83]) { // S key
-            this.movement.y = 1;
+            this.movement.y = 1
         }
         if (this.keysObject[68]) { // D key
-            this.movement.x = 1;
+            this.movement.x = 1
         }
     
         // Normalize movement vector if moving diagonally
@@ -248,11 +250,11 @@ export default class Character{
         }
     
         // Update character position
-        this.sprite.x += this.movement.x * this.speed;
-        this.checkCollision('horizontal');
-        this.sprite.y += this.movement.y * this.speed;
-        this.checkCollision('vertical');
-    };
+        this.sprite.x += this.movement.x * this.speed * this.deltaTime
+        this.checkCollision('horizontal')
+        this.sprite.y += this.movement.y * this.speed * this.deltaTime
+        this.checkCollision('vertical')
+    }
     
     checkCollision = (direction) => {
         //the hitbox of the char sprite
@@ -324,8 +326,41 @@ export default class Character{
         console.log("took damage!")
     }
 
+    //function to apply buff to player
+    applyBuff = (buff) => {
+        //add buff to active buffs
+        this.activeBuffs.push(buff)
 
-    run = (angle) => {
+        //apply buffs effect
+        buff.applyEffect(this)
+    }
+
+    //function to remove a buff from activeBuffs array
+    removeBuff = (buffToRemove) => {
+        this.activeBuffs.forEach((buff, i) => {
+            if(buff.name === buffToRemove.name){
+                this.activeBuffs.splice(i, 1)
+                buff.removeEffect(this)
+            }
+        })
+    }
+
+    //applies buff effects to player
+    handleBuffs = () => {
+
+    }
+
+    run = (deltaTime, angle) => {
+        //update deltaTime
+        this.deltaTime = deltaTime
+        //update animation speed by delta time
+        this.sprite.animationSpeed = ANIMATION_SPEED * this.deltaTime
+
+        //handle all buffs
+        if(this.activeBuffs.length > 0){
+            this.handleBuffs()
+        }
+
         //angle passed in from level class
         this.angle = angle
         this.activeWeapon.run(angle)
@@ -335,12 +370,19 @@ export default class Character{
 
         //stairs check to slow movement
         if(this.isOnStairs)this.speed = this.stairSpeed
-        else this.speed = PLAYER_SETTINGS.BASE_SPEED
+        // else this.speed = PLAYER_SETTINGS.BASE_SPEED
 
         if(!this.teleporting){
             this.sprite.loop = true
             this.handleMovement(angle)
             this.handleDirection(angle)
+
+            ////this is hack and NEEDS TO BE CHANGED AND RETHOUGH
+            if(this.activeBuffs.length > 0){
+                this.particleManager.createGeometryParticle(this.sprite.x, this.sprite.y, this.movement.x, this.movement.y, this.activeBuffs[0].particleKey)
+            }
+            
+            
         }
         else{
             this.sprite.loop = false

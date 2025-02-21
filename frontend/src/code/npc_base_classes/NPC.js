@@ -12,7 +12,9 @@ export class NPC extends AnimatedSprite{
         this.spritesheet = spritesheet
         this.visibleSprites = visibleSprites
         this.obstacleSprites = obstacleSprites
-        
+
+        //init deltaTime and set during run
+        this.deltaTime = 0
 
         //hitbox used for checking bullet hits, collisions, etc.
         this.hitbox = new Graphics()
@@ -57,9 +59,9 @@ export class NPC extends AnimatedSprite{
         }
     
         // Update character position
-        this.x += this.movement.x * this.speed
+        this.x += this.movement.x * this.speed * this.deltaTime
         // this.checkCollision('horizontal')
-        this.y += this.movement.y * this.speed
+        this.y += this.movement.y * this.speed * this.deltaTime
         // this.checkCollision('vertical')
     }
 

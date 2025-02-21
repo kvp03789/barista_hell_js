@@ -152,6 +152,20 @@ export class DropsManager{
         }
     }
 
+    destroy = () => {
+        // destroy each drop and remove it from the visibleSprites container
+        this.dropsList.forEach(drop => {
+            drop.destroy({ children: true }) // Destroy the drop and its children (the sparkle animation)
+            this.visibleSprites.removeChild(drop) // Remove the drop from the container
+        })
+    
+        // vlear the drops list
+        this.dropsList = []
+    
+        // optionally, you can also clear other resources related to drops here
+        this.parsedDropsAssets = {} // clear the parsed assets to free up memory
+    }
+
     run = (player) => {
         this.dropsList.forEach((drop, index) => {
             if(spritesAreColliding(player.sprite, drop)){

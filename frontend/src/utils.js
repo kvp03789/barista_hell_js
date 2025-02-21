@@ -144,7 +144,7 @@ export function showDebugFPS (app) {
  */
 export function getMillisecondsToSeconds(timeInMilliseconds){
     //convert seconds to ms
-    const timeInSeconds = timeInMilliseconds / 1000
+    const timeInSeconds = Math.floor(timeInMilliseconds / 1000)
     //get minutes from seconds
     if(timeInSeconds >= 60){
         const minutes = Math.floor(timeInSeconds / 60)
@@ -152,4 +152,11 @@ export function getMillisecondsToSeconds(timeInMilliseconds){
         return {minutes, seconds: leftOverSeconds}
     }
     else return { seconds: timeInSeconds }
+}
+
+export function parseDurationToString(durationObject){
+    if(durationObject.minutes){
+        return `${durationObject.minutes}m ${durationObject.seconds}s`
+    }
+    else return `${durationObject.seconds}s`
 }

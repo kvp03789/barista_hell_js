@@ -1,6 +1,6 @@
-import { AnimatedSprite, Container, Rectangle, Sprite, Spritesheet, Texture } from 'pixi.js'
+import { AnimatedSprite, Container, Graphics, Rectangle, Sprite, Spritesheet, Texture } from 'pixi.js'
 import { bloodSplatterParticleData, bulletExplodeParticleData, teleportBeamData, walkingParticleData } from '../json/particles/particleSpriteData.js'
-import { SCREEN_HEIGHT, SCREEN_WIDTH, ZOOM_FACTOR, PARTICLE_ANIMATION_SETTINGS } from '../settings.js'
+import { SCREEN_HEIGHT, SCREEN_WIDTH, ZOOM_FACTOR, PARTICLE_ANIMATION_SETTINGS, GEOMETRY_PARTICLE_SETTINGS } from '../settings.js'
 import { generateSeed, randomNumber } from '../utils.js'
 import { GlowFilter, RGBSplitFilter } from 'pixi-filters'
 
@@ -79,6 +79,164 @@ class AshParticleSubContainer extends Container{
         })
     }
 }
+
+// class GeometryParticle extends Graphics {
+//     constructor(x, y, directionX, directionY, type, options) {
+//         super()
+//         this.label = "geometry_particle"
+//         this.isGeometryParticle = true
+
+//         this.seed = generateSeed(.9, 1.1)
+
+//         this.alpha = options.alpha ?? 0.7
+//         this.life = options.life ?? 50 // lifespan in frames
+
+//         // calculate the angle of movement
+//         const angle = Math.atan2(directionY, directionX)
+//         this.pivot.set(.5)
+        
+//         // generate shape based on type
+//         this.rect(0, 0, 60, 3)
+//         this.fill(0xFFFFFF)
+//         this.rotation = angle; 
+        
+        
+//         // switch (type) {
+//         //     case 'speedLines':
+//         //         this.rect(x * ZOOM_FACTOR, y * ZOOM_FACTOR, 10, 2);
+//         //         this.rotation = angle; 
+//         //         break;
+
+//         //     case 'circle':
+//         //         this.circle(x, y, options.radius ?? 5);
+//         //         break;
+
+//         //     case 'triangle':
+//         //         this.poly([
+//         //             x, y,
+//         //             options.size ?? 5, options.size ?? 10,
+//         //             -(options.size ?? 5), options.size ?? 10
+//         //         ]);
+//         //         this.rotation = angle;
+//         //         break;
+
+//         //     case 'square':
+//         //         this.rect(-options.size / 2 ?? -5, -options.size / 2 ?? -5, options.size ?? 10, options.size ?? 10);
+//         //         break;
+
+//         //     default:
+//         //         console.warn(`Unknown particle type: ${type}`);
+//         // }
+
+//         // Set movement direction (opposite to player movement)
+//         const speed = 4
+//         this.vx = -directionX * speed
+//         this.vy = -directionY * speed
+
+//         this.position.set(x * ZOOM_FACTOR, y * ZOOM_FACTOR)
+//         this.x = x
+//         this.y = y * this.seed
+        
+//     }
+
+//     run() {
+        
+//         this.x += this.vx;
+//         this.y += this.vy;
+//         this.alpha -= 0.04; // Gradual fade-out
+//         this.life--;
+//         if(this.life < 0)this.destroy()
+//     }
+// }
+
+class GeometryParticle extends Graphics {
+    constructor(x, y, directionX, directionY, type, options) {
+        super()
+        this.label = "geometry_particle"
+        this.isGeometryParticle = true
+        this.hasMovement = options.hasMovement ?? true
+
+        this.seed = generateSeed(0.95, 1.05)
+
+        this.alpha = options.alpha ?? 0.7
+
+        // lifespan in frames
+        this.life = options.life ?? 50 
+
+        //offset start position to trail behind player
+        //has to be different depending on player mvmnt direction
+        //so is set later
+        let spawnOffsetX
+        let spawnOffsetY
+
+        // Calculate angle of movement
+        if(this.hasMovement){
+            const angle = Math.atan2(directionY, directionX)
+            this.rotation = angle
+            this.pivot.set(0.5)
+        }
+        
+        switch (type) {
+            case 'speedLines':
+                this.rect(0, 0, 80, 3)
+                //set directionX & Y for this particle
+                if(directionX < 0){
+                    spawnOffsetX = 75
+                } else spawnOffsetX = 25
+                     
+                if(directionY < 0){
+                    spawnOffsetY = 75
+                } else spawnOffsetY = 25
+                break;
+
+            case 'shield':
+                this.circle(0, 0, options.radius ?? 5);
+                spawnOffsetX = 0
+                spawnOffsetY = 0
+                break;
+
+            case 'triangle':
+                this.poly([
+                    x, y,
+                    options.size ?? 5, options.size ?? 10,
+                    -(options.size ?? 5), options.size ?? 10
+                ]);
+                this.rotation = angle;
+                break;
+
+            case 'square':
+                this.rect(-options.size / 2 ?? -5, -options.size / 2 ?? -5, options.size ?? 10, options.size ?? 10);
+                break;
+
+            default:
+                console.warn(`Unknown particle type: ${type}`);
+        }
+
+        this.fill(options.fillColor ?? 0xffffff)
+
+        // set movement direction (opposite to player movement)
+        const speed = 14
+        this.vx = -directionX * speed
+        this.vy = -directionY * speed
+
+        this.position.set(
+            (x - directionX * spawnOffsetX) * this.seed, 
+            (y - directionY * spawnOffsetY) * this.seed
+        )
+    }
+
+    run() {
+        if(this.hasMovement){
+            this.x += this.vx;
+            this.y += this.vy;
+            this.alpha -= 0.04; // Gradual fade-out
+        }
+        
+        this.life--;
+        if (this.life < 0) this.destroy();
+    }
+}
+
 
 class ParticleManager extends Container{
     constructor(app, particleAssets){
@@ -169,11 +327,17 @@ class ParticleManager extends Container{
 
     }
 
+    createGeometryParticle(x, y, directionX, directionY, type) {
+        const particle = new GeometryParticle(x, y, directionX, directionY, type, GEOMETRY_PARTICLE_SETTINGS[type]);
+        this.addChild(particle)
+    }
+
     run = (player) => {
         this.offset.x = player.x + (player.width / 2) - this.half_width;
         this.offset.y = player.y + (player.height / 2) - this.half_height;
 
         this.children.forEach((particle, i) => {
+            if(particle.run)particle.run()
             // this is for animated sprites atm
             // check if the particles animation is complete and destroy it if so
             if (particle.shouldDestroy) {
@@ -182,18 +346,22 @@ class ParticleManager extends Container{
                 return
             }
 
-            particle.x -= this.offset.x * ZOOM_FACTOR
-            particle.y -= this.offset.y * ZOOM_FACTOR
+            if(!particle.isGeometryParticle){
+                //only do the following on non geometry particles
 
-            //set scale for different particle types
-            switch(particle.type){
-                case "BulletWallExplodeParticleSmoke":
-                    return particle.scale.set(3)
-                case "CharacterWalkingParticle":
-                    return particle.scale.set(3)
-                default: particle.scale.set(3)
-            }
+                //adjust by offset
+                particle.x -= this.offset.x * ZOOM_FACTOR
+                particle.y -= this.offset.y * ZOOM_FACTOR
 
+                //set scale for different particle types
+                switch(particle.type){
+                    case "BulletWallExplodeParticleSmoke":
+                        return particle.scale.set(3)
+                    case "CharacterWalkingParticle":
+                        return particle.scale.set(3)
+                    default: particle.scale.set(3)
+                }
+        }
             
         });
 

@@ -1,18 +1,21 @@
 import { Container, Sprite } from "pixi.js"
 
 export class Buff extends Sprite{
-    constructor(buffKey, name, description, duration, type, applyEffect, removeEffect, iconTexture) {
+    constructor(buffKey, name, description, duration, type, applyEffect, removeEffect, particleKey, iconTexture) {
         super(iconTexture)
         this.buffKey = buffKey
         //all of these get filled in from the settings file
         this.name = name
         this.description = description
-        //duration is in ms
+        //duration is in milliseconds
         this.duration = duration 
         this.type = type
         this.applyEffect = applyEffect 
         this.removeEffect = removeEffect 
-        this.timeRemaining = duration
+        this.particleKey = particleKey
+
+        //timer is the one that actually gets decremented
+        this.timer = duration
 
         this.iconTexture = iconTexture
     }
@@ -26,8 +29,21 @@ export class Buff extends Sprite{
     }
 
     //updates the timer for this buff
-    update() {
-        
+    update(elapsedTime) {
+        //elapsedTime is deltaMS * deltaTime (which is a vlue in)
+        this.timer -= elapsedTime
+
+        if (this.timer <= 0) {
+            this.expire();
+        }
+    }
+
+    //handle buff expiration
+    expire() {
+        console.log('BUFF EXPIRED')
+        if (this.parent) {
+            this.parent.removeBuff(this);
+        }
     }
 }
 
@@ -37,6 +53,7 @@ export class BuffManager extends Container{
         this.app = app 
         this.player = player
         this.iconAssets = iconAssets
+        this.hasBeenInited = false
         
         this.parsedBuffAssets = {}
         //parses icon assets to populate parsedBuffAssets with only buff assets
@@ -47,6 +64,11 @@ export class BuffManager extends Container{
         //uiManager which is necessary for this class unavailable at instantiation
         this.uiManager = uiManager
         this.tooltipManager = this.uiManager.tooltipManager
+        //add players active buffs if 
+        if(this.children.length === 0 && this.player.activeBuffs.length !== 0){
+            this.player.activeBuffs.forEach(buff => this.addChild(buff))
+        }
+        this.hasBeenInited = true
     }
 
     parseAssets = () => {
@@ -62,16 +84,19 @@ export class BuffManager extends Container{
         //add buff to buff manager as child
         this.addChild(buff)
         //add buff to player active buffs
-        this.player.activeBuffs.push(buff)
+        this.player.applyBuff(buff)
     }
 
-    removeBuff = () => {
-
+    removeBuff = (buff) => {
+        //remove buff to buff manager as child
+        this.removeChild(buff)
+        //remove buff to player active buffs
+        this.player.removeBuff(buff)
     }
 
-    run = () => {
+    run = (ticker) => {
         this.children.forEach(buff => {
-            if (buff.update)buff.update()
+            if (buff.update)buff.update(ticker.deltaTime * ticker.deltaMS)
         })
     }
 }

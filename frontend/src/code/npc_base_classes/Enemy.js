@@ -130,7 +130,9 @@ export class Enemy extends NPC {
         console.log("enemy disengaging....")
     }
 
-    run = (player) => {
+    run = (player, deltaTime) => {
+        this.deltaTime = deltaTime
+        
         this.handleCooldowns()
         this.handleMovement()
         if(!this.isAttacking)this.handleAnimationChange()

@@ -148,12 +148,45 @@ export class NPCManager{
         }
     }
 
-    run = (player) => {
+    destroy = () => {
+        // Destroy all employees
+        this.employees.forEach(employee => {
+            if (employee.destroy) {
+                employee.destroy();
+            }
+            this.visibleSprites.removeChild(employee); // Remove employee from visibleSprites container
+        });
+        this.employees = []; // Clear the employees array
+    
+        // Destroy all enemies
+        this.enemies.forEach(enemy => {
+            if (enemy.destroy) {
+                enemy.destroy();
+            }
+            this.visibleSprites.removeChild(enemy); // Remove enemy from visibleSprites container
+        });
+        this.enemies = []; // Clear the enemies array
+    
+        // Optionally, remove all NPCs from the game
+        this.npcList.forEach(npc => {
+            if (npc.destroy) {
+                npc.destroy();
+            }
+            this.visibleSprites.removeChild(npc); // Remove NPC from visibleSprites container
+        });
+        this.npcList = []; // Clear the npcList
+    
+        // Optionally, clean up other resources like assets
+        this.parsedAssetsObject = {}; // Clear parsed assets
+        this.dropsManager = null; // If dropsManager is dynamically loaded, clean it up as well
+    }
+
+    run = (player, deltaTime) => {
 
         //execute all the employees's run functions
         this.employees.forEach(employee => {
             if(employee.run){
-                employee.run(player)
+                employee.run(player, deltaTime)
             }
             
             
@@ -169,7 +202,7 @@ export class NPCManager{
                 enemySprite.die()
             }
             else{
-                enemySprite.run(player)
+                enemySprite.run(player, deltaTime)
                 this.handleEnemyAggro(player, enemySprite)
             }
             
