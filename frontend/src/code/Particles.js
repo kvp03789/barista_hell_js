@@ -80,75 +80,6 @@ class AshParticleSubContainer extends Container{
     }
 }
 
-// class GeometryParticle extends Graphics {
-//     constructor(x, y, directionX, directionY, type, options) {
-//         super()
-//         this.label = "geometry_particle"
-//         this.isGeometryParticle = true
-
-//         this.seed = generateSeed(.9, 1.1)
-
-//         this.alpha = options.alpha ?? 0.7
-//         this.life = options.life ?? 50 // lifespan in frames
-
-//         // calculate the angle of movement
-//         const angle = Math.atan2(directionY, directionX)
-//         this.pivot.set(.5)
-        
-//         // generate shape based on type
-//         this.rect(0, 0, 60, 3)
-//         this.fill(0xFFFFFF)
-//         this.rotation = angle; 
-        
-        
-//         // switch (type) {
-//         //     case 'speedLines':
-//         //         this.rect(x * ZOOM_FACTOR, y * ZOOM_FACTOR, 10, 2);
-//         //         this.rotation = angle; 
-//         //         break;
-
-//         //     case 'circle':
-//         //         this.circle(x, y, options.radius ?? 5);
-//         //         break;
-
-//         //     case 'triangle':
-//         //         this.poly([
-//         //             x, y,
-//         //             options.size ?? 5, options.size ?? 10,
-//         //             -(options.size ?? 5), options.size ?? 10
-//         //         ]);
-//         //         this.rotation = angle;
-//         //         break;
-
-//         //     case 'square':
-//         //         this.rect(-options.size / 2 ?? -5, -options.size / 2 ?? -5, options.size ?? 10, options.size ?? 10);
-//         //         break;
-
-//         //     default:
-//         //         console.warn(`Unknown particle type: ${type}`);
-//         // }
-
-//         // Set movement direction (opposite to player movement)
-//         const speed = 4
-//         this.vx = -directionX * speed
-//         this.vy = -directionY * speed
-
-//         this.position.set(x * ZOOM_FACTOR, y * ZOOM_FACTOR)
-//         this.x = x
-//         this.y = y * this.seed
-        
-//     }
-
-//     run() {
-        
-//         this.x += this.vx;
-//         this.y += this.vy;
-//         this.alpha -= 0.04; // Gradual fade-out
-//         this.life--;
-//         if(this.life < 0)this.destroy()
-//     }
-// }
-
 class GeometryParticle extends Graphics {
     constructor(x, y, directionX, directionY, type, options) {
         super()
@@ -190,7 +121,8 @@ class GeometryParticle extends Graphics {
                 break;
 
             case 'shield':
-                this.circle(0, 0, options.radius ?? 5);
+                this.circle(0, 0, options.radius ?? 5)
+                .stroke({ color: 0xffffff, width: 4, alignment: 0 })
                 spawnOffsetX = 0
                 spawnOffsetY = 0
                 break;
@@ -237,6 +169,19 @@ class GeometryParticle extends Graphics {
     }
 }
 
+class GeometryParticleSubContainer extends Container{
+    constructor(){
+        super()
+        this.position.set(0,0)
+    }
+
+    run = () => {
+        this.children.forEach(geometryParticle => {
+            if(geometryParticle.run){geometryParticle.run()}
+        })
+    }
+}
+
 
 class ParticleManager extends Container{
     constructor(app, particleAssets){
@@ -252,7 +197,12 @@ class ParticleManager extends Container{
         this.ashParticleSubContainer.label = "ash_particle_sub_container"
         this.ashParticleSubContainer.filters=[new GlowFilter({alpha: 0.37}), new RGBSplitFilter({red: {x: -1, y: 0}, blue: {x: 0, y: 0}, green:{x: 0, y: 1}})]
         this.addChild(this.ashParticleSubContainer)
-        
+
+        //and another one for geometry particles!
+        this.geometryParticleSubContainer = new GeometryParticleSubContainer()
+        this.geometryParticleSubContainer.label = "geometry_particle_sub_container"
+        this.addChild(this.geometryParticleSubContainer)
+
         this.offset = {x: 0, y: 0}
     }
 
@@ -329,8 +279,9 @@ class ParticleManager extends Container{
 
     createGeometryParticle(x, y, directionX, directionY, type) {
         const particle = new GeometryParticle(x, y, directionX, directionY, type, GEOMETRY_PARTICLE_SETTINGS[type]);
+        // this.geometryParticleSubContainer.addChild(particle)
         this.addChild(particle)
-    }
+    }   
 
     run = (player) => {
         this.offset.x = player.x + (player.width / 2) - this.half_width;
@@ -349,7 +300,7 @@ class ParticleManager extends Container{
             if(!particle.isGeometryParticle){
                 //only do the following on non geometry particles
 
-                //adjust by offset
+                //adjust by offset bc of sprites that are in sprite groups
                 particle.x -= this.offset.x * ZOOM_FACTOR
                 particle.y -= this.offset.y * ZOOM_FACTOR
 
@@ -362,8 +313,9 @@ class ParticleManager extends Container{
                     default: particle.scale.set(3)
                 }
         }
-            
-        });
+        })
+
+        // this.geometryParticleSubContainer.run()
 
         this.ashParticleSubContainer.run()
     };

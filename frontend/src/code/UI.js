@@ -1,5 +1,5 @@
 import { Container, Graphics, Sprite, Text, TextStyle } from "pixi.js";
-import { SCREEN_HEIGHT, SCREEN_WIDTH, UI_CLICK_COOLDOWN, UI_SETTINGS, DRINK_RECIPES, ICON_SCALING } from "../settings";
+import { SCREEN_HEIGHT, SCREEN_WIDTH, UI_CLICK_COOLDOWN, UI_SETTINGS, DRINK_RECIPES, ICON_SCALING, ZOOM_FACTOR } from "../settings";
 import { AdjustmentFilter, CRTFilter, GlitchFilter, GlowFilter } from "pixi-filters";
 import { Beans, CorruptedBlood, Ice, LargeFang, Milk, Syrup, WhippedCream } from "./item_classes/Materials";
 import { TooltipManager } from "./TooltipManager";
@@ -1127,23 +1127,56 @@ class CharacterSheet_EquipmentScreen extends Container {
     }
 }
 
-class HealthBar extends Sprite{
+class HealthBar extends Container{
     constructor(app, texture, player, xPos, yPos, uiContainer, tooltipManager){
-        super(texture)
+        super()
         this.app = app
         this.player = player
-        this.label = "health_bar"
+        this.label = "health_bar_container"
         this.uiContainer = uiContainer
         this.tooltipManager = tooltipManager
+
+        this.uiFrame = new Sprite(texture)
+        this.uiFrame.label = "health_ui_frame"
+        this.uiFrame.x = 0
+        this.uiFrame.y = 0
 
         this.x = xPos
         this.y = yPos
 
+        //radius of the health fill circle
+        this.radius = 51
+
+        //RELATIVE position of the healthFill circle center
+        this.circleCenterPosition = {x: 102, y: 105}
         
         //red circle that shows hp
-        this.healthFill = new Graphics().circle( 157, 528, 51).fill('#8a0101')
+        this.healthFill = new Graphics().circle(0, 0, this.radius).fill('#8a0101')
         this.healthFill.label = "health_fill"
 
+        //the bounding box of the healthFill circle. used for mask position
+        const bounds = this.healthFill.getBounds()
+
+        //mask for the red circle
+        this.maskShape = new Graphics()
+        this.maskShape.label = "shape_mask"
+        this.maskShape.rect(bounds.x, bounds.y, this.radius * 2, this.radius * 2)
+        this.maskShape.fill(0xFFFFFF)
+
+        //container for maskShape and healthFill
+        this.maskedContainer = new Container()
+        this.maskedContainer.label = "masked_container"
+
+        //set maskedContainer position
+        this.maskedContainer.position.set(this.circleCenterPosition.x, this.circleCenterPosition.y)
+
+        //add mask and healthFill to maskedContainer
+        this.maskedContainer.addChild(this.maskShape, this.healthFill)
+
+        // set mask on maskedContainer
+        this.maskedContainer.mask = this.maskShape
+
+        //text settings
         this.healthTextStyle = new TextStyle({
             fontFamily: 'roboto',
             dropShadow: {
@@ -1160,11 +1193,26 @@ class HealthBar extends Sprite{
             alpha: 1
         })
         this.healthText = new Text({style: this.healthTextStyle, text: `${this.player.maxHealth} / ${this.player.currentHealth}`})
-        this.healthText.position.set(this.x + 70, this.y + this.height / 2)
-        this.uiContainer.addChild(this.healthFill, this, this.healthText)
+        this.healthText.pivot.set(.5, .5)
+        this.healthText.position.set(0 + this.radius * ZOOM_FACTOR - 20, 0 + this.radius * ZOOM_FACTOR)
+
+        //add stuff to this as child, then add this to uiContainer
+        this.addChild(this.maskedContainer, this.uiFrame, this.healthText)
+        this.uiContainer.addChild(this)
     }
 
     run = () => {
+        // calculate health percentage (0 to 1)
+        let healthPercentage = this.player.currentHealth / this.player.maxHealth
+
+        // ensure it stays within bounds (just in case)
+        healthPercentage = Math.max(0, Math.min(1, healthPercentage))
+
+        // adjust maskShape's y position
+        // maximum shift distance
+        let maxShift = this.radius * 2 
+        this.maskShape.y = (this.radius * 2) - (healthPercentage * maxShift)
+
         //keep text up to date
         this.healthText.text = `${this.player.currentHealth} / ${this.player.maxHealth}`
     }
